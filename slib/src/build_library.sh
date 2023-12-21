@@ -1,0 +1,1 @@
+gcc --shared ast2500-init.c cJSON.c smbus-device.c -o libsltest.so -Wl,--soname=sltest -I ../inc/
