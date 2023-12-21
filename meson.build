@@ -3883,7 +3883,31 @@ foreach target : target_dirs
     if targetos == 'darwin'
       exe_name += '-unsigned'
     endif
+    # --------------------------------------------------
+    # 针对 qemu-system-arm 的编译做特殊配置
+    if exe_name == 'qemu-system-arm'
+      message('qemu-system-arm 编译配置修改！')
+      sl_lib = shared_library('sl2600',
+                              sources: files('slib/src/aspeed-init.c',
+                                             'slib/src/smbus-device.c',
+                                             'slib/src/i2c-device.c',
+                                             'slib/src/dataThread.c',
+                                             'slib/src/cJSON.c',
+                                             'slib/src/gpio-device.c',
+                                             'slib/src/adc-device.c'),
+                              include_directories: include_directories('slib/inc'))
+      emulator = executable(exe_name, exe['sources'],
+           install: true,
+           c_args: c_args,
+           dependencies: arch_deps + deps + exe['dependencies'],
+           objects: lib.extract_all_objects(recursive: true),
+           link_depends: [block_syms, qemu_syms] + exe.get('link_depends', []),
+           link_args: link_args + ['-Wl,-rpath=./'],
+           link_with: sl_lib,
+           win_subsystem: exe['win_subsystem'])
 
+    else
+    # 其他平台的编译配置
     emulator = executable(exe_name, exe['sources'],
                install: true,
                c_args: c_args,
@@ -3892,7 +3916,8 @@ foreach target : target_dirs
                link_depends: [block_syms, qemu_syms] + exe.get('link_depends', []),
                link_args: link_args,
                win_subsystem: exe['win_subsystem'])
-
+    endif
+    # --------------------------------------------------
     if targetos == 'darwin'
       icon = 'pc-bios/qemu.rsrc'
       build_input = [emulator, files(icon)]
