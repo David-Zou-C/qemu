@@ -7,6 +7,7 @@
  */
 
 #include "qemu/osdep.h"
+#include "qapi/error.h"
 #include "hw/sensor/isl_pmbus_vr.h"
 #include "hw/qdev-properties.h"
 #include "qapi/visitor.h"
@@ -24,6 +25,33 @@ static uint8_t isl_pmbus_vr_read_byte(PMBusDevice *pmdev)
         }
         pmbus_send(pmdev, s->ic_device_id, s->ic_device_id_len);
         pmbus_idle(pmdev);
+        return 0;
+    case PMBUS_READ_FAN_SPEED_1:
+        pmbus_send16(pmdev, pmdev->pages[0].read_fan_speed_1);
+        return 0;
+    case 0x99:  /* 厂商信息 */
+        pmbus_send_string(pmdev, "SUGON");
+        return 0;
+    case 0x9a:  /* 型号 */
+        pmbus_send_string(pmdev, "CRPS2000W-1A");
+        return 0;
+    case 0x9B:  /* 硬件版本信息 */
+        pmbus_send_string(pmdev, "A01");
+        return 0;
+    case 0x9C:  /* 生产工厂所在城市 */
+        pmbus_send_string(pmdev, "SHENZHEN");
+        return 0;
+    case 0x9D:  /* 生产工厂所在城市 */
+        pmbus_send_string(pmdev, "2016/05/31");
+        return 0;
+    case 0x9E:  /* 生产工厂所在城市 */
+        pmbus_send_string(pmdev, "3312345678901234");
+        return 0;
+    case 0x80:  /* 生产工厂所在城市 */
+        pmbus_send8(pmdev, 0x01);
+        return 0;
+    case 0xD0:
+        pmbus_send_string(pmdev, "V1.2.1");
         return 0;
     }
 
@@ -98,6 +126,16 @@ static void isl_pmbus_vr_exit_reset(Object *obj)
         pmdev->pages[i].read_temperature_1 = ISL_READ_TEMP_DEFAULT;
         pmdev->pages[i].read_temperature_2 = ISL_READ_TEMP_DEFAULT;
         pmdev->pages[i].read_temperature_3 = ISL_READ_TEMP_DEFAULT;
+
+        /**************************************** PSU INFO ****************************************/
+        pmdev->pages[i].mfr_id = "SUGON";
+        pmdev->pages[i].mfr_model = "CRPS2000W-1A";
+        pmdev->pages[i].mfr_revision = "A01";
+        pmdev->pages[i].mfr_location = "SHENZHEN";
+        pmdev->pages[i].mfr_date = "2016/05/31";
+        pmdev->pages[i].mfr_serial = "3312345678901234";
+
+        pmdev->pages[i].status_mfr_specific = 0x01;  /* 0:没有电源输入   1:AC输入  2:DC输入 */
     }
 }
 
@@ -108,15 +146,24 @@ static void raa228000_exit_reset(Object *obj)
 
     isl_pmbus_vr_exit_reset(obj);
 
-    pmdev->pages[0].read_iout = 0;
-    pmdev->pages[0].read_pout = 0;
-    pmdev->pages[0].read_vout = 0;
-    pmdev->pages[0].read_vin = 0;
-    pmdev->pages[0].read_iin = 0;
-    pmdev->pages[0].read_pin = 0;
-    pmdev->pages[0].read_temperature_1 = 0;
-    pmdev->pages[0].read_temperature_2 = 0;
+    pmdev->pages[0].read_vout = 12;
+    pmdev->pages[0].read_iout = 10;
+    pmdev->pages[0].read_pout = 130;
+
+    pmdev->pages[0].read_vin = 221;
+    pmdev->pages[0].read_iin = 1;
+    pmdev->pages[0].read_pin = 222;
+
+    pmdev->pages[0].read_temperature_1 = 20;
+    pmdev->pages[0].read_temperature_2 = 30;
     pmdev->pages[0].read_temperature_3 = 0;
+
+    pmdev->pages[0].read_fan_speed_1 = 900;
+}
+
+static void psu_realize(DeviceState *dev, Error **errp) {
+    PMBusDevice *pmdev = PMBUS_DEVICE(dev);
+    device_add(PMBUS_PSU, pmdev->ptrDeviceConfig->name, &(pmdev->pages[0]), pmdev);
 }
 
 static void isl69259_exit_reset(Object *obj)
@@ -257,6 +304,7 @@ static void raa228000_class_init(ObjectClass *klass, void *data)
     DeviceClass *dc = DEVICE_CLASS(klass);
     dc->desc = "Renesas 228000 Digital Multiphase Voltage Regulator";
     rc->phases.exit = raa228000_exit_reset;
+    dc->realize = psu_realize;
     isl_pmbus_vr_class_init(klass, data, 1);
 }
 
@@ -317,3 +365,12 @@ static void isl_pmbus_vr_register_types(void)
 }
 
 type_init(isl_pmbus_vr_register_types)
+
+void pmbus_vr_add(struct I2CBus *bus, uint8_t address, const char *type, PTR_DEVICE_CONFIG ptrDeviceConfig) {
+    DeviceState *dev;
+    dev = qdev_new(type);
+    qdev_prop_set_uint8(dev, "address", address);
+    PMBUS_DEVICE(dev)->ptrDeviceConfig = ptrDeviceConfig;
+
+    qdev_realize_and_unref(dev, (BusState *) bus, &error_fatal);
+};

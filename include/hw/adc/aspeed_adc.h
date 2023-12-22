@@ -53,4 +53,7 @@ struct AspeedADCClass {
     uint32_t nr_engines;
 };
 
+uint16_t aspeed_adc_get_value(void *opaque, uint8_t channel);
+void aspeed_adc_set_value(void *opaque, uint8_t channel, uint16_t value);
+
 #endif /* HW_ADC_ASPEED_ADC_H */
