@@ -27,7 +27,7 @@
 #include "qapi/visitor.h"
 #include "qemu/module.h"
 #include "include/hw/qdev-properties.h"
-#include "slib/inc/ast2500-init.h"
+#include "slib/inc/aspeed-init.h"
 #include "qemu/main-loop.h"
 
 

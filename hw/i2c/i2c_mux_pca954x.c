@@ -27,7 +27,7 @@
 #include "qemu/queue.h"
 #include "qom/object.h"
 #include "trace.h"
-#include "slib/inc/ast2500-init.h"
+#include "slib/inc/aspeed-init.h"
 
 #define PCA9548_CHANNEL_COUNT 8
 #define PCA9546_CHANNEL_COUNT 4

@@ -2,7 +2,7 @@
 #define QEMU_I2C_MUX_PCA954X_H
 
 #include "hw/i2c/i2c.h"
-#include "slib/inc/ast2500-init.h"
+#include "slib/inc/aspeed-init.h"
 
 #define TYPE_PCA9546 "pca9546"
 #define TYPE_PCA9548 "pca9548"

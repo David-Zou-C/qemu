@@ -11,7 +11,7 @@
 
 #include "qemu/bitops.h"
 #include "hw/i2c/smbus_slave.h"
-#include "slib/inc/ast2500-init.h"
+#include "slib/inc/aspeed-init.h"
 
 /* STATUS_WORD */
 #define PB_STATUS_VOUT           BIT(15)
