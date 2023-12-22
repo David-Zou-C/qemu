@@ -17,6 +17,7 @@
 #include "migration/vmstate.h"
 #include "trace.h"
 #include "hw/registerfields.h"
+#include "slib/inc/aspeed-init.h"
 
 #define GPIOS_PER_GROUP 8
 
@@ -1008,9 +1009,36 @@ static const MemoryRegionOps aspeed_gpio_ops = {
 static void aspeed_gpio_reset(DeviceState *dev)
 {
     AspeedGPIOState *s = ASPEED_GPIO(dev);
+    AspeedGPIOClass *agc = ASPEED_GPIO_GET_CLASS(s);
 
     /* TODO: respect the reset tolerance registers */
+    file_log("aspeed_gpio_reset()", LOG_TIME_END);
+    /* 同时触发所有 gpio irq 告知所有其他设备 */
+
+    for (int i = 0; i < ASPEED_GPIO_MAX_NR_SETS; i++) {
+        const GPIOSetProperties *props = &agc->props[i];
+        uint32_t skip = ~(props->input | props->output);
+        for (int j = 0; j < ASPEED_GPIOS_PER_SET; j++) {
+            if (skip >> j & 1) {
+                continue;
+            }
+            qemu_set_irq(s->gpios[i][j], 0);
+        }
+    }
+
     memset(s->sets, 0, sizeof(s->sets));
+
+}
+
+static void aspeed_gpio_set(void *opaque, int line, int new_state)
+{
+    AspeedGPIOState *s = ASPEED_GPIO(opaque);
+    uint32_t set_idx, pin;
+
+    set_idx = line / ASPEED_GPIOS_PER_SET;
+    pin = line % ASPEED_GPIOS_PER_SET;
+
+    aspeed_gpio_set_pin_level(s, set_idx, pin, new_state);
 }
 
 static void aspeed_gpio_realize(DeviceState *dev, Error **errp)
@@ -1031,6 +1059,8 @@ static void aspeed_gpio_realize(DeviceState *dev, Error **errp)
                 continue;
             }
             sysbus_init_irq(sbd, &s->gpios[i][j]);
+            qdev_init_gpio_out(dev, &s->gpios[i][j], 1);
+            qdev_init_gpio_in(dev, aspeed_gpio_set, 1);
         }
     }
 
