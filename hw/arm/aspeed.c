@@ -525,7 +525,7 @@ static void ast2600_evb_i2c_init(AspeedMachineState *bmc)
     srand((unsigned )time(NULL));
     pthread_mutex_init(&file_log_lock, NULL); /* file log 线程所的初始化，需要在函数开始时进行 */
     FUNC_DEBUG("ast2600_evb_i2c_init")
-    AspeedSoCState *soc = &bmc->soc;
+    AspeedSoCState *soc = bmc->soc;
 
     device_add(BMC, "BMC", NULL, soc->gpio);
 
