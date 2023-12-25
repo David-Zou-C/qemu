@@ -527,7 +527,7 @@ static void ast2600_evb_i2c_init(AspeedMachineState *bmc)
     FUNC_DEBUG("ast2600_evb_i2c_init")
     AspeedSoCState *soc = bmc->soc;
 
-    device_add(BMC, "BMC", NULL, soc->gpio);
+    device_add(BMC, "BMC", NULL, soc.gpio);
 
     /**************************************** slib func ****************************************/
     connect_gpio_line = connect_gpio_line_for_slib;
