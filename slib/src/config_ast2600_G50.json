@@ -22,6 +22,20 @@
       }
     },
     {
+      "description": "System Power: 当 line_0 被改变时，翻转 GPIO-G0",
+      "name": "SystemPower",
+      "device_type_id": 201,
+      "pin_nums": 2,
+      "signal": {
+        "output_lines": [
+          ["BMC", 48, 1]
+        ],
+        "response_logic": [
+          [0, "3", 1, "0", 2]
+        ]
+      }
+    },
+    {
       "description": "Power Button out: line_0(GPIO-P1) 输入下降沿和上升沿后，翻转 SystemPower的 line_0",
       "name": "PowerButtonOut",
       "device_type_id": 201,
@@ -38,20 +52,6 @@
         ],
         "response_logic": [
           [0, "12", 1, "0", 2]
-        ]
-      }
-    },
-    {
-      "description": "System Power: 当 line_0 被改变时，翻转 GPIO-G0",
-      "name": "SystemPower",
-      "device_type_id": 201,
-      "pin_nums": 2,
-      "signal": {
-        "output_lines": [
-          ["BMC", 48, 1]
-        ],
-        "response_logic": [
-          [0, "3", 1, "0", 2]
         ]
       }
     }
