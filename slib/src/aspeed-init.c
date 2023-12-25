@@ -156,6 +156,7 @@ void get_dev_index_for_name(const char *name, int *index) {
             }
         }
     }
+    printf("get index for name (\"%s\") failed! \n", name);
     *index = -1;
 }
 
