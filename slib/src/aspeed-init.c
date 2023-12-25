@@ -276,7 +276,7 @@ cJSON *read_config_file(const char *filename) {
         exit(1);
     }
 
-    printf("read json file over! \n");
+    printf("read json file (%s) over! \n", CONFIG_FILE);
     return root;
 }
 
