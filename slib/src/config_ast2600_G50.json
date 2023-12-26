@@ -433,7 +433,7 @@
       "addr": "0x72"
     },
     {
-      "description": "RiserG_Temmp",
+      "description": "RiserH_Temmp",
       "device_type_id": 2,
       "bus": 0,
       "i2c": {
@@ -453,7 +453,7 @@
       "addr": "0x72"
     },
     {
-      "description": "RiserH_Temmp",
+      "description": "RiserI_Temmp",
       "device_type_id": 2,
       "bus": 0,
       "i2c": {
@@ -473,7 +473,7 @@
       "addr": "0x72"
     },
     {
-      "description": "RiserH_Temmp",
+      "description": "RiserJ_Temmp",
       "device_type_id": 2,
       "bus": 0,
       "i2c": {
