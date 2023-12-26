@@ -325,7 +325,7 @@
       "addr": "0x77"
     },
     {
-      "description": "RiserC_Temmp",
+      "description": "RiserC_Temp",
       "device_type_id": 2,
       "bus": 0,
       "i2c": {
@@ -345,7 +345,7 @@
       "addr": "0x77"
     },
     {
-      "description": "RiserD_Temmp",
+      "description": "RiserD_Temp",
       "device_type_id": 2,
       "bus": 0,
       "i2c": {
@@ -365,7 +365,7 @@
       "addr": "0x77"
     },
     {
-      "description": "RiserE_Temmp",
+      "description": "RiserE_Temp",
       "device_type_id": 2,
       "bus": 0,
       "i2c": {
@@ -385,7 +385,7 @@
       "addr": "0x77"
     },
     {
-      "description": "RiserF_Temmp",
+      "description": "RiserF_Temp",
       "device_type_id": 2,
       "bus": 0,
       "i2c": {
@@ -413,7 +413,7 @@
       "addr": "0x72"
     },
     {
-      "description": "RiserG_Temmp",
+      "description": "RiserG_Temp",
       "device_type_id": 2,
       "bus": 0,
       "i2c": {
@@ -433,7 +433,7 @@
       "addr": "0x72"
     },
     {
-      "description": "RiserH_Temmp",
+      "description": "RiserH_Temp",
       "device_type_id": 2,
       "bus": 0,
       "i2c": {
@@ -453,7 +453,7 @@
       "addr": "0x72"
     },
     {
-      "description": "RiserI_Temmp",
+      "description": "RiserI_Temp",
       "device_type_id": 2,
       "bus": 0,
       "i2c": {
@@ -473,7 +473,7 @@
       "addr": "0x72"
     },
     {
-      "description": "RiserJ_Temmp",
+      "description": "RiserJ_Temp",
       "device_type_id": 2,
       "bus": 0,
       "i2c": {
