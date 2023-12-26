@@ -609,7 +609,7 @@
     {
       "description": "sku id   (GPIO A0-A5)",
       "device_type_id": 201,
-      "pin_nums": 7,
+      "pin_nums": 2,
       "signal": {
         "output_lines": [
           ["BMC", 0, 0],
