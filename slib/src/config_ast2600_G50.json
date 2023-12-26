@@ -1097,6 +1097,29 @@
           ["BMC", 195, 0]
         ]
       }
+    },
+    {
+      "description": "sku id   (GPIO A0-A5)",
+      "device_type_id": 201,
+      "pin_nums": 7,
+      "signal": {
+        "output_lines": [
+          ["BMC", 0, 0],
+          ["BMC", 1, 1],
+          ["BMC", 2, 2],
+          ["BMC", 3, 3],
+          ["BMC", 4, 4],
+          ["BMC", 5, 5]
+        ],
+        "output_logic_init": [
+          [0, "1", 0],
+          [1, "1", 0],
+          [2, "0", 0],
+          [3, "0", 0],
+          [4, "0", 0],
+          [5, "0", 0]
+        ]
+      }
     }
   ],
   "mac": {
