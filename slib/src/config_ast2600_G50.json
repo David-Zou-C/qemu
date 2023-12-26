@@ -945,6 +945,158 @@
           [0, "0", 0]
         ]
       }
+    },
+    {
+      "description": "系统ID按键 (GPIO V2)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 170, 0]
+        ],
+        "output_logic_init": [
+          [0, "1", 0]
+        ]
+      }
+    },
+    {
+      "description": "System UART切换信号 (GPIO V3)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 171, 0]
+        ]
+      }
+    },
+    {
+      "description": "BMC复位Dedicate PHY的控制信号 (GPIO V4)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 172, 0]
+        ]
+      }
+    },
+    {
+      "description": "为延长CMOS电池的使用时间，每次对CMOS电池进行电压检测时，需要该信号进行操作 (GPIO X0)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 184, 0]
+        ]
+      }
+    },
+    {
+      "description": "SMI Signal Active Input (GPIO X1)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 185, 0]
+        ],
+        "output_logic_init": [
+          [0, "0", 0]
+        ]
+      }
+    },
+    {
+      "description": "PSU2的AC PWR OK信号 (GPIO X2)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 186, 0]
+        ],
+        "output_logic_init": [
+          [0, "0", 0]
+        ]
+      }
+    },
+    {
+      "description": "驱动健康指示灯Red LED，低电平点亮LED (GPIO X4)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 188, 0]
+        ]
+      }
+    },
+    {
+      "description": "驱动健康指示灯Green LED，低电平点亮LED (GPIO X5)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 189, 0]
+        ]
+      }
+    },
+    {
+      "description": "BIOS Flash的SPI通道切换信号 (GPIO X6)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 190, 0]
+        ]
+      }
+    },
+    {
+      "description": "该信号可用于控制SPD读取链路的切换，相关说明如下： 高：BMC读取DDR5 SPD信息  低：CPU读取DDR5 SPD信息   (GPIO X7)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 191, 0]
+        ]
+      }
+    },
+    {
+      "description": "BMC_READY用于CPLD看门狗功能   (GPIO Y0)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 192, 0]
+        ]
+      }
+    },
+    {
+      "description": "VR SMBUS Alert   (GPIO Y1)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 193, 0]
+        ],
+        "output_logic_init": [
+          [0, "0", 0]
+        ]
+      }
+    },
+    {
+      "description": "该信号用于EEPROM的写保护信号控制   (GPIO Y2)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 194, 0]
+        ]
+      }
+    },
+    {
+      "description": "EMMC IC Reset  (GPIO Y3)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 195, 0]
+        ]
+      }
     }
   ],
   "mac": {
