@@ -16,16 +16,16 @@
 
 static uint8_t isl_pmbus_vr_read_byte(PMBusDevice *pmdev)
 {
-    ISLState *s = ISL69260(pmdev);
+//    ISLState *s = ISL69260(pmdev);
 
     switch (pmdev->code) {
-    case PMBUS_IC_DEVICE_ID:
-        if (!s->ic_device_id_len) {
-            break;
-        }
-        pmbus_send(pmdev, s->ic_device_id, s->ic_device_id_len);
-        pmbus_idle(pmdev);
-        return 0;
+//    case PMBUS_IC_DEVICE_ID:
+//        if (!s->ic_device_id_len) {
+//            break;
+//        }
+//        pmbus_send(pmdev, s->ic_device_id, s->ic_device_id_len);
+//        pmbus_idle(pmdev);
+//        return 0;
     case PMBUS_READ_FAN_SPEED_1:
         pmbus_send16(pmdev, pmdev->pages[0].read_fan_speed_1);
         return 0;
