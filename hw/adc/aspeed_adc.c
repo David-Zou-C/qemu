@@ -211,9 +211,7 @@ static void aspeed_adc_engine_write(void *opaque, hwaddr addr, uint64_t value,
         /* fallthrough */
     case DATA_CHANNEL_1_AND_0 ... DATA_CHANNEL_7_AND_6:
     case BOUNDS_CHANNEL_0 ... BOUNDS_CHANNEL_7:
-        file_log("data channel 1 and 0 has write", LOG_TIME_END);
         value &= ASPEED_ADC_LH_MASK;
-        printf(">>>>>\n data channel 1 and 0 has write %2lx  <<<<<<<\n", value);
         break;
     case HYSTERESIS_CHANNEL_8 ... HYSTERESIS_CHANNEL_15:
         if (s->nr_channels <= 8) {
@@ -275,6 +273,12 @@ void aspeed_adc_set_value(void *opaque, uint8_t channel, uint16_t value)
         reg_value_h = value;
     }
     s->regs[reg] = (reg_value_h << 16) | (reg_value_l);
+    if (reg == DATA_CHANNEL_1_AND_0){
+        file_log("DATA_CHANNEL_1_AND_0 has write", LOG_TIME_END);
+        printf("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+        printf("DATA_CHANNEL_1_AND_0 has write to : %02x \n", value);
+        printf("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
+    }
 }
 
 static const MemoryRegionOps aspeed_adc_engine_ops = {
@@ -302,7 +306,7 @@ static void aspeed_adc_engine_reset(DeviceState *dev)
     memcpy(s->regs, aspeed_adc_resets, sizeof(aspeed_adc_resets));
 
     /* 设置 ADC010 的值，设定初始偏移补偿 */
-    s->regs[0x10] = 0x100 << 16 | 0x100;
+    s->regs[DATA_CHANNEL_1_AND_0] = 0x100 << 16 | 0x100;
 }
 
 static void aspeed_adc_engine_realize(DeviceState *dev, Error **errp)
@@ -321,7 +325,7 @@ static void aspeed_adc_engine_realize(DeviceState *dev, Error **errp)
 
     sysbus_init_mmio(sbd, &s->mmio);
 
-    s->regs[0x10] = 0x100 << 16 | 0x100;
+    s->regs[DATA_CHANNEL_1_AND_0] = 0x100 << 16 | 0x100;
 }
 
 static const VMStateDescription vmstate_aspeed_adc_engine = {
