@@ -404,7 +404,7 @@ static void *read_data_thread(void *pVoid) {
             file_log(buffer, LOG_END);
 
             /* 根据输入参数更改数据 */
-            device_index = strtoul(buffer, &endPtr, 16);
+            device_index = strtoul(buffer, &endPtr, 10);
             if (endPtr != buffer && (device_index < DEVICE_MAX_NUM)) {
                 /* device_index 有解析到值，且设备索引没有超过 最大边界 */
                 if (deviceAddList[device_index].exist) {

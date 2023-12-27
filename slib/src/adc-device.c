@@ -29,7 +29,7 @@ static void *adc_control_thread(void *pVoidAdcDeviceData) {
 
     while (TRUE) {
 //        pthread_mutex_lock(&ptrAdcDeviceData->value_mutex);
-        sprintf(temp, "%2x", ptrAdcDeviceData->set_adc_value);
+        sprintf(temp, "%d", ptrAdcDeviceData->set_adc_value);
         real_vol = strtoul(temp, &end, 10);
         if (*end != '\0') {
             /* 停止符 不为 \0，表示遇到非10进制字符，此时非预期值，应该跳出设置 */
@@ -41,8 +41,6 @@ static void *adc_control_thread(void *pVoidAdcDeviceData) {
         sample_vol = ((double )real_vol) / division;
         if (sample_vol >= 1250) {
             real_reg = (uint16_t )(sample_vol * 1024 / 2500 - 512);
-        } else {
-            real_reg = (uint16_t )(512 + sample_vol * 1024 / 2500);
         }
 
         if (ptrAdcDeviceData->adcRegType == REG_L) {
