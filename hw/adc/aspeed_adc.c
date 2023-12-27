@@ -213,7 +213,7 @@ static void aspeed_adc_engine_write(void *opaque, hwaddr addr, uint64_t value,
     case BOUNDS_CHANNEL_0 ... BOUNDS_CHANNEL_7:
         file_log("data channel 1 and 0 has write", LOG_TIME_END);
         value &= ASPEED_ADC_LH_MASK;
-        printf(">>>>>\n data channel 1 and 0 has write %2llx  <<<<<<<\n", value);
+        printf(">>>>>\n data channel 1 and 0 has write %2lx  <<<<<<<\n", value);
         break;
     case HYSTERESIS_CHANNEL_8 ... HYSTERESIS_CHANNEL_15:
         if (s->nr_channels <= 8) {
