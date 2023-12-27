@@ -73,7 +73,7 @@ static int smbus_i2c_event(I2CSlave *s, enum i2c_event event)
             break;
 
         default:
-            BADF("Unexpected send start condition in state %d\n", dev->mode);
+//            BADF("Unexpected send start condition in state %d\n", dev->mode);
             dev->mode = SMBUS_CONFUSED;
             break;
         }
@@ -191,7 +191,7 @@ static int smbus_i2c_send(I2CSlave *s, uint8_t data)
         break;
 
     default:
-        BADF("Unexpected write in state %d\n", dev->mode);
+//        BADF("Unexpected write in state %d\n", dev->mode);
         break;
     }
 
