@@ -1137,84 +1137,84 @@
       "device_type_id": 301,
       "adc_channel": 4,
       "division": 1,
-      "args": "1100"
+      "args": "1300"
     },
     {
       "description": "ADC-5 P0_VDDCR_CPU1",
       "device_type_id": 301,
       "adc_channel": 5,
       "division": 1,
-      "args": "1100"
+      "args": "1300"
     },
     {
       "description": "ADC-6 P0_VDDCR_SOC",
       "device_type_id": 301,
       "adc_channel": 6,
       "division": 1,
-      "args": "1100"
+      "args": "1300"
     },
     {
       "description": "ADC-7 P0_VDD_CLDO",
       "device_type_id": 301,
       "adc_channel": 7,
       "division": 1,
-      "args": "1100"
+      "args": "1300"
     },
     {
       "description": "ADC-8 P0_VDDP_PHY",
       "device_type_id": 301,
       "adc_channel": 8,
       "division": 1,
-      "args": "1100"
+      "args": "1300"
     },
     {
       "description": "ADC-9 P0_VDDH_PHY",
       "device_type_id": 301,
       "adc_channel": 9,
       "division": 1,
-      "args": "1100"
+      "args": "1300"
     },
     {
       "description": "ADC-10 P1_VDDCR_CPU0",
       "device_type_id": 301,
       "adc_channel": 10,
       "division": 1,
-      "args": "1100"
+      "args": "1300"
     },
     {
       "description": "ADC-11 P1_VDDCR_CPU1",
       "device_type_id": 301,
       "adc_channel": 11,
       "division": 1,
-      "args": "1100"
+      "args": "1300"
     },
     {
       "description": "ADC-12 P1_VDDCR_SOC",
       "device_type_id": 301,
       "adc_channel": 12,
       "division": 1,
-      "args": "1100"
+      "args": "1300"
     },
     {
       "description": "ADC-13 P1_VDD_CLDO",
       "device_type_id": 301,
       "adc_channel": 13,
       "division": 1,
-      "args": "1100"
+      "args": "1300"
     },
     {
       "description": "ADC-14 P1_VDDP_PHY",
       "device_type_id": 301,
       "adc_channel": 14,
       "division": 1,
-      "args": "1100"
+      "args": "1300"
     },
     {
       "description": "ADC-15 P1_VDDH_PHY",
       "device_type_id": 301,
       "adc_channel": 15,
       "division": 1,
-      "args": "1100"
+      "args": "1300"
     }
 
   ],
