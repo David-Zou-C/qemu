@@ -211,7 +211,9 @@ static void aspeed_adc_engine_write(void *opaque, hwaddr addr, uint64_t value,
         /* fallthrough */
     case DATA_CHANNEL_1_AND_0 ... DATA_CHANNEL_7_AND_6:
     case BOUNDS_CHANNEL_0 ... BOUNDS_CHANNEL_7:
+        file_log("data channel 1 and 0 has write", LOG_TIME_END);
         value &= ASPEED_ADC_LH_MASK;
+        printf(">>>>>\n data channel 1 and 0 has write %2llx  <<<<<<<\n", value);
         break;
     case HYSTERESIS_CHANNEL_8 ... HYSTERESIS_CHANNEL_15:
         if (s->nr_channels <= 8) {
@@ -300,7 +302,7 @@ static void aspeed_adc_engine_reset(DeviceState *dev)
     memcpy(s->regs, aspeed_adc_resets, sizeof(aspeed_adc_resets));
 
     /* 设置 ADC010 的值，设定初始偏移补偿 */
-    s->regs[0x10] = 0x100;
+    s->regs[0x10] = 0x100 << 16;
 }
 
 static void aspeed_adc_engine_realize(DeviceState *dev, Error **errp)
