@@ -1130,7 +1130,7 @@
       "device_type_id": 301,
       "adc_channel": 3,
       "division": 3,
-      "args": "3500"
+      "args": "3750"
     },
     {
       "description": "ADC-4 P0_VDDCR_CPU0",
