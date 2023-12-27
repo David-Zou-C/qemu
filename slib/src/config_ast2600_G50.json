@@ -612,22 +612,6 @@
       "addr": "0x45",
       "args": "0x00 0x4327 0x01 0x01 0x02 0x02 0x03 0x0020 0x04 0x03 0x05 0x0A00 0xfe 0x5549 0xff 0x2260"
     },
-
-    {
-      "description": "sku id   (GPIO A0-A5)",
-      "device_type_id": 201,
-      "pin_nums": 2,
-      "signal": {
-        "output_lines": [
-          ["BMC", 0, 0],
-          ["BMC", 1, 1]
-        ],
-        "output_logic_init": [
-          [0, "1", 0],
-          [1, "1", 0]
-        ]
-      }
-    },
     {
       "description": "Power Button In: line_0 输出到 GPIO P0",
       "name": "PowerButtonIn",
