@@ -39,7 +39,7 @@ static void *adc_control_thread(void *pVoidAdcDeviceData) {
         }
         division = (double )(ptrAdcDeviceData->division) / 1000;
         sample_vol = ((double )real_vol) / division;
-        real_reg = (uint16_t )(sample_vol * 1024 / 2500 - 512);
+        real_reg = (uint16_t )(sample_vol * 1024 / 2500 - 256);
 
         if (ptrAdcDeviceData->adcRegType == REG_L) {
             if (ptrAdcDeviceData->ptrAdcReg->reg_lh.l != real_reg) {

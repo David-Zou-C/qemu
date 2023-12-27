@@ -298,6 +298,9 @@ static void aspeed_adc_engine_reset(DeviceState *dev)
     AspeedADCEngineState *s = ASPEED_ADC_ENGINE(dev);
 
     memcpy(s->regs, aspeed_adc_resets, sizeof(aspeed_adc_resets));
+
+    /* 设置 ADC010 的值，设定初始偏移补偿 */
+    s->regs[0x10] = 0x100;
 }
 
 static void aspeed_adc_engine_realize(DeviceState *dev, Error **errp)
