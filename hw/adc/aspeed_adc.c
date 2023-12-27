@@ -302,7 +302,7 @@ static void aspeed_adc_engine_reset(DeviceState *dev)
     memcpy(s->regs, aspeed_adc_resets, sizeof(aspeed_adc_resets));
 
     /* 设置 ADC010 的值，设定初始偏移补偿 */
-    s->regs[0x10] = 0x100 << 16;
+    s->regs[0x10] = 0x100 << 16 | 0x100;
 }
 
 static void aspeed_adc_engine_realize(DeviceState *dev, Error **errp)
@@ -321,7 +321,7 @@ static void aspeed_adc_engine_realize(DeviceState *dev, Error **errp)
 
     sysbus_init_mmio(sbd, &s->mmio);
 
-    s->regs[0x10] = 0x100;
+    s->regs[0x10] = 0x100 << 16 | 0x100;
 }
 
 static const VMStateDescription vmstate_aspeed_adc_engine = {
