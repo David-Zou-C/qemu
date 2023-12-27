@@ -318,6 +318,8 @@ static void aspeed_adc_engine_realize(DeviceState *dev, Error **errp)
                           ASPEED_ADC_ENGINE_MEMORY_REGION_SIZE);
 
     sysbus_init_mmio(sbd, &s->mmio);
+
+    s->regs[0x10] = 0x100;
 }
 
 static const VMStateDescription vmstate_aspeed_adc_engine = {
