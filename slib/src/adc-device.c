@@ -42,7 +42,7 @@ static void *adc_control_thread(void *pVoidAdcDeviceData) {
         if (sample_vol >= 1250) {
             real_reg = (uint16_t )(sample_vol * 1024 / 2500 - 512);
         } else {
-            real_reg = (uint16_t )(512 - sample_vol * 1024 / 2500);
+            real_reg = (uint16_t )(512 + sample_vol * 1024 / 2500);
         }
 
         if (ptrAdcDeviceData->adcRegType == REG_L) {
