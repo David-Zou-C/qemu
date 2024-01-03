@@ -74,6 +74,7 @@ static void *send_thread(void *pVoid) {
 
     char temp[1024];
     char send_str[MAX_SEND_DATA_LEN] = {0};
+    char *json_str;
     int fd;
     ssize_t bytes_written;
     while (1) {
@@ -349,8 +350,8 @@ static void *send_thread(void *pVoid) {
             }
         }
         cJSON_AddItemToObject(root, "devices", devices);
-        send_str = cJSON_PrintUnformatted(root);
-        bytes_written = write(fd, send_str, strlen(send_str));
+        json_str = cJSON_PrintUnformatted(root);
+        bytes_written = write(fd, json_str, strlen(json_str));
         if (bytes_written == -1) {
             perror("write data to read pipe failed!");
             exit(1);
