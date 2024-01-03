@@ -358,6 +358,8 @@ static void *send_thread(void *pVoid) {
         }
         close(fd);
         send_str[0] = 0;
+        cJSON_Delete(root);
+        free(json_str);
         usleep(500 * 1000); /* 休眠 0.5 秒 */
     }
     pthread_mutex_unlock(&pthreadMutex_sendData);
