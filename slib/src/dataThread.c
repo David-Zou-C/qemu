@@ -73,7 +73,7 @@ static void *send_thread(void *pVoid) {
     FUNC_DEBUG("function: send_thread() unlocked, it's running !")
 
     char temp[1024];
-    char *send_str;
+    char send_str[MAX_SEND_DATA_LEN] = {0};
     int fd;
     ssize_t bytes_written;
     while (1) {
@@ -181,161 +181,161 @@ static void *send_thread(void *pVoid) {
                     case SMBUS_DIMM_TEMP:
                         ptrSmbusDimmTmpSType = (PTR_SMBUS_DIMM_TMP_sTYPE) (deviceAddList[i].ptrSmbusDeviceData->data_buf);
                         /**************************************** 数据处理并发送 - S ****************************************/
-//                        /* 先发送 desc 信息 */
-//                        sprintf(temp, "desc: %s \n", deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->description);
-//                        strcat(send_str, temp);
-//                        /* 发送温度数据 */
-//                        strcat(send_str, temp_prefix);
-//                        sprintf(temp, "%02x \n", ptrSmbusDimmTmpSType->temperature);
-//                        strcat(send_str, temp);
-//                        sprintf(temp, "receive times: %lu \n", ptrSmbusDimmTmpSType->receive_times);
-//                        strcat(send_str, temp);
-//                        sprintf(temp, "write times: %lu \n", ptrSmbusDimmTmpSType->write_times);
-//                        strcat(send_str, temp);
+                        /* 先发送 desc 信息 */
+                        sprintf(temp, "desc: %s \n", deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->description);
+                        strcat(send_str, temp);
+                        /* 发送温度数据 */
+                        strcat(send_str, "tmp: ");
+                        sprintf(temp, "%02x \n", ptrSmbusDimmTmpSType->temperature);
+                        strcat(send_str, temp);
+                        sprintf(temp, "receive times: %lu \n", ptrSmbusDimmTmpSType->receive_times);
+                        strcat(send_str, temp);
+                        sprintf(temp, "write times: %lu \n", ptrSmbusDimmTmpSType->write_times);
+                        strcat(send_str, temp);
                         /**************************************** 数据处理并发送 - N ****************************************/
                         break;
 
                     case PMBUS_PSU:
                         pmBusPage = (PMBusPage *) deviceAddList[i].pmBusPage;
-//                        sprintf(temp, "desc: PMBUS PSU \n");
-//                        strcat(send_str, temp);
-//
-//                        sprintf(temp, "PSU_Vin[0x88]: %04x \n", pmBusPage->read_vin);
-//                        strcat(send_str, temp);
-//
-//                        sprintf(temp, "PSU_Iin[0x89]: %04x \n", pmBusPage->read_iin);
-//                        strcat(send_str, temp);
-//
-//                        sprintf(temp, "PSU_Pin[0x97]: %04x \n", pmBusPage->read_pin);
-//                        strcat(send_str, temp);
-//
-//                        sprintf(temp, "PSU_Vout[0x8B]: %04x \n", pmBusPage->read_vout);
-//                        strcat(send_str, temp);
-//
-//                        sprintf(temp, "PSU_Iout[0x8C]: %04x \n", pmBusPage->read_iout);
-//                        strcat(send_str, temp);
-//
-//                        sprintf(temp, "PSU_Pout[0x96]: %04x \n", pmBusPage->read_pout);
-//                        strcat(send_str, temp);
-//
-//                        sprintf(temp, "PSU_Hs_Temp[0x8D]: %04x \n", pmBusPage->read_temperature_1);
-//                        strcat(send_str, temp);
-//
-//                        sprintf(temp, "PSU_Amb_Temp[0x8E]: %04x \n", pmBusPage->read_temperature_2);
-//                        strcat(send_str, temp);
-//
-//                        sprintf(temp, "PSU_FanSpeed[0x90]: %04x \n", pmBusPage->read_fan_speed_1);
-//                        strcat(send_str, temp);
+                        sprintf(temp, "desc: PMBUS PSU \n");
+                        strcat(send_str, temp);
+
+                        sprintf(temp, "PSU_Vin[0x88]: %04x \n", pmBusPage->read_vin);
+                        strcat(send_str, temp);
+
+                        sprintf(temp, "PSU_Iin[0x89]: %04x \n", pmBusPage->read_iin);
+                        strcat(send_str, temp);
+
+                        sprintf(temp, "PSU_Pin[0x97]: %04x \n", pmBusPage->read_pin);
+                        strcat(send_str, temp);
+
+                        sprintf(temp, "PSU_Vout[0x8B]: %04x \n", pmBusPage->read_vout);
+                        strcat(send_str, temp);
+
+                        sprintf(temp, "PSU_Iout[0x8C]: %04x \n", pmBusPage->read_iout);
+                        strcat(send_str, temp);
+
+                        sprintf(temp, "PSU_Pout[0x96]: %04x \n", pmBusPage->read_pout);
+                        strcat(send_str, temp);
+
+                        sprintf(temp, "PSU_Hs_Temp[0x8D]: %04x \n", pmBusPage->read_temperature_1);
+                        strcat(send_str, temp);
+
+                        sprintf(temp, "PSU_Amb_Temp[0x8E]: %04x \n", pmBusPage->read_temperature_2);
+                        strcat(send_str, temp);
+
+                        sprintf(temp, "PSU_FanSpeed[0x90]: %04x \n", pmBusPage->read_fan_speed_1);
+                        strcat(send_str, temp);
                         break;
                     case I2C_EEPROM:
                         /* I2C Device0 - EEPROM */
                         ptrI2CEepromSType = (PTR_I2C_EEPROM_sTYPE) (deviceAddList[i].ptrI2cDeviceData->data_buf);
                         /* 发送 */
                         /* 先发送 desc 信息 */
-//                        sprintf(temp, "desc: %s \n", deviceAddList[i].ptrI2cDeviceData->ptrDeviceConfig->description);
-//                        strcat(send_str, temp);
-//                        for (int j = 0; j < ptrI2CEepromSType->monitor_data_len; ++j) {
-//                            if (ptrI2CEepromSType->monitor_data[j] < ptrI2CEepromSType->total_size) {
-//                                sprintf(temp, "monitor addr - '0x%02x' : 0x%02x \n",
-//                                        ptrI2CEepromSType->monitor_data[j],
-//                                        ptrI2CEepromSType->buf[ptrI2CEepromSType->monitor_data[j]]);
-//                                strcat(send_str, temp);
-//                            } else {
-//                                sprintf(temp, "monitor addr - '0x%02x' exceed eeprom total size - '0x%02x'!\n",
-//                                        ptrI2CEepromSType->monitor_data[j],
-//                                        ptrI2CEepromSType->total_size);
-//                                strcat(send_str, temp);
-//                            }
-//                        }
-//                        sprintf(temp, "receive times: %lu \n", ptrI2CEepromSType->receive_times);
-//                        strcat(send_str, temp);
-//                        sprintf(temp, "write times: %lu \n", ptrI2CEepromSType->write_times);
-//                        strcat(send_str, temp);
+                        sprintf(temp, "desc: %s \n", deviceAddList[i].ptrI2cDeviceData->ptrDeviceConfig->description);
+                        strcat(send_str, temp);
+                        for (int j = 0; j < ptrI2CEepromSType->monitor_data_len; ++j) {
+                            if (ptrI2CEepromSType->monitor_data[j] < ptrI2CEepromSType->total_size) {
+                                sprintf(temp, "monitor addr - '0x%02x' : 0x%02x \n",
+                                        ptrI2CEepromSType->monitor_data[j],
+                                        ptrI2CEepromSType->buf[ptrI2CEepromSType->monitor_data[j]]);
+                                strcat(send_str, temp);
+                            } else {
+                                sprintf(temp, "monitor addr - '0x%02x' exceed eeprom total size - '0x%02x'!\n",
+                                        ptrI2CEepromSType->monitor_data[j],
+                                        ptrI2CEepromSType->total_size);
+                                strcat(send_str, temp);
+                            }
+                        }
+                        sprintf(temp, "receive times: %lu \n", ptrI2CEepromSType->receive_times);
+                        strcat(send_str, temp);
+                        sprintf(temp, "write times: %lu \n", ptrI2CEepromSType->write_times);
+                        strcat(send_str, temp);
                         break;
                     case I2C_BP_CPLD:
                         ptrI2CBpCpldSType = (PTR_I2C_BP_CPLD_sTYPE) (deviceAddList[i].ptrI2cDeviceData->data_buf);
                         /* 先发送 desc 信息 */
-//                        sprintf(temp, "desc: %s \n", deviceAddList[i].ptrI2cDeviceData->ptrDeviceConfig->description);
-//                        strcat(send_str, temp);
-//                        /* cpld manufacture */
-//                        sprintf(temp, "[0x74] cpld manufacture   : %02x \n"
-//                                      "[0x90] max hdd num        : %02x \n"
-//                                      "[0x96] cpld revision      : %02x \n"
-//                                      "[0x97] bp_type_id         : %02x \n"
-//                                      "[0x98] cpld update flag   : %02x \n"
-//                                      "[0xA0 - 0xBF] bp name     : %s \n"
-//                                      "|  Hdd_num  |  Predictive_Fail  |  Warning  |  Present  |  Idle/Act  |  Locate  |  Rebuild  |  Fail  |\n"
-//                                      "|           |                   |           |           |            |          |           |        |\n",
-//                                      ptrI2CBpCpldSType->i2CBpCpldData.cpld_manufacture,
-//                                      ptrI2CBpCpldSType->i2CBpCpldData.max_hdd_num,
-//                                      ptrI2CBpCpldSType->i2CBpCpldData.revision,
-//                                      ptrI2CBpCpldSType->i2CBpCpldData.bp_type_id,
-//                                      ptrI2CBpCpldSType->i2CBpCpldData.update_flag,
-//                                      ptrI2CBpCpldSType->i2CBpCpldData.bp_name);
-//                        strcat(send_str, temp);
-//
-//                        for (int j = 0; j < ptrI2CBpCpldSType->i2CBpCpldData.max_hdd_num; ++j) {
-//                            sprintf(temp,
-//                                    "|   %3d     |        %d          |    %d      |      %d    |     %d      |    %d     |      %d    |    %d   |\n",
-//                                    j,
-//                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Predictive_Fail,
-//                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Warning,
-//                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Present,
-//                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Idle_Act,
-//                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Locate,
-//                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Rebuid,
-//                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Fail);
-//                            strcat(send_str, temp);
-//                        }
-//                        sprintf(temp, "receive times: %lu \n", ptrI2CBpCpldSType->receive_times);
-//                        strcat(send_str, temp);
-//                        sprintf(temp, "write times: %lu \n", ptrI2CBpCpldSType->write_times);
-//                        strcat(send_str, temp);
+                        sprintf(temp, "desc: %s \n", deviceAddList[i].ptrI2cDeviceData->ptrDeviceConfig->description);
+                        strcat(send_str, temp);
+                        /* cpld manufacture */
+                        sprintf(temp, "[0x74] cpld manufacture   : %02x \n"
+                                      "[0x90] max hdd num        : %02x \n"
+                                      "[0x96] cpld revision      : %02x \n"
+                                      "[0x97] bp_type_id         : %02x \n"
+                                      "[0x98] cpld update flag   : %02x \n"
+                                      "[0xA0 - 0xBF] bp name     : %s \n"
+                                      "|  Hdd_num  |  Predictive_Fail  |  Warning  |  Present  |  Idle/Act  |  Locate  |  Rebuild  |  Fail  |\n"
+                                      "|           |                   |           |           |            |          |           |        |\n",
+                                      ptrI2CBpCpldSType->i2CBpCpldData.cpld_manufacture,
+                                      ptrI2CBpCpldSType->i2CBpCpldData.max_hdd_num,
+                                      ptrI2CBpCpldSType->i2CBpCpldData.revision,
+                                      ptrI2CBpCpldSType->i2CBpCpldData.bp_type_id,
+                                      ptrI2CBpCpldSType->i2CBpCpldData.update_flag,
+                                      ptrI2CBpCpldSType->i2CBpCpldData.bp_name);
+                        strcat(send_str, temp);
+
+                        for (int j = 0; j < ptrI2CBpCpldSType->i2CBpCpldData.max_hdd_num; ++j) {
+                            sprintf(temp,
+                                    "|   %3d     |        %d          |    %d      |      %d    |     %d      |    %d     |      %d    |    %d   |\n",
+                                    j,
+                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Predictive_Fail,
+                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Warning,
+                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Present,
+                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Idle_Act,
+                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Locate,
+                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Rebuid,
+                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Fail);
+                            strcat(send_str, temp);
+                        }
+                        sprintf(temp, "receive times: %lu \n", ptrI2CBpCpldSType->receive_times);
+                        strcat(send_str, temp);
+                        sprintf(temp, "write times: %lu \n", ptrI2CBpCpldSType->write_times);
+                        strcat(send_str, temp);
 
                         break;
                     case GPIO_SWITCH:
                         /* GPIO Device0 - SWITCH */
                         ptrGpioSwitchSType = (PTR_GPIO_SWITCH_sTYPE) (deviceAddList[i].ptrGpioDeviceData->data_buf);
-//                        sprintf(temp, "desc: %s \n", deviceAddList[i].ptrGpioDeviceData->ptrDeviceConfig->description);
-//                        strcat(send_str, temp);
-//                        for (int j = 0; j < deviceAddList[i].ptrGpioDeviceData->pin_nums; ++j) {
-//                            if (deviceAddList[i].ptrGpioDeviceData->pin_type[j] == 0) {
-//                                /* 没有配置此 pin */
-//                                continue;
-//                            } else if (deviceAddList[i].ptrGpioDeviceData->pin_type[j] == 1) {
-//                                /* 只配置为 INPUT */
-//                                sprintf(temp, "[IN]     pin[%d]: ", j);
-//                            } else if (deviceAddList[i].ptrGpioDeviceData->pin_type[j] == 2) {
-//                                /* 只配置为 OUTPUT */
-//                                sprintf(temp, "[OUT]    pin[%d]: ", j);
-//                            } else if (deviceAddList[i].ptrGpioDeviceData->pin_type[j] == 3) {
-//                                /* 同时配置为 INPUT 和 OUTPUT */
-//                                sprintf(temp, "[IN|OUT] pin[%d]: ", j);
-//                            } else {
-//                                printf("device[%d] : error pin[%d]_type - %d \n", i, j, deviceAddList[i].ptrGpioDeviceData->pin_type[j]);
-//                                exit(1);
-//                            }
-//                            strcat(send_str, temp);
-//                            for (uint32_t k = ptrGpioSwitchSType->pinOscilloscope_list[j].front; k != ptrGpioSwitchSType->pinOscilloscope_list[j].rear; k = (k+1)%(PIN_OSCILLOSCOPE_MAX_BITS+1)) {
-//                                sprintf(temp, "%d", ptrGpioSwitchSType->pinOscilloscope_list[j].status_bit[k]);
-//                                strcat(send_str, temp);
-//                            }
-//                            sprintf(temp, "|\n");
-//                            strcat(send_str, temp);
-//                        }
+                        sprintf(temp, "desc: %s \n", deviceAddList[i].ptrGpioDeviceData->ptrDeviceConfig->description);
+                        strcat(send_str, temp);
+                        for (int j = 0; j < deviceAddList[i].ptrGpioDeviceData->pin_nums; ++j) {
+                            if (deviceAddList[i].ptrGpioDeviceData->pin_type[j] == 0) {
+                                /* 没有配置此 pin */
+                                continue;
+                            } else if (deviceAddList[i].ptrGpioDeviceData->pin_type[j] == 1) {
+                                /* 只配置为 INPUT */
+                                sprintf(temp, "[IN]     pin[%d]: ", j);
+                            } else if (deviceAddList[i].ptrGpioDeviceData->pin_type[j] == 2) {
+                                /* 只配置为 OUTPUT */
+                                sprintf(temp, "[OUT]    pin[%d]: ", j);
+                            } else if (deviceAddList[i].ptrGpioDeviceData->pin_type[j] == 3) {
+                                /* 同时配置为 INPUT 和 OUTPUT */
+                                sprintf(temp, "[IN|OUT] pin[%d]: ", j);
+                            } else {
+                                printf("device[%d] : error pin[%d]_type - %d \n", i, j, deviceAddList[i].ptrGpioDeviceData->pin_type[j]);
+                                exit(1);
+                            }
+                            strcat(send_str, temp);
+                            for (uint32_t k = ptrGpioSwitchSType->pinOscilloscope_list[j].front; k != ptrGpioSwitchSType->pinOscilloscope_list[j].rear; k = (k+1)%(PIN_OSCILLOSCOPE_MAX_BITS+1)) {
+                                sprintf(temp, "%d", ptrGpioSwitchSType->pinOscilloscope_list[j].status_bit[k]);
+                                strcat(send_str, temp);
+                            }
+                            sprintf(temp, "|\n");
+                            strcat(send_str, temp);
+                        }
                         break;
                     case ADC:
                         /* ADC  */
-//                        sprintf(temp, "desc: %s \n", deviceAddList[i].ptrAdcDeviceData->ptrDeviceConfig->description);
-//                        strcat(send_str, temp);
-//                        if (deviceAddList[i].ptrAdcDeviceData->adcRegType == REG_L) {
-//                            sprintf(temp, "adc_value : %04x \n", deviceAddList[i].ptrAdcDeviceData->ptrAdcReg->reg_lh.l);
-//                        } else {
-//                            sprintf(temp, "adc_value : %04x \n", deviceAddList[i].ptrAdcDeviceData->ptrAdcReg->reg_lh.h);
-//                        }
-//                        strcat(send_str, temp);
-//                        sprintf(temp, "division: %.3f \n", deviceAddList[i].ptrAdcDeviceData->division/1000.0);
-//                        strcat(send_str, temp);
+                        sprintf(temp, "desc: %s \n", deviceAddList[i].ptrAdcDeviceData->ptrDeviceConfig->description);
+                        strcat(send_str, temp);
+                        if (deviceAddList[i].ptrAdcDeviceData->adcRegType == REG_L) {
+                            sprintf(temp, "adc_value : %04x \n", deviceAddList[i].ptrAdcDeviceData->ptrAdcReg->reg_lh.l);
+                        } else {
+                            sprintf(temp, "adc_value : %04x \n", deviceAddList[i].ptrAdcDeviceData->ptrAdcReg->reg_lh.h);
+                        }
+                        strcat(send_str, temp);
+                        sprintf(temp, "division: %.3f \n", deviceAddList[i].ptrAdcDeviceData->division/1000.0);
+                        strcat(send_str, temp);
                         break;
                     case PCA9546:
                         /* PCA9546 */
