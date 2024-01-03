@@ -273,12 +273,6 @@ void aspeed_adc_set_value(void *opaque, uint8_t channel, uint16_t value)
         reg_value_h = value;
     }
     s->regs[reg] = (reg_value_h << 16) | (reg_value_l);
-    if (reg == DATA_CHANNEL_1_AND_0){
-        file_log("DATA_CHANNEL_1_AND_0 has write", LOG_TIME_END);
-        printf("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-        printf("DATA_CHANNEL_1_AND_0 has write to : %02x \n", value);
-        printf("\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n");
-    }
 }
 
 static const MemoryRegionOps aspeed_adc_engine_ops = {
