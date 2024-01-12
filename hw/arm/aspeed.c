@@ -509,15 +509,100 @@ static void quanta_q71l_bmc_i2c_init(AspeedMachineState *bmc)
 
 static void ast2500_evb_i2c_init(AspeedMachineState *bmc)
 {
+
+    srand((unsigned )time(NULL));
+    pthread_mutex_init(&file_log_lock, NULL); /* file log 线程所的初始化，需要在函数开始时进行 */
+    FUNC_DEBUG("ast2500_evb_i2c_init")
     AspeedSoCState *soc = bmc->soc;
-    uint8_t *eeprom_buf = g_malloc0(8 * 1024);
 
-    smbus_eeprom_init_one(aspeed_i2c_get_bus(&soc->i2c, 3), 0x50,
-                          eeprom_buf);
+    device_add(BMC, "BMC", NULL, &soc->gpio);
 
-    /* The AST2500 EVB expects a LM75 but a TMP105 is compatible */
-    i2c_slave_create_simple(aspeed_i2c_get_bus(&soc->i2c, 7),
-                     TYPE_TMP105, 0x4d);
+    /**************************************** slib func ****************************************/
+    connect_gpio_line = connect_gpio_line_for_slib;
+    set_gpio_line = set_gpio_line_for_slib;
+    adc_get_value = aspeed_adc_get_value;
+    adc_set_value = aspeed_adc_set_value;
+
+    data_thread_init(NULL);
+
+    /**************************************** func add ****************************************/
+    PTR_CONFIG_DATA ptrConfigData = parse_configuration();
+    PTR_DEVICE_CONFIG pDeviceConfig = ptrConfigData->ptrDeviceConfig;
+    while (pDeviceConfig != NULL && pDeviceConfig->pre != NULL) {
+        pDeviceConfig = pDeviceConfig->pre;  /* 确保回到起始节点 */
+    }
+
+    file_log("Function Add ... ", LOG_TIME_END);
+    while (pDeviceConfig != NULL) {
+        I2CBus *master_bus;
+        int master_bus_device_index = -1;
+        if (pDeviceConfig->i2c_dev.device_index == 0) {
+            master_bus = aspeed_i2c_get_bus(&soc->i2c, pDeviceConfig->bus);
+        } else {
+            if (pDeviceConfig->i2c_dev.device_index > 0) {
+                master_bus_device_index = pDeviceConfig->i2c_dev.device_index;
+            } else {
+                /* device_index < 0 */
+                int device_index;
+                get_dev_index_for_name(pDeviceConfig->i2c_dev.device_name, &device_index);
+                if (device_index < 0) {
+                    /* -1: 没有找到对应名称的设备 */
+                    printf("The  name \"%s\" not found! \n", pDeviceConfig->i2c_dev.device_name);
+                    exit(1);
+                } else {
+                    master_bus_device_index = device_index;
+                }
+            }
+            /**************************************** - ****************************************/
+            if (master_bus_device_index < DEVICE_MAX_NUM) {
+                if (deviceAddList[master_bus_device_index].exist) {
+                    if (deviceAddList[master_bus_device_index].device_type == PCA954X_DEVICE_TYPE) {
+                        master_bus = pca954x_i2c_get_bus(deviceAddList[master_bus_device_index].pca954x,
+                                                         pDeviceConfig->bus);
+                    } else {
+                        printf("The devices[%d] don't have i2c bus ! \n", master_bus_device_index);
+                        exit(1);
+                    }
+                } else {
+                    printf("The devices[%d] not exist ! \n", master_bus_device_index);
+                    exit(1);
+                }
+            } else {
+                printf("The device_index - %d error, exceed max num ! \n", master_bus_device_index);
+                exit(1);
+            }
+        }
+
+        /**************************************** - ****************************************/
+        if (pDeviceConfig->deviceType == SMBUS_DEVICE_TYPE) {
+            SMBusFunctionPtr smBusFunctionPtr = getSMBusDeviceAddFunc(pDeviceConfig->device_type_id);
+            smBusFunctionPtr(master_bus, pDeviceConfig);
+        } else if (pDeviceConfig->deviceType == I2C_DEVICE_TYPE) {
+            I2cFunctionPtr i2CFunctionPtr = getI2cDeviceAddFunc(pDeviceConfig->device_type_id);
+            i2CFunctionPtr(master_bus, pDeviceConfig);
+        } else if (pDeviceConfig->deviceType == PMBUS_DEVICE_TYPE) {
+            pmbus_vr_add(master_bus, pDeviceConfig->addr, TYPE_RAA228000, pDeviceConfig);
+        } else if (pDeviceConfig->deviceType == GPIO_DEVICE_TYPE) {
+            GpioFunctionPtr gpioFunctionPtr = getGpioDeviceAddFunc(pDeviceConfig->device_type_id);
+            gpioFunctionPtr(OBJECT(bmc), pDeviceConfig);
+        } else if (pDeviceConfig->deviceType == ADC_DEVICE_TYPE) {
+            adc_device_add0(&(soc->adc.engines[0]), pDeviceConfig);
+        } else if (pDeviceConfig->deviceType == PCA954X_DEVICE_TYPE) {
+            pca_device_add(master_bus, pDeviceConfig);
+        }
+
+        if (pDeviceConfig->next == NULL) {
+            break;
+        }
+        pDeviceConfig = pDeviceConfig->next;
+    }
+
+    mac_apply_method(ptrConfigData->ptrMacConfig);
+
+    file_log("unlocking send thread.", LOG_TIME_END);
+    /* 释放数据线程锁，以开始数据发送 */
+    pthread_mutex_unlock(&pthreadMutex_sendData);
+    file_log("unlocked send thread.", LOG_TIME_END);
 }
 
 static void ast2600_evb_i2c_init(AspeedMachineState *bmc)
