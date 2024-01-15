@@ -8,7 +8,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-#define MAX_SEND_DATA_LEN 102400
+#define MAX_SEND_DATA_LEN (1024*1024)
 #define MAX_READ_DATA_LEN 102400
 
 #define READ_PIPE "i2cReadPipe"     // read pipe：外部使用者只能读此管道的数据
