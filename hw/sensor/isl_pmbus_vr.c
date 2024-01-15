@@ -163,7 +163,8 @@ static void raa228000_exit_reset(Object *obj)
 
 static void psu_realize(DeviceState *dev, Error **errp) {
     PMBusDevice *pmdev = PMBUS_DEVICE(dev);
-    device_add(PMBUS_PSU, pmdev->ptrDeviceConfig->name, &(pmdev->pages[0]), pmdev);
+    pmdev->pages[0].ptrDeviceConfig = pmdev->ptrDeviceConfig;
+    device_add(PMBUS_PSU, pmdev->ptrDeviceConfig->name, &(pmdev->pages[0]), NULL);
 }
 
 static void isl69259_exit_reset(Object *obj)

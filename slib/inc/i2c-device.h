@@ -51,7 +51,7 @@ void send_I2cEmptyDevice0(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
 
 typedef struct BP_HDD_STATUS_ {
     uint8_t Fail :1;
-    uint8_t Rebuid :1;
+    uint8_t Rebuild :1;
     uint8_t Locate :1;
     uint8_t Idle_Act :1;
     uint8_t Present :2;

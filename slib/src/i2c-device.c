@@ -242,15 +242,15 @@ uint8_t recv_I2cEmptyDevice1(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
                     if (op_code == 0b01) {
                         /* 点亮 Fail，同时关闭 Rebuild */
                         ptrI2CBpCpldSTypeData->hdd_status[hdd_num].Fail = 1;
-                        ptrI2CBpCpldSTypeData->hdd_status[hdd_num].Rebuid = 0;
+                        ptrI2CBpCpldSTypeData->hdd_status[hdd_num].Rebuild = 0;
                     } else if (op_code == 0b11){
                         /* 点亮 Rebuild，同时关闭 Fail */
                         ptrI2CBpCpldSTypeData->hdd_status[hdd_num].Fail = 0;
-                        ptrI2CBpCpldSTypeData->hdd_status[hdd_num].Rebuid = 1;
+                        ptrI2CBpCpldSTypeData->hdd_status[hdd_num].Rebuild = 1;
                     } else if (op_code == 0b00) {
                         /* 都关闭 */
                         ptrI2CBpCpldSTypeData->hdd_status[hdd_num].Fail = 0;
-                        ptrI2CBpCpldSTypeData->hdd_status[hdd_num].Rebuid = 0;
+                        ptrI2CBpCpldSTypeData->hdd_status[hdd_num].Rebuild = 0;
                     }
                 }
             }
