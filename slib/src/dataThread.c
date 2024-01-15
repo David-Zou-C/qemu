@@ -92,6 +92,7 @@ static void *send_thread(void *pVoid) {
             if (deviceAddList[i].exist) {
                 cJSON *device = cJSON_CreateObject();
                 cJSON_AddNumberToObject(device, "index", i);
+                cJSON_AddNumberToObject(device, "device_type_id", deviceAddList[i].device_type_id);
                 switch (deviceAddList[i].device_type_id) {
                     case SMBUS_EEPROM_S:
                         /* {
@@ -106,7 +107,6 @@ static void *send_thread(void *pVoid) {
                         /**************************************** 数据处理 - S ****************************************/
                         /* 先发送 desc 信息 */
                         cJSON_AddStringToObject(device, "description", deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->description);
-                        cJSON_AddNumberToObject(device, "device_type_id", deviceAddList[i].device_type_id);
                         /* 发送 buf 的所有数据 */
                         cJSON *eeprom_data = cJSON_CreateArray();
                         for (int j = 0; j < SMBUS_EEPROM_BUF_SIZE; ++j) {
@@ -131,7 +131,6 @@ static void *send_thread(void *pVoid) {
                         /**************************************** 数据处理并发送 - S ****************************************/
                         /* 先发送 desc 信息 */
                         cJSON_AddStringToObject(device, "description", deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->description);
-                        cJSON_AddNumberToObject(device, "device_type_id", deviceAddList[i].device_type_id);
                         /* 发送温度数据 */
                         cJSON_AddNumberToObject(device, "temperature_integer", ptrSmbusTmpSType->temperature_integer);
                         cJSON_AddNumberToObject(device, "temperature_decimal", ptrSmbusTmpSType->temperature_decimal);
@@ -145,7 +144,6 @@ static void *send_thread(void *pVoid) {
                         ptrSmbusTpa626SType = (PTR_SMBUS_TPA626_sTYPE) (deviceAddList[i].ptrSmbusDeviceData->data_buf);
                         /**************************************** 数据处理并发送 - S ****************************************/
                         cJSON_AddStringToObject(device, "description", deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->description);
-                        cJSON_AddNumberToObject(device, "device_type_id", deviceAddList[i].device_type_id);
 
                         cJSON_AddNumberToObject(device, "configuration_reg00", ptrSmbusTpa626SType->configuration_reg00);
                         cJSON_AddNumberToObject(device, "shunt_vol_reg01", ptrSmbusTpa626SType->shunt_vol_reg01);
@@ -169,7 +167,6 @@ static void *send_thread(void *pVoid) {
                         /* 先发送 desc 信息 */
                         cJSON_AddStringToObject(device, "description",
                                                 deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->description);
-                        cJSON_AddNumberToObject(device, "device_type_id", deviceAddList[i].device_type_id);
 
                         /* 发送温度数据 */
                         cJSON_AddNumberToObject(device, "temperature", ptrSmbusDimmTmpSType->temperature);
