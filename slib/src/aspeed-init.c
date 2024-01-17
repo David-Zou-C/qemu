@@ -498,8 +498,8 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                             ptrSmbusEepromSType->buf[j] = initial_data[i];
                         } else {
                             /* 越界 ！ */
-                            printf("smbus eeprom buf size is 256, but args is more - '%lu'", len - 1);
-                            exit(1);
+//                            printf("smbus eeprom buf size is 256, but args is more - '%lu'", len - 1);
+//                            exit(1);
                         }
                     }
                     i--; /* 此时的 i 就等于 len，所以 i-1 此处等同于 initial data 的最后一个值 */
@@ -515,8 +515,8 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                             ptrSmbusEepromSType->buf[initial_data[addr_i]] = initial_data[val_i];
                         } else {
                             /* 越界 ！ */
-                            printf("This address - '%02x' exceeds the maximum! \n", initial_data[addr_i]);
-                            exit(1);
+//                            printf("This address - '%02x' exceeds the maximum! \n", initial_data[addr_i]);
+//                            exit(1);
                         }
                     }
                 }
