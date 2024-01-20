@@ -73,7 +73,6 @@ static void *send_thread(void *pVoid) {
     FUNC_DEBUG("function: send_thread() unlocked, it's running !")
 
     char temp[1024];
-    char addr[10];
     char send_str[MAX_SEND_DATA_LEN] = {0};
     char *json_str;
     int fd;
@@ -101,10 +100,7 @@ static void *send_thread(void *pVoid) {
                         /**************************************** 数据处理 - S ****************************************/
                         /* 先发送 desc 信息 */
                         cJSON_AddStringToObject(device, "description", deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->description);
-                        cJSON_AddNumberToObject(device, "bus",
-                                                deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->bus);
-                        sprintf(addr, "0x%02x", deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->addr);
-                        cJSON_AddStringToObject(device, "address", addr);
+                        /* 发送 buf 的所有数据 */
                         cJSON *eeprom_data = cJSON_CreateArray();
                         for (int j = 0; j < SMBUS_EEPROM_BUF_SIZE; ++j) {
                             cJSON_AddItemToArray(eeprom_data, cJSON_CreateNumber(ptrSmbusEepromSType->buf[j]));
@@ -128,10 +124,6 @@ static void *send_thread(void *pVoid) {
                         /**************************************** 数据处理并发送 - S ****************************************/
                         /* 先发送 desc 信息 */
                         cJSON_AddStringToObject(device, "description", deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->description);
-                        cJSON_AddNumberToObject(device, "bus",
-                                                deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->bus);
-                        sprintf(addr, "0x%02x", deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->addr);
-                        cJSON_AddStringToObject(device, "address", addr);
                         /* 发送温度数据 */
                         cJSON_AddNumberToObject(device, "temperature_integer", ptrSmbusTmpSType->temperature_integer);
                         cJSON_AddNumberToObject(device, "temperature_decimal", ptrSmbusTmpSType->temperature_decimal);
@@ -145,10 +137,6 @@ static void *send_thread(void *pVoid) {
                         ptrSmbusTpa626SType = (PTR_SMBUS_TPA626_sTYPE) (deviceAddList[i].ptrSmbusDeviceData->data_buf);
                         /**************************************** 数据处理并发送 - S ****************************************/
                         cJSON_AddStringToObject(device, "description", deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->description);
-                        cJSON_AddNumberToObject(device, "bus",
-                                                deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->bus);
-                        sprintf(addr, "0x%02x", deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->addr);
-                        cJSON_AddStringToObject(device, "address", addr);
 
                         cJSON_AddNumberToObject(device, "configuration_reg00", ptrSmbusTpa626SType->configuration_reg00);
                         cJSON_AddNumberToObject(device, "shunt_vol_reg01", ptrSmbusTpa626SType->shunt_vol_reg01);
@@ -172,10 +160,7 @@ static void *send_thread(void *pVoid) {
                         /* 先发送 desc 信息 */
                         cJSON_AddStringToObject(device, "description",
                                                 deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->description);
-                        cJSON_AddNumberToObject(device, "bus",
-                                                deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->bus);
-                        sprintf(addr, "0x%02x", deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->addr);
-                        cJSON_AddStringToObject(device, "address", addr);
+
                         /* 发送温度数据 */
                         cJSON_AddNumberToObject(device, "temperature", ptrSmbusDimmTmpSType->temperature);
                         cJSON_AddNumberToObject(device, receive_times_str, (double) ptrSmbusDimmTmpSType->receive_times);
@@ -186,10 +171,6 @@ static void *send_thread(void *pVoid) {
                     case PMBUS_PSU:
                         pmBusPage = (PMBusPage *) deviceAddList[i].pmBusPage;
                         cJSON_AddStringToObject(device, "description", pmBusPage->ptrDeviceConfig->description);
-                        cJSON_AddNumberToObject(device, "bus",
-                                                deviceAddList[i].pmBusPage->ptrDeviceConfig->bus);
-                        sprintf(addr, "0x%02x", deviceAddList[i].pmBusPage->ptrDeviceConfig->addr);
-                        cJSON_AddStringToObject(device, "address", addr);
 
                         cJSON_AddNumberToObject(device, "PSU_Vin", pmBusPage->read_vin);
                         cJSON_AddNumberToObject(device, "PSU_Iin", pmBusPage->read_iin);
@@ -207,11 +188,6 @@ static void *send_thread(void *pVoid) {
                         /* 发送 */
                         cJSON_AddStringToObject(device, "description",
                                                 deviceAddList[i].ptrI2cDeviceData->ptrDeviceConfig->description);
-                        cJSON_AddNumberToObject(device, "bus",
-                                                deviceAddList[i].ptrI2cDeviceData->ptrDeviceConfig->bus);
-                        sprintf(addr, "0x%02x", deviceAddList[i].ptrI2cDeviceData->ptrDeviceConfig->addr);
-                        cJSON_AddStringToObject(device, "address", addr);
-
                         cJSON *monitor_data = cJSON_CreateObject();
                         for (int j = 0; j < ptrI2CEepromSType->monitor_data_len; ++j) {
                             if (ptrI2CEepromSType->monitor_data[j] < ptrI2CEepromSType->total_size) {
@@ -231,10 +207,6 @@ static void *send_thread(void *pVoid) {
                         /* 先发送 desc 信息 */
                         cJSON_AddStringToObject(device, "description",
                                                 deviceAddList[i].ptrI2cDeviceData->ptrDeviceConfig->description);
-                        cJSON_AddNumberToObject(device, "bus",
-                                                deviceAddList[i].ptrI2cDeviceData->ptrDeviceConfig->bus);
-                        sprintf(addr, "0x%02x", deviceAddList[i].ptrI2cDeviceData->ptrDeviceConfig->addr);
-                        cJSON_AddStringToObject(device, "address", addr);
                         /* cpld manufacture */
                         cJSON_AddNumberToObject(device, "cpld_manufacture",
                                                 ptrI2CBpCpldSType->i2CBpCpldData.cpld_manufacture);
@@ -300,8 +272,6 @@ static void *send_thread(void *pVoid) {
                         strcat(send_str, temp);
                         cJSON_AddStringToObject(device, "description",
                                                 deviceAddList[i].ptrAdcDeviceData->ptrDeviceConfig->description);
-                        cJSON_AddNumberToObject(device, "adc_channel",
-                                                deviceAddList[i].ptrAdcDeviceData->ptrDeviceConfig->adc_channel);
                         if (deviceAddList[i].ptrAdcDeviceData->adcRegType == REG_L) {
                             sprintf(temp, "adc_value : %04x \n", deviceAddList[i].ptrAdcDeviceData->ptrAdcReg->reg_lh.l);
                             cJSON_AddNumberToObject(device, "adc_value",
