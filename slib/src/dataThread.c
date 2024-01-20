@@ -96,6 +96,13 @@ static void *send_thread(void *pVoid) {
                 cJSON_AddNumberToObject(device, "device_type_id", deviceAddList[i].device_type_id);
                 switch (deviceAddList[i].device_type_id) {
                     case SMBUS_EEPROM_S:
+                        /* {
+                         *      "index": 0,
+                         *      "description": "",
+                         *      "eeprom_data": [0, 1, 2, ...],
+                         *      "receive_times": 0,
+                         *      "write_times": 0
+                         * } */
                         /* Device0 - EEPROM */
                         ptrSmbusEepromSType = (PTR_SMBUS_EEPROM_sTYPE) (deviceAddList[i].ptrSmbusDeviceData->data_buf);
                         /**************************************** 数据处理 - S ****************************************/
