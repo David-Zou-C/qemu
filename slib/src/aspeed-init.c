@@ -757,13 +757,12 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                         }
                         for (kj = 0; kj < n && kj < 50-1; ++kj) {
                             temp_mfr[kj] = (char) initial_data[data_i++];
-                            printf(">>>> PSU set reg_type-%d : s_%d ==> %c \n", reg_type, kj, temp_mfr[kj]);
                         }
                         temp_mfr[kj] = 0;
                         break;
                     case 7:
                         /* mfr_specific */
-                        if (data_i + 1 >= len) {
+                        if (data_i >= len) {
                             break;
                         }
                         pmBusPage->status_mfr_specific = (int8_t) initial_data[data_i++];
@@ -780,7 +779,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                          * read_temperature_2
                          * read_fan_speed_1
                          **/
-                        if (data_i + 1 >= len) {
+                        if (data_i >= len) {
                             break;
                         }
                         if (reg_type == 8) {
@@ -791,6 +790,8 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                             pmBusPage->read_iout = (uint16_t) initial_data[data_i++];
                         } else if (reg_type == 11) {
                             pmBusPage->read_pout = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 12) {
+                            pmBusPage->read_vin = (uint16_t) initial_data[data_i++];
                         } else if (reg_type == 13) {
                             pmBusPage->read_iin = (uint16_t) initial_data[data_i++];
                         } else if (reg_type == 14) {
