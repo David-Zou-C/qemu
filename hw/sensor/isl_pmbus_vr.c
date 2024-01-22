@@ -47,8 +47,8 @@ static uint8_t isl_pmbus_vr_read_byte(PMBusDevice *pmdev)
     case 0x9E:  /* 生产工厂所在城市 */
         pmbus_send_string(pmdev, "3312345678901234");
         return 0;
-    case 0x80:  /* 生产工厂所在城市 */
-        pmbus_send8(pmdev, 0x02);
+    case 0x80:  /* 0:没有电源输入   1:AC输入  2:DC输入 */
+        pmbus_send8(pmdev, 0x01);
         return 0;
     case 0xD0:
         pmbus_send_string(pmdev, "V1.2.1");
