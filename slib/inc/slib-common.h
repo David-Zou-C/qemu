@@ -36,8 +36,6 @@ typedef enum DEVICE_TYPE_ID_ {
     SMBUS_TMP = 2,
     SMBUS_TPA626 = 3,
     SMBUS_DIMM_TEMP = 4,
-    /* PMBUS */
-    PMBUS_PSU = 21,
     /* I2c */
     I2C_EEPROM = 101,
     I2C_BP_CPLD = 102,
@@ -48,6 +46,8 @@ typedef enum DEVICE_TYPE_ID_ {
     /* PCA954X */
     PCA9546 = 401,
     PCA9548 = 402,
+    /* PMBUS */
+    PMBUS_PSU = 501,
 } DEVICE_TYPE_ID, *PTR_DEVICE_TYPE_ID;
 
 
