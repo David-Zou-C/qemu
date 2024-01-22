@@ -717,8 +717,9 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                 break;
             }
             int data_i = 0;
-            uint32_t n = 0;
+            uint32_t n = 0, k = 0;
             uint32_t reg_type;
+            char *temp_mfr;
             while (data_i < len) {
                 reg_type = initial_data[data_i++];
                 switch (reg_type) {
@@ -739,23 +740,25 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                         if (data_i + n >= len) {
                             break;
                         }
-                        for (int k = 0; k < n && k < 50; ++k) {
-                            if (reg_type == 0) {
-                                pmBusPage->mfr_id[k] = (char) initial_data[data_i++];
-                            } else if (reg_type == 1) {
-                                pmBusPage->mfr_model[k] = (char) initial_data[data_i++];
-                            } else if (reg_type == 2) {
-                                pmBusPage->mfr_revision[k] = (char) initial_data[data_i++];
-                            } else if (reg_type == 3) {
-                                pmBusPage->mfr_location[k] = (char) initial_data[data_i++];
-                            } else if (reg_type == 4) {
-                                pmBusPage->mfr_date[k] = (char) initial_data[data_i++];
-                            } else if (reg_type == 5) {
-                                pmBusPage->mfr_serial[k] = (char) initial_data[data_i++];
-                            } else if (reg_type == 6) {
-                                pmBusPage->version[k] = (char) initial_data[data_i++];
-                            }
+                        if (reg_type == 0) {
+                            temp_mfr = pmBusPage->mfr_id;
+                        } else if (reg_type == 1) {
+                            temp_mfr = pmBusPage->mfr_model;
+                        } else if (reg_type == 2) {
+                            temp_mfr = pmBusPage->mfr_revision;
+                        } else if (reg_type == 3) {
+                            temp_mfr = pmBusPage->mfr_location;
+                        } else if (reg_type == 4) {
+                            temp_mfr = pmBusPage->mfr_date;
+                        } else if (reg_type == 5) {
+                            temp_mfr = pmBusPage->mfr_serial;
+                        } else if (reg_type == 6) {
+                            temp_mfr = pmBusPage->version;
                         }
+                        for (k = 0; k < n && k < 50-1; ++k) {
+                            temp_mfr[k] = (char) initial_data[data_i++];
+                        }
+                        temp_mfr[k] = 0;
                         break;
                     case 7:
                         /* mfr_specific */
@@ -774,7 +777,6 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                          * read_pin
                          * read_temperature_1
                          * read_temperature_2
-                         * read_temperature_3
                          * read_fan_speed_1
                          **/
                         if (data_i + 1 >= len) {
@@ -797,8 +799,6 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                         } else if (reg_type == 16) {
                             pmBusPage->read_temperature_2 = (uint16_t) initial_data[data_i++];
                         } else if (reg_type == 17) {
-                            pmBusPage->read_temperature_3 = (uint16_t) initial_data[data_i++];
-                        } else if (reg_type == 18) {
                             pmBusPage->read_fan_speed_1 = (uint16_t) initial_data[data_i++];
                         }
                         break;

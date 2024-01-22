@@ -212,16 +212,16 @@ static void *send_thread(void *pVoid) {
                         } else {
                             cJSON_AddNullToObject(device, "MFR_specific");
                         }
-
-                        cJSON_AddNumberToObject(device, "PSU_Vin", pmBusPage->read_vin);
-                        cJSON_AddNumberToObject(device, "PSU_Iin", pmBusPage->read_iin);
-                        cJSON_AddNumberToObject(device, "PSU_Pin", pmBusPage->read_pin);
-                        cJSON_AddNumberToObject(device, "PSU_Vout", pmBusPage->read_vout);
-                        cJSON_AddNumberToObject(device, "PSU_Iout", pmBusPage->read_iout);
-                        cJSON_AddNumberToObject(device, "PSU_Pout", pmBusPage->read_pout);
-                        cJSON_AddNumberToObject(device, "PSU_Hs_Temp", pmBusPage->read_temperature_1);
-                        cJSON_AddNumberToObject(device, "PSU_Amb_Temp", pmBusPage->read_temperature_2);
-                        cJSON_AddNumberToObject(device, "PSU_FanSpeed", pmBusPage->read_fan_speed_1);
+                        cJSON_AddNumberToObject(device, "Pout_max", pmBusPage->mfr_pout_max);
+                        cJSON_AddNumberToObject(device, "Vin", pmBusPage->read_vin);
+                        cJSON_AddNumberToObject(device, "Iin", pmBusPage->read_iin);
+                        cJSON_AddNumberToObject(device, "Pin", pmBusPage->read_pin);
+                        cJSON_AddNumberToObject(device, "Vout", pmBusPage->read_vout);
+                        cJSON_AddNumberToObject(device, "Iout", pmBusPage->read_iout);
+                        cJSON_AddNumberToObject(device, "Pout", pmBusPage->read_pout);
+                        cJSON_AddNumberToObject(device, "Hs_Temp", pmBusPage->read_temperature_1);
+                        cJSON_AddNumberToObject(device, "Amb_Temp", pmBusPage->read_temperature_2);
+                        cJSON_AddNumberToObject(device, "FanSpeed", pmBusPage->read_fan_speed_1);
                         cJSON_AddNumberToObject(device, receive_times_str, (double) pmBusPage->receive_times);
                         cJSON_AddNumberToObject(device, write_times_str, (double) pmBusPage->write_times);
                         break;
