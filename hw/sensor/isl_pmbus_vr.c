@@ -159,6 +159,8 @@ static void raa228000_exit_reset(Object *obj)
     pmdev->pages[0].read_temperature_3 = 0;
 
     pmdev->pages[0].read_fan_speed_1 = 900;
+
+    pmdev->pages[0].mfr_pout_max = 1200;
 }
 
 static void psu_realize(DeviceState *dev, Error **errp) {
