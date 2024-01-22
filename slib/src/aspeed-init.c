@@ -757,6 +757,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                         }
                         for (kj = 0; kj < n && kj < 50-1; ++kj) {
                             temp_mfr[kj] = (char) initial_data[data_i++];
+                            printf(">>>> PSU set reg_type-%d : s_%d ==> %c \n", reg_type, kj, temp_mfr[kj]);
                         }
                         temp_mfr[kj] = 0;
                         break;
