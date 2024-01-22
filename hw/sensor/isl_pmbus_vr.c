@@ -30,30 +30,30 @@ static uint8_t isl_pmbus_vr_read_byte(PMBusDevice *pmdev)
         pmbus_send16(pmdev, pmdev->pages[0].read_fan_speed_1);
         return 0;
     case 0x99:  /* 厂商信息 */
-        pmbus_send_string(pmdev, "SUGON1");
+        pmbus_send_string(pmdev, pmdev->pages[0].mfr_id);
         return 0;
     case 0x9a:  /* 型号 */
-        pmbus_send_string(pmdev, "CRPS2000W-1A");
+        pmbus_send_string(pmdev, pmdev->pages[0].mfr_model);
         return 0;
     case 0x9B:  /* 硬件版本信息 */
-        pmbus_send_string(pmdev, "A01");
+        pmbus_send_string(pmdev, pmdev->pages[0].mfr_revision);
         return 0;
     case 0x9C:  /* 生产工厂所在城市 */
-        pmbus_send_string(pmdev, "SHENZHEN");
+        pmbus_send_string(pmdev, pmdev->pages[0].mfr_location);
         return 0;
-    case 0x9D:  /* 生产工厂所在城市 */
-        pmbus_send_string(pmdev, "2024/01/01");
+    case 0x9D:  /* 生产日期 */
+        pmbus_send_string(pmdev, pmdev->pages[0].mfr_date);
         return 0;
-    case 0x9E:  /* 生产工厂所在城市 */
-        pmbus_send_string(pmdev, "abc1232465421321");
+    case 0x9E:  /* 序列号 */
+        pmbus_send_string(pmdev, pmdev->pages[0].mfr_serial);
         return 0;
     case 0x80:  /* 0:没有电源输入   1:AC输入  2:DC输入 */
-        pmbus_send8(pmdev, 0x01);
+        pmbus_send8(pmdev, pmdev->pages[0].status_mfr_specific);
         return 0;
-    case 0xD0:
-        pmbus_send_string(pmdev, "V1.2.1");
+    case 0xD0:  /* 版本号 */
+        pmbus_send_string(pmdev, pmdev->pages[0].version);
         return 0;
-    case 0xA7:
+    case 0xA7:  /* 额定功率 */
         pmbus_send16(pmdev, 1200);
         return 0;
     }
@@ -137,6 +137,7 @@ static void isl_pmbus_vr_exit_reset(Object *obj)
         pmdev->pages[i].mfr_location = "SHENZHEN";
         pmdev->pages[i].mfr_date = "2016/05/31";
         pmdev->pages[i].mfr_serial = "3312345678901234";
+        pmdev->pages[i].version = "V1.2.1";
 
         pmdev->pages[i].status_mfr_specific = 0x01;  /* 0:没有电源输入   1:AC输入  2:DC输入 */
     }
