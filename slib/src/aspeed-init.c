@@ -733,11 +733,11 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                          * 6 mfr_version   */
                         /* 第一个数表述数据长度 n */
                         /* 后续 n 个字符被视为 char 类型 */
-                        if (data_i + 1 >= len) {
+                        if (data_i >= len) {
                             break;
                         }
                         n = initial_data[data_i++];
-                        if (data_i + n >= len) {
+                        if (data_i - 1 + n >= len) {
                             break;
                         }
                         if (reg_type == 0) {
