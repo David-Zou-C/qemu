@@ -292,12 +292,12 @@ typedef struct PMBusPage {
     uint16_t read_pout;                /* Read-Only word */
     uint16_t read_pin;                 /* Read-Only word */
     uint8_t revision;                  /* Read-Only byte */
-    char *mfr_id;                /* R/W block */
-    char *mfr_model;             /* R/W block */
-    char *mfr_revision;          /* R/W block */
-    char *mfr_location;          /* R/W block */
-    char *mfr_date;              /* R/W block */
-    char *mfr_serial;            /* R/W block */
+    char mfr_id[50];                /* R/W block */
+    char mfr_model[50];             /* R/W block */
+    char mfr_revision[50];          /* R/W block */
+    char mfr_location[50];          /* R/W block */
+    char mfr_date[50];              /* R/W block */
+    char mfr_serial[50];            /* R/W block */
     const char *app_profile_support;   /* Read-Only block-read */
     uint16_t mfr_vin_min;              /* Read-Only word */
     uint16_t mfr_vin_max;              /* Read-Only word */
@@ -315,7 +315,7 @@ typedef struct PMBusPage {
     uint16_t mfr_max_temp_1;           /* R/W word */
     uint16_t mfr_max_temp_2;           /* R/W word */
     uint16_t mfr_max_temp_3;           /* R/W word */
-    char *version;
+    char version[50];
     PTR_DEVICE_CONFIG ptrDeviceConfig;
     uint64_t receive_times;
     uint64_t write_times;

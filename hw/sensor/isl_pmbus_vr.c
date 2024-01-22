@@ -139,27 +139,7 @@ static void raa228000_exit_reset(Object *obj)
     PMBusDevice *pmdev = PMBUS_DEVICE(obj);
 
     isl_pmbus_vr_exit_reset(obj);
-    if (pmdev->pages[0].mfr_id == NULL) {
-        pmdev->pages[0].mfr_id = (char *) malloc(55);
-    }
-    if (pmdev->pages[0].mfr_model == NULL) {
-        pmdev->pages[0].mfr_model = (char *) malloc(55);
-    }
-    if (pmdev->pages[0].mfr_revision == NULL) {
-        pmdev->pages[0].mfr_revision = (char *) malloc(55);
-    }
-    if (pmdev->pages[0].mfr_location == NULL) {
-        pmdev->pages[0].mfr_location = (char *) malloc(55);
-    }
-    if (pmdev->pages[0].mfr_date == NULL) {
-        pmdev->pages[0].mfr_date = (char *) malloc(55);
-    }
-    if (pmdev->pages[0].mfr_serial == NULL) {
-        pmdev->pages[0].mfr_serial = (char *) malloc(55);
-    }
-    if (pmdev->pages[0].version == NULL) {
-        pmdev->pages[0].version = (char *) malloc(55);
-    }
+
     /**************************************** PSU INFO ****************************************/
     strcpy(pmdev->pages[0].mfr_id, "SUGON");
     strcpy(pmdev->pages[0].mfr_model,"CRPS2000W-1A");
@@ -183,7 +163,6 @@ static void raa228000_exit_reset(Object *obj)
 
     pmdev->pages[0].read_temperature_1 = 20;
     pmdev->pages[0].read_temperature_2 = 30;
-    pmdev->pages[0].read_temperature_3 = 0;
 
     pmdev->pages[0].read_fan_speed_1 = 900;
 }
