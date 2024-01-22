@@ -716,38 +716,95 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
             if (len < 2) {
                 break;
             }
-            /* 第 0 个表示 寄存器数 */
-            switch (initial_data[0]) {
-                case PMBUS_READ_VIN:
-                    pmBusPage->read_vin = (uint16_t) initial_data[1];
-                    break;
-                case PMBUS_READ_IIN:
-                    pmBusPage->read_iin = (uint16_t) initial_data[1];
-                    break;
-                case PMBUS_READ_PIN:
-                    pmBusPage->read_pin = (uint16_t) initial_data[1];
-                    break;
-                case PMBUS_READ_VOUT:
-                    pmBusPage->read_pout = (uint16_t) initial_data[1];
-                    break;
-                case PMBUS_READ_IOUT:
-                    pmBusPage->read_iout = (uint16_t) initial_data[1];
-                    break;
-                case PMBUS_READ_POUT:
-                    pmBusPage->read_pout = (uint16_t) initial_data[1];
-                    break;
-                case PMBUS_READ_TEMPERATURE_1:
-                    pmBusPage->read_temperature_1 = (uint16_t) initial_data[1];
-                    break;
-                case PMBUS_READ_TEMPERATURE_2:
-                    pmBusPage->read_temperature_2 = (uint16_t) initial_data[1];
-                    break;
-                case PMBUS_READ_FAN_SPEED_1:
-                    pmBusPage->read_fan_speed_1 = (uint16_t) initial_data[1];
-                    break;
-                default:
-                    printf("unknown psu register !\n");
-                    break;
+            int data_i = 0;
+            uint32_t n = 0;
+            uint32_t reg_type;
+            while (data_i < len) {
+                reg_type = initial_data[data_i++];
+                switch (reg_type) {
+                    case 0 ... 6:
+                        /* 0 mfr_id
+                         * 1 mfr_model
+                         * 2 mfr_revision
+                         * 3 mfr_location
+                         * 4 mfr_date
+                         * 5 mfr_serial
+                         * 6 mfr_version   */
+                        /* 第一个数表述数据长度 n */
+                        /* 后续 n 个字符被视为 char 类型 */
+                        if (data_i + 1 >= len) {
+                            break;
+                        }
+                        n = initial_data[data_i++];
+                        if (data_i + n >= len) {
+                            break;
+                        }
+                        for (int k = 0; k < n && k < 50; ++k) {
+                            if (reg_type == 0) {
+                                pmBusPage->mfr_id[k] = (char) initial_data[data_i++];
+                            } else if (reg_type == 1) {
+                                pmBusPage->mfr_model[k] = (char) initial_data[data_i++];
+                            } else if (reg_type == 2) {
+                                pmBusPage->mfr_revision[k] = (char) initial_data[data_i++];
+                            } else if (reg_type == 3) {
+                                pmBusPage->mfr_location[k] = (char) initial_data[data_i++];
+                            } else if (reg_type == 4) {
+                                pmBusPage->mfr_date[k] = (char) initial_data[data_i++];
+                            } else if (reg_type == 5) {
+                                pmBusPage->mfr_serial[k] = (char) initial_data[data_i++];
+                            } else if (reg_type == 6) {
+                                pmBusPage->version[k] = (char) initial_data[data_i++];
+                            }
+                        }
+                        break;
+                    case 7:
+                        /* mfr_specific */
+                        if (data_i + 1 >= len) {
+                            break;
+                        }
+                        pmBusPage->status_mfr_specific = (int8_t) initial_data[data_i++];
+                        break;
+                    case 8 ... 18:
+                        /* mfr_pout_max 
+                         * read_vout
+                         * read_iout
+                         * read_pout
+                         * read_vin
+                         * read_iin
+                         * read_pin
+                         * read_temperature_1
+                         * read_temperature_2
+                         * read_temperature_3
+                         * read_fan_speed_1
+                         **/
+                        if (data_i + 1 >= len) {
+                            break;
+                        }
+                        if (reg_type == 8) {
+                            pmBusPage->mfr_pout_max = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 9) {
+                            pmBusPage->read_vout = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 10) {
+                            pmBusPage->read_iout = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 11) {
+                            pmBusPage->read_pout = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 13) {
+                            pmBusPage->read_iin = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 14) {
+                            pmBusPage->read_pin = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 15) {
+                            pmBusPage->read_temperature_1 = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 16) {
+                            pmBusPage->read_temperature_2 = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 17) {
+                            pmBusPage->read_temperature_3 = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 18) {
+                            pmBusPage->read_fan_speed_1 = (uint16_t) initial_data[data_i++];
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
             free(initial_data);
             break;

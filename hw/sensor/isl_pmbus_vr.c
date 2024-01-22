@@ -54,7 +54,7 @@ static uint8_t isl_pmbus_vr_read_byte(PMBusDevice *pmdev)
         pmbus_send_string(pmdev, pmdev->pages[0].version);
         return 0;
     case 0xA7:  /* 额定功率 */
-        pmbus_send16(pmdev, 1200);
+        pmbus_send16(pmdev, pmdev->pages[0].mfr_pout_max);
         return 0;
     }
 
@@ -130,16 +130,6 @@ static void isl_pmbus_vr_exit_reset(Object *obj)
         pmdev->pages[i].read_temperature_2 = ISL_READ_TEMP_DEFAULT;
         pmdev->pages[i].read_temperature_3 = ISL_READ_TEMP_DEFAULT;
 
-        /**************************************** PSU INFO ****************************************/
-        pmdev->pages[i].mfr_id = "SUGON";
-        pmdev->pages[i].mfr_model = "CRPS2000W-1A";
-        pmdev->pages[i].mfr_revision = "A01";
-        pmdev->pages[i].mfr_location = "SHENZHEN";
-        pmdev->pages[i].mfr_date = "2016/05/31";
-        pmdev->pages[i].mfr_serial = "3312345678901234";
-        pmdev->pages[i].version = "V1.2.1";
-
-        pmdev->pages[i].status_mfr_specific = 0x01;  /* 0:没有电源输入   1:AC输入  2:DC输入 */
     }
 }
 
@@ -149,6 +139,19 @@ static void raa228000_exit_reset(Object *obj)
     PMBusDevice *pmdev = PMBUS_DEVICE(obj);
 
     isl_pmbus_vr_exit_reset(obj);
+
+    /**************************************** PSU INFO ****************************************/
+    strcpy(pmdev->pages[0].mfr_id, "SUGON");
+    strcpy(pmdev->pages[0].mfr_model,"CRPS2000W-1A");
+    strcpy(pmdev->pages[0].mfr_revision, "A01");
+    strcpy(pmdev->pages[0].mfr_location, "SHENZHEN");
+    strcpy(pmdev->pages[0].mfr_date, "2016/05/31");
+    strcpy(pmdev->pages[0].mfr_serial, "3312345678901234");
+    strcpy(pmdev->pages[0].version, "V1.2.1");
+
+    pmdev->pages[0].status_mfr_specific = 0x01;  /* 0:没有电源输入   1:AC输入  2:DC输入 */
+
+    pmdev->pages[0].mfr_pout_max = 1200;
 
     pmdev->pages[0].read_vout = 12;
     pmdev->pages[0].read_iout = 10;
@@ -163,8 +166,6 @@ static void raa228000_exit_reset(Object *obj)
     pmdev->pages[0].read_temperature_3 = 0;
 
     pmdev->pages[0].read_fan_speed_1 = 900;
-
-    pmdev->pages[0].mfr_pout_max = 1200;
 }
 
 static void psu_realize(DeviceState *dev, Error **errp) {
