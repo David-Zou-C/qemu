@@ -198,6 +198,21 @@ static void *send_thread(void *pVoid) {
                         sprintf(addr, "0x%02x", deviceAddList[i].pmBusPage->ptrDeviceConfig->addr);
                         cJSON_AddStringToObject(device, "address", addr);
 
+                        cJSON_AddStringToObject(device, "MFR_id", pmBusPage->mfr_id);
+                        cJSON_AddStringToObject(device, "MFR_model", pmBusPage->mfr_model);
+                        cJSON_AddStringToObject(device, "MFR_revision", pmBusPage->mfr_revision);
+                        cJSON_AddStringToObject(device, "MFR_location", pmBusPage->mfr_location);
+                        cJSON_AddStringToObject(device, "MFR_date", pmBusPage->mfr_date);
+                        cJSON_AddStringToObject(device, "MFR_serial", pmBusPage->mfr_serial);
+                        cJSON_AddStringToObject(device, "MFR_version", pmBusPage->version);
+                        if (pmBusPage->status_mfr_specific == 1) {
+                            cJSON_AddStringToObject(device, "MFR_specific", "AC");
+                        } else if (pmBusPage->status_mfr_specific == 2) {
+                            cJSON_AddStringToObject(device, "MFR_specific", "DC");
+                        } else {
+                            cJSON_AddNullToObject(device, "MFR_specific");
+                        }
+
                         cJSON_AddNumberToObject(device, "PSU_Vin", pmBusPage->read_vin);
                         cJSON_AddNumberToObject(device, "PSU_Iin", pmBusPage->read_iin);
                         cJSON_AddNumberToObject(device, "PSU_Pin", pmBusPage->read_pin);
