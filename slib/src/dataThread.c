@@ -207,6 +207,8 @@ static void *send_thread(void *pVoid) {
                         cJSON_AddNumberToObject(device, "PSU_Hs_Temp", pmBusPage->read_temperature_1);
                         cJSON_AddNumberToObject(device, "PSU_Amb_Temp", pmBusPage->read_temperature_2);
                         cJSON_AddNumberToObject(device, "PSU_FanSpeed", pmBusPage->read_fan_speed_1);
+                        cJSON_AddNumberToObject(device, receive_times_str, (double) pmBusPage->receive_times);
+                        cJSON_AddNumberToObject(device, write_times_str, (double) pmBusPage->write_times);
                         break;
                     case I2C_EEPROM:
                         /* I2C Device0 - EEPROM */

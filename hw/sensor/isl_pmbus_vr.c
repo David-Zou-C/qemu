@@ -48,7 +48,7 @@ static uint8_t isl_pmbus_vr_read_byte(PMBusDevice *pmdev)
         pmbus_send_string(pmdev, "3312345678901234");
         return 0;
     case 0x80:  /* 生产工厂所在城市 */
-        pmbus_send8(pmdev, 0x01);
+        pmbus_send8(pmdev, 0x02);
         return 0;
     case 0xD0:
         pmbus_send_string(pmdev, "V1.2.1");

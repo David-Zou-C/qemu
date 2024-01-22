@@ -316,6 +316,8 @@ typedef struct PMBusPage {
     uint16_t mfr_max_temp_2;           /* R/W word */
     uint16_t mfr_max_temp_3;           /* R/W word */
     PTR_DEVICE_CONFIG ptrDeviceConfig;
+    uint64_t receive_times;
+    uint64_t write_times;
 } PMBusPage;
 
 
