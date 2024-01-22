@@ -717,7 +717,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                 break;
             }
             int data_i = 0;
-            uint32_t n = 0, k = 0;
+            uint32_t n = 0, kj = 0;
             uint32_t reg_type;
             char *temp_mfr;
             while (data_i < len) {
@@ -755,10 +755,10 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                         } else if (reg_type == 6) {
                             temp_mfr = pmBusPage->version;
                         }
-                        for (k = 0; k < n && k < 50-1; ++k) {
-                            temp_mfr[k] = (char) initial_data[data_i++];
+                        for (kj = 0; kj < n && kj < 50-1; ++kj) {
+                            temp_mfr[kj] = (char) initial_data[data_i++];
                         }
-                        temp_mfr[k] = 0;
+                        temp_mfr[kj] = 0;
                         break;
                     case 7:
                         /* mfr_specific */
