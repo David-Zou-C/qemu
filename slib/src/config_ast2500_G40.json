@@ -171,25 +171,25 @@
     },
     {
       "description": "CPU0_VR_VCORE1",
-      "device_type_id": 21,
+      "device_type_id": 501,
       "bus": 6,
       "addr": "0x20"
     },
     {
       "description": "CPU0_VR_VSOC1",
-      "device_type_id": 21,
+      "device_type_id": 501,
       "bus": 4,
       "addr": "0x21"
     },
     {
       "description": "PSU1",
-      "device_type_id": 21,
+      "device_type_id": 501,
       "bus": 4,
       "addr": "0x58"
     },
     {
       "description": "PSU2",
-      "device_type_id": 21,
+      "device_type_id": 501,
       "bus": 4,
       "addr": "0x5a"
     },
