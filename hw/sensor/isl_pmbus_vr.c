@@ -30,7 +30,7 @@ static uint8_t isl_pmbus_vr_read_byte(PMBusDevice *pmdev)
         pmbus_send16(pmdev, pmdev->pages[0].read_fan_speed_1);
         return 0;
     case 0x99:  /* 厂商信息 */
-        pmbus_send_string(pmdev, "SUGON");
+        pmbus_send_string(pmdev, "SUGON1");
         return 0;
     case 0x9a:  /* 型号 */
         pmbus_send_string(pmdev, "CRPS2000W-1A");
@@ -42,16 +42,19 @@ static uint8_t isl_pmbus_vr_read_byte(PMBusDevice *pmdev)
         pmbus_send_string(pmdev, "SHENZHEN");
         return 0;
     case 0x9D:  /* 生产工厂所在城市 */
-        pmbus_send_string(pmdev, "2016/05/31");
+        pmbus_send_string(pmdev, "2024/01/01");
         return 0;
     case 0x9E:  /* 生产工厂所在城市 */
-        pmbus_send_string(pmdev, "3312345678901234");
+        pmbus_send_string(pmdev, "abc1232465421321");
         return 0;
     case 0x80:  /* 0:没有电源输入   1:AC输入  2:DC输入 */
         pmbus_send8(pmdev, 0x01);
         return 0;
     case 0xD0:
         pmbus_send_string(pmdev, "V1.2.1");
+        return 0;
+    case 0xA7:
+        pmbus_send16(pmdev, 1200);
         return 0;
     }
 
