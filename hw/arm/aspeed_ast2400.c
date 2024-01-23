@@ -499,6 +499,14 @@ static void aspeed_ast2400_soc_realize(DeviceState *dev, Error **errp)
                     sc->memmap[ASPEED_DEV_HACE]);
     sysbus_connect_irq(SYS_BUS_DEVICE(&s->hace), 0,
                        aspeed_soc_get_irq(s, ASPEED_DEV_HACE));
+
+    /* PWM */
+    if (!sysbus_realize(SYS_BUS_DEVICE(&s->pwm), errp)) {
+        return;
+    }
+    aspeed_mmio_map(s, SYS_BUS_DEVICE(&s->pwm), 0, sc->memmap[ASPEED_DEV_PWM]);
+    sysbus_connect_irq(SYS_BUS_DEVICE(&s->pwm), 0,
+                       aspeed_soc_get_irq(s, ASPEED_DEV_PWM));
 }
 
 static void aspeed_soc_ast2400_class_init(ObjectClass *oc, void *data)
