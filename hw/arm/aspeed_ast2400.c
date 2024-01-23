@@ -239,6 +239,7 @@ static void aspeed_ast2400_soc_init(Object *obj)
 
     object_initialize_child(obj, "iomem", &s->iomem, TYPE_UNIMPLEMENTED_DEVICE);
     object_initialize_child(obj, "video", &s->video, TYPE_UNIMPLEMENTED_DEVICE);
+    object_initialize_child(obj, "pwm", &s->pwm, TYPE_ASPEED_PWM);
 }
 
 static void aspeed_ast2400_soc_realize(DeviceState *dev, Error **errp)
