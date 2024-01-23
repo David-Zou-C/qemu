@@ -236,6 +236,7 @@ static void *send_thread(void *pVoid) {
                         sprintf(addr, "0x%02x", deviceAddList[i].ptrI2cDeviceData->ptrDeviceConfig->addr);
                         cJSON_AddStringToObject(device, "address", addr);
 
+                        cJSON_AddNumberToObject(device, "size", ptrI2CEepromSType->total_size);
                         cJSON *monitor_data = cJSON_CreateObject();
                         for (int j = 0; j < ptrI2CEepromSType->monitor_data_len; ++j) {
                             if (ptrI2CEepromSType->monitor_data[j] < ptrI2CEepromSType->total_size) {
