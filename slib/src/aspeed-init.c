@@ -824,11 +824,11 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                 break;
             }
 
-            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "WAVEFORM", &len);
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_WAVEFORM", &len);
             if (len > 0) {
                 pthread_mutex_lock(&ptrGpioSwitchSType->pin_state_mutex[initial_data[0]]);
                 ptrGpioSwitchSType->pinWaveformGenerator_list[initial_data[0]].waveform_len = 0;
-                for (int k = 0; k < len; ++k) {
+                for (int k = 0; k < len && k < PIN_WAVEFORM_BUF_MAX_BIT-1; ++k) {
                     if (ctrl_data[k] == 0) {
                         ptrGpioSwitchSType->pinWaveformGenerator_list[initial_data[0]]
                         .waveform_buf[ptrGpioSwitchSType->pinWaveformGenerator_list[initial_data[0]].waveform_len++] = FALSE;
@@ -843,7 +843,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
             }
             free(ctrl_data);
 
-            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "WAVEFORM_TYPE", &len);
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_WAVEFORM_TYPE", &len);
             if (len > 0) {
                 pthread_mutex_lock(&ptrGpioSwitchSType->pin_state_mutex[initial_data[0]]);
                 if (ctrl_data[0] == 0) {
@@ -859,7 +859,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
             }
             free(ctrl_data);
 
-            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "WAVEFORM_RATE", &len);
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_WAVEFORM_RATE", &len);
             if (len > 0) {
                 pthread_mutex_lock(&ptrGpioSwitchSType->pin_state_mutex[initial_data[0]]);
                 if (ctrl_data[0] <= PIN_WAVEFORM_RATE_MAX) {
@@ -871,7 +871,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
             }
             free(ctrl_data);
 
-            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "WAVEFORM_STOP", &len);
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_WAVEFORM_STOP", &len);
             if (len > 0) {
                 pthread_mutex_lock(&ptrGpioSwitchSType->pin_state_mutex[initial_data[0]]);
                 ptrGpioSwitchSType->pinWaveformGenerator_list[initial_data[0]].stop_waveform_generator = (ctrl_data[0] != 0);

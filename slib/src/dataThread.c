@@ -292,6 +292,7 @@ static void *send_thread(void *pVoid) {
                         ptrGpioSwitchSType = (PTR_GPIO_SWITCH_sTYPE) (deviceAddList[i].ptrGpioDeviceData->data_buf);
                         cJSON_AddStringToObject(device, "description",
                                                 deviceAddList[i].ptrGpioDeviceData->ptrDeviceConfig->description);
+                        cJSON_AddNumberToObject(device, "pin_nums", deviceAddList[i].ptrGpioDeviceData->pin_nums);
                         cJSON *pins = cJSON_CreateArray();
                         for (int j = 0; j < deviceAddList[i].ptrGpioDeviceData->pin_nums; ++j) {
                             cJSON *pin = cJSON_CreateObject();
