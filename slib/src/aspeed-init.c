@@ -691,7 +691,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                             ptrI2CBpCpldSType->i2CBpCpldData.exp_manufacture = initial_data[val_i];
                             break;
                         case 0xA0 ... 0xBF:
-                            ptrI2CBpCpldSType->i2CBpCpldData.bp_name[reg_i - 0xA0] = (char )initial_data[val_i];
+                            ptrI2CBpCpldSType->i2CBpCpldData.bp_name[initial_data[reg_i] - 0xA0] = (char )initial_data[val_i];
                             break;
                         default:
                             break;

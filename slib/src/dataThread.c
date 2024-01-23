@@ -266,6 +266,8 @@ static void *send_thread(void *pVoid) {
                         cJSON_AddNumberToObject(device, "max_hdd_num", ptrI2CBpCpldSType->i2CBpCpldData.max_hdd_num);
                         cJSON_AddNumberToObject(device, "cpld_revision", ptrI2CBpCpldSType->i2CBpCpldData.revision);
                         cJSON_AddNumberToObject(device, "bp_type_id", ptrI2CBpCpldSType->i2CBpCpldData.bp_type_id);
+                        cJSON_AddNumberToObject(device, "update_flag", ptrI2CBpCpldSType->i2CBpCpldData.update_flag);
+                        cJSON_AddNumberToObject(device, "exp_manufacture", ptrI2CBpCpldSType->i2CBpCpldData.exp_manufacture);
                         cJSON_AddStringToObject(device, "bp_name", ptrI2CBpCpldSType->i2CBpCpldData.bp_name);
                         cJSON *hdd_infos = cJSON_CreateArray();
 
@@ -281,6 +283,7 @@ static void *send_thread(void *pVoid) {
                             cJSON_AddNumberToObject(hdd_info, "Fail", ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Fail);
                             cJSON_AddItemToArray(hdd_infos, hdd_info);
                         }
+                        cJSON_AddItemToObject(device, "hdd_infos", hdd_infos);
                         cJSON_AddNumberToObject(device, receive_times_str, (double) ptrI2CBpCpldSType->receive_times);
                         cJSON_AddNumberToObject(device, write_times_str, (double) ptrI2CBpCpldSType->write_times);
                         break;
