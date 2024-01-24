@@ -65,8 +65,10 @@ static double get_rpm_from_duty(float duty, uint8_t fan_loc)
               (duty - ptrRpmDuty->min_offset) / (ptrRpmDuty->max_offset - ptrRpmDuty->min_offset) *
               (ptrRpmDuty->max_rpm - ptrRpmDuty->min_rpm);
     }
-    double a = rand() % (DEVIATION_RATE * 2 * 100) / 100.0;
-    ret = ret * (1 - DEVIATION_RATE/100.0 + a/100.0);
+    if (ptrRpmDuty->rand_deviation_rate > 0) {
+        double a = rand() % (ptrRpmDuty->rand_deviation_rate * 2 * 100) / 100.0;
+        ret = ret * (1 - ptrRpmDuty->rand_deviation_rate/100.0 + a/100.0);
+    }
     return ret;
 }
 

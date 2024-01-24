@@ -12,7 +12,7 @@ typedef struct RPM_DUTY_ {
     double min_rpm;
     double min_offset;
     double max_offset;
-    double rand_deviation_rate;
+    int rand_deviation_rate;
 } RPM_DUTY, *PTR_RPM_DUTY;
 
 typedef struct PWM_TACH_DEVICE_{
