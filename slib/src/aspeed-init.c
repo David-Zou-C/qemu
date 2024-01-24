@@ -961,7 +961,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
             if (len < 1) {
                 ;
             } else {
-                ptrPwmTachDevice->ptrRpmDuty->min_offset = (ctrl_data[0] % 1000) / 1000.0;
+                ptrPwmTachDevice->ptrRpmDuty->min_offset = (ctrl_data[0] % 1001) / 1000.0;
             }
             free(ctrl_data);
             
@@ -969,7 +969,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
             if (len < 1) {
                 ;
             } else {
-                ptrPwmTachDevice->ptrRpmDuty->max_offset = (ctrl_data[0] % 1000) / 1000.0;
+                ptrPwmTachDevice->ptrRpmDuty->max_offset = (ctrl_data[0] % 1001) / 1000.0;
             }
             free(ctrl_data);
             
