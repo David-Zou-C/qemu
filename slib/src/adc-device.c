@@ -12,8 +12,6 @@ uint8_t adc_reg10_has_read = FALSE;
 
 static void *adc_control_thread(void *pVoidAdcDeviceData) {
     PTR_ADC_DEVICE_DATA ptrAdcDeviceData = (PTR_ADC_DEVICE_DATA) pVoidAdcDeviceData;
-    char temp[20];
-    char *end;
     uint32_t real_vol = 0;
     double sample_vol = 0;
     uint16_t real_reg = 0;
@@ -30,12 +28,7 @@ static void *adc_control_thread(void *pVoidAdcDeviceData) {
     while (TRUE) {
 //        pthread_mutex_lock(&ptrAdcDeviceData->value_mutex);
         real_vol = ptrAdcDeviceData->set_adc_value;
-        if (*end != '\0') {
-            /* 停止符 不为 \0，表示遇到非10进制字符，此时非预期值，应该跳出设置 */
-//            pthread_mutex_unlock(&ptrAdcDeviceData->value_mutex);
-            usleep(500 * 1000);  /* 0.5 s */
-            continue;
-        }
+
         division = (double )(ptrAdcDeviceData->division) / 1000;
         sample_vol = ((double )real_vol) / division;
         real_reg = (uint16_t )(sample_vol * 1024 / 2500 - 256);
