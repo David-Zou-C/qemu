@@ -107,6 +107,7 @@ static void *send_thread(void *pVoid) {
                         /**************************************** 数据处理 - S ****************************************/
                         /* 先发送 desc 信息 */
                         cJSON_AddStringToObject(device, "description", deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
                         cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->i2c_dev.device_name);
                         cJSON_AddNumberToObject(device, "bus",
                                                 deviceAddList[i].ptrDeviceConfig->bus);
@@ -135,6 +136,7 @@ static void *send_thread(void *pVoid) {
                         /**************************************** 数据处理并发送 - S ****************************************/
                         /* 先发送 desc 信息 */
                         cJSON_AddStringToObject(device, "description", deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
                         cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->i2c_dev.device_name);
                         cJSON_AddNumberToObject(device, "bus",
                                                 deviceAddList[i].ptrDeviceConfig->bus);
@@ -153,6 +155,7 @@ static void *send_thread(void *pVoid) {
                         ptrSmbusTpa626SType = (PTR_SMBUS_TPA626_sTYPE) (deviceAddList[i].ptrSmbusDeviceData->data_buf);
                         /**************************************** 数据处理并发送 - S ****************************************/
                         cJSON_AddStringToObject(device, "description", deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
                         cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->i2c_dev.device_name);
                         cJSON_AddNumberToObject(device, "bus",
                                                 deviceAddList[i].ptrDeviceConfig->bus);
@@ -181,6 +184,7 @@ static void *send_thread(void *pVoid) {
                         /* 先发送 desc 信息 */
                         cJSON_AddStringToObject(device, "description",
                                                 deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
                         cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->i2c_dev.device_name);
                         cJSON_AddNumberToObject(device, "bus",
                                                 deviceAddList[i].ptrDeviceConfig->bus);
@@ -196,6 +200,7 @@ static void *send_thread(void *pVoid) {
                     case PMBUS_PSU:
                         pmBusPage = (PMBusPage *) deviceAddList[i].pmBusPage;
                         cJSON_AddStringToObject(device, "description", pmBusPage->ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
                         cJSON_AddStringToObject(device, "master", pmBusPage->ptrDeviceConfig->i2c_dev.device_name);
                         cJSON_AddNumberToObject(device, "bus",
                                                 deviceAddList[i].pmBusPage->ptrDeviceConfig->bus);
@@ -235,6 +240,7 @@ static void *send_thread(void *pVoid) {
                         /* 发送 */
                         cJSON_AddStringToObject(device, "description",
                                                 deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
                         cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->i2c_dev.device_name);
                         cJSON_AddNumberToObject(device, "bus",
                                                 deviceAddList[i].ptrDeviceConfig->bus);
@@ -261,6 +267,7 @@ static void *send_thread(void *pVoid) {
                         /* 先发送 desc 信息 */
                         cJSON_AddStringToObject(device, "description",
                                                 deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
                         cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->i2c_dev.device_name);
                         cJSON_AddNumberToObject(device, "bus",
                                                 deviceAddList[i].ptrDeviceConfig->bus);
@@ -298,6 +305,7 @@ static void *send_thread(void *pVoid) {
                         ptrGpioSwitchSType = (PTR_GPIO_SWITCH_sTYPE) (deviceAddList[i].ptrGpioDeviceData->data_buf);
                         cJSON_AddStringToObject(device, "description",
                                                 deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
                         cJSON_AddNumberToObject(device, "pin_nums", deviceAddList[i].ptrGpioDeviceData->pin_nums);
                         cJSON *pins = cJSON_CreateArray();
                         for (int j = 0; j < deviceAddList[i].ptrGpioDeviceData->pin_nums; ++j) {
@@ -333,6 +341,7 @@ static void *send_thread(void *pVoid) {
                         /* ADC  */
                         cJSON_AddStringToObject(device, "description",
                                                 deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
                         cJSON_AddNumberToObject(device, "adc_channel",
                                                 deviceAddList[i].ptrDeviceConfig->adc_channel);
                         if (deviceAddList[i].ptrAdcDeviceData->adcRegType == REG_L) {
@@ -349,6 +358,7 @@ static void *send_thread(void *pVoid) {
                         /* PCA9546 */
                         cJSON_AddStringToObject(device, "description",
                                                 deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
                         cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->i2c_dev.device_name);
                         cJSON_AddNumberToObject(device, "bus",
                                                 deviceAddList[i].ptrDeviceConfig->bus);
