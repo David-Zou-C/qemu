@@ -589,6 +589,8 @@ static void ast2500_evb_i2c_init(AspeedMachineState *bmc)
             adc_device_add0(&(soc->adc.engines[0]), pDeviceConfig);
         } else if (pDeviceConfig->deviceType == PCA954X_DEVICE_TYPE) {
             pca_device_add(master_bus, pDeviceConfig);
+        } else if (pDeviceConfig->deviceType == PWM_TACH_DEVICE_TYPE) {
+            pwm_device_add(pDeviceConfig);
         }
 
         if (pDeviceConfig->next == NULL) {
@@ -671,7 +673,6 @@ static void ast2600_evb_i2c_init(AspeedMachineState *bmc)
         }
 
         /**************************************** - ****************************************/
-        printf("device_type_id-%d == device_type-%d \n", pDeviceConfig->device_type_id, pDeviceConfig->deviceType);
         if (pDeviceConfig->deviceType == SMBUS_DEVICE_TYPE) {
             SMBusFunctionPtr smBusFunctionPtr = getSMBusDeviceAddFunc(pDeviceConfig->device_type_id);
             smBusFunctionPtr(master_bus, pDeviceConfig);
