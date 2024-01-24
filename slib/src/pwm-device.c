@@ -16,6 +16,7 @@ void pwm_device_add(PTR_DEVICE_CONFIG ptrDeviceConfig) {
     PTR_PWM_TACH_DEVICE ptrPwmTachDevice = (PTR_PWM_TACH_DEVICE) malloc(sizeof(PWM_TACH_DEVICE));
     memset(ptrPwmTachDevice, 0, sizeof(PWM_TACH_DEVICE));
 
+    ptrPwmTachDevice->ptrDeviceConfig = ptrDeviceConfig;
     ptrPwmTachDevice->pwm_tach_num = ptrDeviceConfig->pwm_tach_num;
     printf("pwm device added - %d\n", ptrPwmTachDevice->pwm_tach_num);
     if (ptrPwmTachDevice->pwm_tach_num < 8) {
