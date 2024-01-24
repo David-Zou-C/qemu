@@ -977,7 +977,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
             if (len < 1) {
                 ;
             } else {
-                ptrPwmTachDevice->ptrRpmDuty->rand_deviation_rate = ctrl_data[0];
+                ptrPwmTachDevice->ptrRpmDuty->rand_deviation_rate = (int)ctrl_data[0];
             }
             free(ctrl_data);
             

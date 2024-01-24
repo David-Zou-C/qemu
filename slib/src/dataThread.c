@@ -366,6 +366,24 @@ static void *send_thread(void *pVoid) {
                         cJSON_AddStringToObject(device, "address", addr);
 
                         break;
+                    case PWM_TACH:
+                        /* PWM_TACH */
+                        cJSON_AddStringToObject(device, "description",
+                                                deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
+                        cJSON_AddNumberToObject(device, "pwm_tach_num",
+                                                deviceAddList[i].ptrPwmTachDevice->pwm_tach_num);
+                        cJSON_AddNumberToObject(device, "min_rpm",
+                                                deviceAddList[i].ptrPwmTachDevice->ptrRpmDuty->min_rpm);
+                        cJSON_AddNumberToObject(device, "max_rpm",
+                                                deviceAddList[i].ptrPwmTachDevice->ptrRpmDuty->max_rpm);
+                        cJSON_AddNumberToObject(device, "min_offset",
+                                                deviceAddList[i].ptrPwmTachDevice->ptrRpmDuty->min_offset);
+                        cJSON_AddNumberToObject(device, "max_offset",
+                                                deviceAddList[i].ptrPwmTachDevice->ptrRpmDuty->max_offset);
+                        cJSON_AddNumberToObject(device, "rand_deviation_rate",
+                                                deviceAddList[i].ptrPwmTachDevice->ptrRpmDuty->rand_deviation_rate);
+                        break;
                     default:
                         break;
                 }
@@ -516,6 +534,10 @@ static void *read_data_thread(void *pVoid) {
                                                 deviceAddList[device_index].ptrAdcDeviceData, endPtr);
                             pthread_mutex_unlock(&deviceAddList[device_index].ptrAdcDeviceData->value_mutex);
                             break;
+                        case PWM_TACH:
+                            /* PWM_TACH */
+                            dynamic_change_data(deviceAddList[device_index].device_type_id,
+                                                deviceAddList[device_index].ptrPwmTachDevice, endPtr);
                         default:
                             sprintf(temp, "device type id - '%d' not processed! ", deviceAddList[device_index].device_type_id);
                             file_log(temp, LOG_TIME_END);
