@@ -5,7 +5,7 @@
 #ifndef QEMU_PWM_DEVICE_H
 #define QEMU_PWM_DEVICE_H
 
-#include "aspeed-init.h"
+#include "slib-common.h"
 
 typedef struct RPM_DUTY_ {
     double max_rpm;

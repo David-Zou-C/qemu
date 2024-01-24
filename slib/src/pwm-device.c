@@ -4,7 +4,7 @@
  **************************************************/
 
 #include "pwm-device.h"
-
+#include "aspeed-init.h"
 
 RPM_DUTY gRpmDuty[8] = {0};
 
