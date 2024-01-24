@@ -1064,12 +1064,11 @@ PTR_CONFIG_DATA parse_configuration(void) {
             exit(1);
         }
         tempConfigJson->device_type_id = device_type_id->valueint;
-        tempConfigJson->deviceType = get_device_type(tempConfigJson->device_type_id);
 
         DEVICE_TYPE deviceType = get_device_type(device_type_id->valueint);
-        sprintf(temp_desc, "device_type_id-%d ==> device_type-%d", device_type_id->valueint, deviceType);
-        FUNC_DEBUG(temp_desc)
-        printf("%s \n", temp_desc);
+
+        tempConfigJson->deviceType = deviceType;
+
         /**************************************** bus addr i2c args ****************************************/
         FUNC_DEBUG("function: parse_configuration() -> bus & addr")
         if (deviceType == SMBUS_DEVICE_TYPE ||

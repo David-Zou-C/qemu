@@ -671,6 +671,7 @@ static void ast2600_evb_i2c_init(AspeedMachineState *bmc)
         }
 
         /**************************************** - ****************************************/
+        printf("device_type_id-%d == device_type-%d \n", pDeviceConfig->device_type_id, pDeviceConfig->deviceType);
         if (pDeviceConfig->deviceType == SMBUS_DEVICE_TYPE) {
             SMBusFunctionPtr smBusFunctionPtr = getSMBusDeviceAddFunc(pDeviceConfig->device_type_id);
             smBusFunctionPtr(master_bus, pDeviceConfig);
