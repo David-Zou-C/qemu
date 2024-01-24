@@ -177,11 +177,15 @@ I2CBus *pca954x_i2c_get_bus(I2CSlave *mux, uint8_t channel)
 static void pca9546_realize(DeviceState *dev, Error **errp)
 {
     Pca954xState *pca954x = PCA954X(dev);
+    int index;
 
     if (pca954x->ptrDeviceConfig == NULL) {
         return;
     }
-    device_add(PCA9546, pca954x->ptrDeviceConfig->name, pca954x, NULL);
+    index = device_add(PCA9546, pca954x->ptrDeviceConfig->name, pca954x, NULL);
+    if (index > 0) {
+        deviceAddList[index].ptrDeviceConfig = pca954x->ptrDeviceConfig;
+    }
 }
 
 static void pca9546_class_init(ObjectClass *klass, void *data)

@@ -33,7 +33,7 @@ MAC_DEVICE_INFO macDeviceInfo[MAC_DEVICE_INFO_MAX_NUM] = {
         { /* end of list */ }
 };
 
-void device_add(DEVICE_TYPE_ID device_type_id, const char *device_name, void *vPtrDeviceData, void *vPtrDevGpio) {
+int device_add(DEVICE_TYPE_ID device_type_id, const char *device_name, void *vPtrDeviceData, void *vPtrDevGpio) {
     FUNC_DEBUG("function: device_add()")
     for (int i = 0; i < DEVICE_MAX_NUM; ++i) {
         if (deviceAddList[i].exist == 0) {
@@ -48,30 +48,38 @@ void device_add(DEVICE_TYPE_ID device_type_id, const char *device_name, void *vP
                        (device_type_id < SMBUS_DEVICE_TYPE_ID_OFFSET + SMBUS_DEVICE_TOTAL_NUM)) {
                 deviceAddList[i].ptrSmbusDeviceData = vPtrDeviceData;
                 deviceAddList[i].device_type = SMBUS_DEVICE_TYPE;
+                deviceAddList[i].ptrDeviceConfig = deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig;
             } else if (device_type_id == PMBUS_PSU){
                 deviceAddList[i].pmBusPage = vPtrDeviceData;
                 deviceAddList[i].device_type = PMBUS_DEVICE_TYPE;
+                deviceAddList[i].ptrDeviceConfig = deviceAddList[i].pmBusPage->ptrDeviceConfig;
             } else if ((device_type_id >= I2C_DEVICE_TYPE_ID_OFFSET) &&
                        (device_type_id < I2C_DEVICE_TYPE_ID_OFFSET + I2C_DEVICE_TOTAL_NUM)) {
                 deviceAddList[i].ptrI2cDeviceData = vPtrDeviceData;
                 deviceAddList[i].device_type = I2C_DEVICE_TYPE;
+                deviceAddList[i].ptrDeviceConfig = deviceAddList[i].ptrI2cDeviceData->ptrDeviceConfig;
             } else if ((device_type_id >= GPIO_DEVICE_TYPE_ID_OFFSET) &&
                        (device_type_id < GPIO_DEVICE_TYPE_ID_OFFSET + GPIO_DEVICE_TOTAL_NUM)) {
                 deviceAddList[i].ptrGpioDeviceData = vPtrDeviceData;
                 deviceAddList[i].device_type = GPIO_DEVICE_TYPE;
+                deviceAddList[i].ptrDeviceConfig = deviceAddList[i].ptrGpioDeviceData->ptrDeviceConfig;
             } else if ((device_type_id >= ADC_DEVICE_TYPE_ID_OFFSET) &&
                        (device_type_id < ADC_DEVICE_TYPE_ID_OFFSET + ADC_DEVICE_TOTAL_NUM)) {
                 deviceAddList[i].ptrAdcDeviceData = vPtrDeviceData;
                 deviceAddList[i].device_type = ADC_DEVICE_TYPE;
+                deviceAddList[i].ptrDeviceConfig = deviceAddList[i].ptrAdcDeviceData->ptrDeviceConfig;
             } else if (device_type_id == PCA9546 || device_type_id == PCA9548) {
                 deviceAddList[i].pca954x = vPtrDeviceData;
                 deviceAddList[i].device_type = PCA954X_DEVICE_TYPE;
+                /* 对于 PCA954X 而言 ptrDeviceConfig 无法在此处直接赋值，返回索引值后，由设备的 realize 函数中赋值 */
             }
-            return;
+            return i;
         }
     }
+
     printf("device exceed max num! \n");
     exit(1);
+    return -1;
 }
 
 int get_device_index(void *vPtrDeviceData) {
@@ -478,6 +486,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
     PTR_ADC_DEVICE_DATA ptrAdcDeviceData;
     PMBusPage *pmBusPage;
     char temp[128];
+    char *end=NULL;
     uint64_t len;
     uint32_t *initial_data = NULL;
     uint32_t *ctrl_data = NULL;
@@ -888,15 +897,36 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
             if (len < 1) {
                 ;
             } else {
-                ptrAdcDeviceData->set_adc_value = initial_data[0];
+                uint32_t temp_adc_value;
+                sprintf(temp, "%2x", initial_data[0]);
+                temp_adc_value = strtoul(temp, &end, 10);
+                if (*end != '\0') {
+                    /* 停止符 不为 \0，表示遇到非10进制字符，此时非预期值，应该跳出设置 */
+                    ;
+                } else {
+                    ptrAdcDeviceData->set_adc_value = temp_adc_value;
+                }
             }
 
-            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "DIVISION", &len);
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_ADC_REGISTER", &len);
+            if (len < 1) {
+                ;
+            } else {
+                if (ptrAdcDeviceData->adcRegType == REG_L) {
+                    ptrAdcDeviceData->ptrAdcReg->reg_lh.l = ctrl_data[0];
+                } else {
+                    ptrAdcDeviceData->ptrAdcReg->reg_lh.h = ctrl_data[0];
+                }
+            }
+            free(ctrl_data);
+
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_DIVISION", &len);
             if (len < 1) {
                 ;
             } else {
                 ptrAdcDeviceData->division = ctrl_data[0];
             }
+            free(ctrl_data);
 
             free(initial_data);
             break;
@@ -1021,6 +1051,9 @@ PTR_CONFIG_DATA parse_configuration(void) {
 
             /* i2c */
             if (i2c == NULL) {
+                /* 没有指定 i2c 字段，即默认为 0 - BMC，应自动填充 index 和 name 字段，以方便直接使用 */
+                tempConfigJson->i2c_dev.device_index = 0;
+                sprintf(tempConfigJson->i2c_dev.device_name, "BMC");
             } else if (i2c->type == cJSON_Object) {
                 /* i2c_device */
                 cJSON *i2c_device = cJSON_GetObjectItem(i2c, "device");
@@ -1029,9 +1062,9 @@ PTR_CONFIG_DATA parse_configuration(void) {
                     exit(1);
                 } else if (i2c_device->type == cJSON_Number) {
                     tempConfigJson->i2c_dev.device_index = i2c_device->valueint;
-                    tempConfigJson->i2c_dev.device_name[0] = 0;
+                    sprintf(tempConfigJson->i2c_dev.device_name, "device[%d]", tempConfigJson->i2c_dev.device_index);
                 } else if (i2c_device->type == cJSON_String) {
-                    tempConfigJson->i2c_dev.device_index = -1;
+                    tempConfigJson->i2c_dev.device_index = -1;  /* 设置为 -1，表示是无效的，index 应该留至之后设置 */
                     strcpy(tempConfigJson->i2c_dev.device_name, i2c_device->valuestring);
                 } else {
                     printf("The devices[%d]: 'i2c > device' is not a number or string ! \n", i);
