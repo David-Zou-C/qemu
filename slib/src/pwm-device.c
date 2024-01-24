@@ -17,6 +17,7 @@ void pwm_device_add(PTR_DEVICE_CONFIG ptrDeviceConfig) {
     memset(ptrPwmTachDevice, 0, sizeof(PWM_TACH_DEVICE));
 
     ptrPwmTachDevice->pwm_tach_num = ptrDeviceConfig->pwm_tach_num;
+    printf("pwm device added - %d\n", ptrPwmTachDevice->pwm_tach_num);
     if (ptrPwmTachDevice->pwm_tach_num < 8) {
         ptrPwmTachDevice->ptrRpmDuty = &gRpmDuty[ptrPwmTachDevice->pwm_tach_num];
     }
