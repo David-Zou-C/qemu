@@ -538,6 +538,7 @@ static void *read_data_thread(void *pVoid) {
                             /* PWM_TACH */
                             dynamic_change_data(deviceAddList[device_index].device_type_id,
                                                 deviceAddList[device_index].ptrPwmTachDevice, endPtr);
+                            break;
                         default:
                             sprintf(temp, "device type id - '%d' not processed! ", deviceAddList[device_index].device_type_id);
                             file_log(temp, LOG_TIME_END);

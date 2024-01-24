@@ -1157,7 +1157,7 @@ PTR_CONFIG_DATA parse_configuration(void) {
                 printf("The devices[%d]: 'pwm_tach_num' not found, but it is necessary! \n", i);
                 exit(1);
             } else if (pwm_tach_num->type != cJSON_Number) {
-                printf("The devices[%d]: 'pwm_tach_num' it is not a number! \n");
+                printf("The devices[%d]: 'pwm_tach_num' it is not a number! \n", i);
                 exit(1);
             }
             tempConfigJson->pwm_tach_num = pwm_tach_num->valueint;
