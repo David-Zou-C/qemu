@@ -15,8 +15,8 @@
 #include "i2c-device.h"
 #include "gpio-device.h"
 #include "adc-device.h"
-#include "dataThread.h"
 #include "pwm-device.h"
+#include "dataThread.h"
 
 #define sDEBUG 1
 
