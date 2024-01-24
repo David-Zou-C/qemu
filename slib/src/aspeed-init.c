@@ -72,7 +72,12 @@ int device_add(DEVICE_TYPE_ID device_type_id, const char *device_name, void *vPt
                 deviceAddList[i].pca954x = vPtrDeviceData;
                 deviceAddList[i].device_type = PCA954X_DEVICE_TYPE;
                 /* 对于 PCA954X 而言 ptrDeviceConfig 无法在此处直接赋值，返回索引值后，由设备的 realize 函数中赋值 */
+            } else if (device_type_id == PWM_TACH) {
+                deviceAddList[i].ptrPwmTachDevice = vPtrDeviceData;
+                deviceAddList[i].device_type = PWM_TACH_DEVICE_TYPE;
+                deviceAddList[i].ptrDeviceConfig = deviceAddList[i].ptrPwmTachDevice->ptrDeviceConfig;
             }
+                
             return i;
         }
     }
@@ -127,6 +132,8 @@ DEVICE_TYPE get_device_type(DEVICE_TYPE_ID device_type_id) {
         return ADC_DEVICE_TYPE;
     } else if (device_type_id == PCA9546 || device_type_id == PCA9548) {
         return PCA954X_DEVICE_TYPE;
+    } else if (device_type_id == PWM_TACH) {
+        return PWM_TACH_DEVICE_TYPE;
     } else {
         return UNDEFINED;
     }
@@ -484,6 +491,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
     PTR_GPIO_DEVICE_DATA ptrGpioDeviceData;
     PTR_GPIO_SWITCH_sTYPE ptrGpioSwitchSType;
     PTR_ADC_DEVICE_DATA ptrAdcDeviceData;
+    PTR_PWM_TACH_DEVICE ptrPwmTachDevice;
     PMBusPage *pmBusPage;
     char temp[128];
     char *end=NULL;
@@ -930,6 +938,50 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
 
             free(initial_data);
             break;
+        case PWM_TACH:
+            /* PWM_TACH */
+            ptrPwmTachDevice = (PTR_PWM_TACH_DEVICE) vPtrDeviceData;
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_MIN_RPM", &len);
+            if (len < 1) {
+                ;
+            } else {
+                ptrPwmTachDevice->ptrRpmDuty->min_rpm = ctrl_data[0];
+            }
+            free(ctrl_data);
+            
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_MAX_RPM", &len);
+            if (len < 1) {
+                ;
+            } else {
+                ptrPwmTachDevice->ptrRpmDuty->max_rpm = ctrl_data[0];
+            }
+            free(ctrl_data);
+            
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_MIN_OFFSET", &len);
+            if (len < 1) {
+                ;
+            } else {
+                ptrPwmTachDevice->ptrRpmDuty->min_offset = ctrl_data[0];
+            }
+            free(ctrl_data);
+            
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_MAX_OFFSET", &len);
+            if (len < 1) {
+                ;
+            } else {
+                ptrPwmTachDevice->ptrRpmDuty->max_offset = ctrl_data[0];
+            }
+            free(ctrl_data);
+            
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_RAND_DEVIATION_RATE", &len);
+            if (len < 1) {
+                ;
+            } else {
+                ptrPwmTachDevice->ptrRpmDuty->rand_deviation_rate = ctrl_data[0];
+            }
+            free(ctrl_data);
+            
+            break;
         default:
             break;
     }
@@ -978,6 +1030,7 @@ PTR_CONFIG_DATA parse_configuration(void) {
         cJSON *adc_channel = cJSON_GetObjectItem(device, "adc_channel");
         cJSON *division = cJSON_GetObjectItem(device, "division");
 
+        cJSON *pwm_tach_num = cJSON_GetObjectItem(device, "pwm_tach_num");
         /* 校验 */
         if (description == NULL) {
             sprintf(temp_desc, "devices[%d] ", i+1);  /* i+1, 因为第 0 个 device 是 BMC SOC */
@@ -1096,6 +1149,18 @@ PTR_CONFIG_DATA parse_configuration(void) {
                 exit(1);
             }
             tempConfigJson->division = division->valuedouble;
+        }
+        /**************************************** pwm_tach ****************************************/
+        else if (deviceType == PWM_TACH_DEVICE_TYPE) {
+            /* pwm_tach_num */
+            if (pwm_tach_num == NULL) {
+                printf("The devices[%d]: 'pwm_tach_num' not found, but it is necessary! \n", i);
+                exit(1);
+            } else if (pwm_tach_num->type != cJSON_Number) {
+                printf("The devices[%d]: 'pwm_tach_num' it is not a number! \n");
+                exit(1);
+            }
+            tempConfigJson->pwm_tach_num = pwm_tach_num->valueint;
         }
 
         FUNC_DEBUG("function: parse_configuration() -> args")

@@ -686,6 +686,8 @@ static void ast2600_evb_i2c_init(AspeedMachineState *bmc)
             adc_device_add0(&(soc->adc.engines[0]), pDeviceConfig);
         } else if (pDeviceConfig->deviceType == PCA954X_DEVICE_TYPE) {
             pca_device_add(master_bus, pDeviceConfig);
+        } else if (pDeviceConfig->deviceType == PWM_TACH_DEVICE_TYPE) {
+            pwm_device_add(pDeviceConfig);
         }
 
         if (pDeviceConfig->next == NULL) {

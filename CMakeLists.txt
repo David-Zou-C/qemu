@@ -3674,4 +3674,4 @@ add_executable(qemu
         qemu-io.c
         qemu-keymap.c
         qemu-nbd.c
-        replication.c)
+        replication.c slib/src/pwm-device.c)

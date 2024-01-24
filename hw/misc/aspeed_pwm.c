@@ -16,6 +16,7 @@
 #include "trace.h"
 
 #include "slib/inc/aspeed-init.h"
+#include "slib/inc/pwm-device.h"
 
 #define TO_REG(addr) (addr >> 2)
 
@@ -45,38 +46,16 @@
 
 #define DEVIATION_RATE (5)
 
-typedef struct RPM_DUTY_ {
-    double max_rpm;
-    double min_rpm;
-    double min_offset;
-    double max_offset;
-}RPM_DUTY, *PTR_RPM_DUTY;
-
-static RPM_DUTY inlet_rpm_duty = {
-        .max_rpm = 17000.0,
-        .min_rpm = 1800.0,
-        .min_offset = 0.1,
-        .max_offset = 1.0
-};
-
-static RPM_DUTY outlet_rpm_duty = {
-        .max_rpm = 14500.0,
-        .min_rpm = 1550.0,
-        .min_offset = 0.1,
-        .max_offset = 1.0
-};
 
 static double get_rpm_from_duty(float duty, uint8_t fan_loc)
 {
     PTR_RPM_DUTY ptrRpmDuty;
     double ret = 0;
 
-    if (fan_loc % 2 == 1) {
-        /* outlet fan */
-        ptrRpmDuty = &outlet_rpm_duty;
+    if (fan_loc < 8) {
+        ptrRpmDuty = &gRpmDuty[fan_loc];
     } else {
-        /* inlet fan */
-        ptrRpmDuty = &inlet_rpm_duty;
+        return 0;
     }
 
     if (duty <= ptrRpmDuty->min_offset) {

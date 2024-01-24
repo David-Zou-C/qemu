@@ -16,6 +16,7 @@
 #include "gpio-device.h"
 #include "adc-device.h"
 #include "dataThread.h"
+#include "pwm-device.h"
 
 #define sDEBUG 1
 
@@ -339,6 +340,7 @@ typedef struct DEVICE_ADD_INFO_ {
     PTR_ADC_DEVICE_DATA ptrAdcDeviceData;
     PMBusPage *pmBusPage;
     void *pca954x;
+    PTR_PWM_TACH_DEVICE ptrPwmTachDevice;
     PTR_DEVICE_CONFIG ptrDeviceConfig;
 } DEVICE_ADD_INFO, *PTR_DEVICE_ADD_INFO;
 

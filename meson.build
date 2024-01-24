@@ -3894,7 +3894,8 @@ foreach target : target_dirs
                                              'slib/src/dataThread.c',
                                              'slib/src/cJSON.c',
                                              'slib/src/gpio-device.c',
-                                             'slib/src/adc-device.c'),
+                                             'slib/src/adc-device.c',
+                                             'slib/src/pwm-device.c'),
                               include_directories: include_directories('slib/inc'))
       emulator = executable(exe_name, exe['sources'],
            install: true,
