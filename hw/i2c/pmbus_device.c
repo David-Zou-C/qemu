@@ -1244,6 +1244,8 @@ static int pmbus_write_data(SMBusDevice *smd, uint8_t *buf, uint8_t len)
         pmbus_pages_alloc(pmdev);
     }
 
+    pmdev->pages[0].write_times++;
+
     pmdev->in_buf_len = len;
     pmdev->in_buf = buf;
 
@@ -1252,6 +1254,7 @@ static int pmbus_write_data(SMBusDevice *smd, uint8_t *buf, uint8_t len)
     if (pmdev->code == PMBUS_CLEAR_FAULTS) {
         pmbus_clear_faults(pmdev);
     }
+
 
     if (len == 1) { /* Single length writes are command codes only */
         return 0;
@@ -1283,7 +1286,6 @@ static int pmbus_write_data(SMBusDevice *smd, uint8_t *buf, uint8_t len)
 
     index = pmdev->page;
 
-    pmdev->pages[0].write_times++;
 
     switch (pmdev->code) {
     case PMBUS_OPERATION:                 /* R/W byte */
