@@ -138,13 +138,13 @@
 
      {
       "description": "PSU1",
-      "device_type_id": 601,
+      "device_type_id": 501,
       "bus": 4,
       "addr": "0x58"
     },
     {
       "description": "PSU2",
-      "device_type_id": 601,
+      "device_type_id": 501,
       "bus": 4,
       "addr": "0x59"
     },
@@ -196,49 +196,49 @@
 
     {
       "description": "VDDCR0_P0_CPU",
-      "device_type_id": 601,
+      "device_type_id": 501,
       "bus": 6,
       "addr": "0x21"
     },
     {
       "description": "P0_VDDIO_VDDP",
-      "device_type_id": 601,
+      "device_type_id": 501,
       "bus": 6,
       "addr": "0x22"
     },
     {
       "description": "P0_CLD0_CRCPU1",
-      "device_type_id": 601,
+      "device_type_id": 501,
       "bus": 6,
       "addr": "0x23"
     },
     {
       "description": "VDDCR_P0_SOC",
-      "device_type_id": 601,
+      "device_type_id": 501,
       "bus": 6,
       "addr": "0x24"
     },
     {
       "description": "VDDCR_P1_CPU",
-      "device_type_id": 601,
+      "device_type_id": 501,
       "bus": 6,
       "addr": "0x25"
     },
     {
       "description": "P1_VDDIO_VDDP",
-      "device_type_id": 601,
+      "device_type_id": 501,
       "bus": 6,
       "addr": "0x26"
     },
     {
       "description": "P1_CLD0_CRCPU1",
-      "device_type_id": 601,
+      "device_type_id": 501,
       "bus": 6,
       "addr": "0x27"
     },
     {
       "description": "VDDCR_P1_SOC",
-      "device_type_id": 601,
+      "device_type_id": 501,
       "bus": 6,
       "addr": "0x28"
     },
