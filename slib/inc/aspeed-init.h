@@ -22,7 +22,7 @@
 
 #define FUNC_DEBUG(message) file_log(message, LOG_TIME_END);
 
-#define CONFIG_FILE "config_ast2500_G40.json"
+#define CONFIG_FILE "config_ast2600_G50.json"
 
 #define LOG_FILE "log.txt"
 
