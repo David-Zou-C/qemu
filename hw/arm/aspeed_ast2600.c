@@ -265,7 +265,7 @@ static void aspeed_soc_ast2600_init(Object *obj)
                             &s->emmc_boot_controller,
                             TYPE_UNIMPLEMENTED_DEVICE);
 
-    object_initialize_child(obj, "pwm", &s->pwm, TYPE_ASPEED_PWM);
+//    object_initialize_child(obj, "pwm", &s->pwm, TYPE_ASPEED_PWM);
 }
 
 /*
@@ -629,12 +629,12 @@ static void aspeed_soc_ast2600_realize(DeviceState *dev, Error **errp)
     aspeed_mmio_map(s, SYS_BUS_DEVICE(&s->sbc), 0, sc->memmap[ASPEED_DEV_SBC]);
 
     /* PWM */
-    if (!sysbus_realize(SYS_BUS_DEVICE(&s->pwm), errp)) {
-        return;
-    }
-    aspeed_mmio_map(s, SYS_BUS_DEVICE(&s->pwm), 0, sc->memmap[ASPEED_DEV_PWM]);
-    sysbus_connect_irq(SYS_BUS_DEVICE(&s->pwm), 0,
-                       aspeed_soc_get_irq(s, ASPEED_DEV_PWM));
+//    if (!sysbus_realize(SYS_BUS_DEVICE(&s->pwm), errp)) {
+//        return;
+//    }
+//    aspeed_mmio_map(s, SYS_BUS_DEVICE(&s->pwm), 0, sc->memmap[ASPEED_DEV_PWM]);
+//    sysbus_connect_irq(SYS_BUS_DEVICE(&s->pwm), 0,
+//                       aspeed_soc_get_irq(s, ASPEED_DEV_PWM));
 }
 
 static void aspeed_soc_ast2600_class_init(ObjectClass *oc, void *data)
