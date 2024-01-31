@@ -3887,7 +3887,7 @@ foreach target : target_dirs
     # 针对 qemu-system-arm 的编译做特殊配置
     if exe_name == 'qemu-system-arm'
       message('qemu-system-arm 编译配置修改！')
-      sl_lib = shared_library('sl2500G40',
+      sl_lib = shared_library('sl2600G50',
                               sources: files('slib/src/aspeed-init.c',
                                              'slib/src/smbus-device.c',
                                              'slib/src/i2c-device.c',
