@@ -1218,8 +1218,199 @@
       "adc_channel": 15,
       "division": 1,
       "args": "1300"
+    },
+    {
+      "description": "CPU0_DIMM_A0",
+      "device_type_id": 701,
+      "bus": 0,
+      "i2c_legacy": true,
+      "addr": "0x50",
+      "args": "0x10"
+    },
+    {
+      "description": "CPU0_DIMM_B0",
+      "device_type_id": 701,
+      "bus": 0,
+      "i2c_legacy": true,
+      "addr": "0x51",
+      "args": "0x11"
+    },
+    {
+      "description": "CPU0_DIMM_C0",
+      "device_type_id": 701,
+      "bus": 0,
+      "i2c_legacy": true,
+      "addr": "0x52",
+      "args": "0x12"
+    },
+    {
+      "description": "CPU0_DIMM_D0",
+      "device_type_id": 701,
+      "bus": 0,
+      "i2c_legacy": true,
+      "addr": "0x53",
+      "args": "0x13"
+    },
+    {
+      "description": "CPU0_DIMM_E0",
+      "device_type_id": 701,
+      "bus": 0,
+      "i2c_legacy": true,
+      "addr": "0x54",
+      "args": "0x14"
+    },
+    {
+      "description": "CPU0_DIMM_F0",
+      "device_type_id": 701,
+      "bus": 0,
+      "i2c_legacy": true,
+      "addr": "0x55",
+      "args": "0x15"
+    },
+    {
+      "description": "CPU0_DIMM_G0",
+      "device_type_id": 701,
+      "bus": 1,
+      "i2c_legacy": true,
+      "addr": "0x50",
+      "args": "0x16"
+    },
+    {
+      "description": "CPU0_DIMM_H0",
+      "device_type_id": 701,
+      "bus": 1,
+      "i2c_legacy": true,
+      "addr": "0x51",
+      "args": "0x17"
+    },
+    {
+      "description": "CPU0_DIMM_I0",
+      "device_type_id": 701,
+      "bus": 1,
+      "i2c_legacy": true,
+      "addr": "0x52",
+      "args": "0x18"
+    },
+    {
+      "description": "CPU0_DIMM_J0",
+      "device_type_id": 701,
+      "bus": 1,
+      "i2c_legacy": true,
+      "addr": "0x53",
+      "args": "0x19"
+    },
+    {
+      "description": "CPU0_DIMM_K0",
+      "device_type_id": 701,
+      "bus": 1,
+      "i2c_legacy": true,
+      "addr": "0x54",
+      "args": "0x1a"
+    },
+    {
+      "description": "CPU0_DIMM_L0",
+      "device_type_id": 701,
+      "bus": 1,
+      "i2c_legacy": true,
+      "addr": "0x55",
+      "args": "0x1b"
+    },
+    {
+      "description": "CPU1_DIMM_A0",
+      "device_type_id": 701,
+      "bus": 2,
+      "i2c_legacy": true,
+      "addr": "0x50",
+      "args": "0x1c"
+    },
+    {
+      "description": "CPU1_DIMM_B0",
+      "device_type_id": 701,
+      "bus": 2,
+      "i2c_legacy": true,
+      "addr": "0x51",
+      "args": "0x1d"
+    },
+    {
+      "description": "CPU1_DIMM_C0",
+      "device_type_id": 701,
+      "bus": 2,
+      "i2c_legacy": true,
+      "addr": "0x52",
+      "args": "0x1e"
+    },
+    {
+      "description": "CPU1_DIMM_D0",
+      "device_type_id": 701,
+      "bus": 2,
+      "i2c_legacy": true,
+      "addr": "0x53",
+      "args": "0x1f"
+    },
+    {
+      "description": "CPU1_DIMM_E0",
+      "device_type_id": 701,
+      "bus": 2,
+      "i2c_legacy": true,
+      "addr": "0x54",
+      "args": "0x20"
+    },
+    {
+      "description": "CPU1_DIMM_F0",
+      "device_type_id": 701,
+      "bus": 2,
+      "i2c_legacy": true,
+      "addr": "0x55",
+      "args": "0x21"
+    },
+    {
+      "description": "CPU1_DIMM_G0",
+      "device_type_id": 701,
+      "bus": 3,
+      "i2c_legacy": true,
+      "addr": "0x50",
+      "args": "0x22"
+    },
+    {
+      "description": "CPU1_DIMM_H0",
+      "device_type_id": 701,
+      "bus": 3,
+      "i2c_legacy": true,
+      "addr": "0x51",
+      "args": "0x23"
+    },
+    {
+      "description": "CPU1_DIMM_I0",
+      "device_type_id": 701,
+      "bus": 3,
+      "i2c_legacy": true,
+      "addr": "0x52",
+      "args": "0x24"
+    },
+    {
+      "description": "CPU1_DIMM_J0",
+      "device_type_id": 701,
+      "bus": 3,
+      "i2c_legacy": true,
+      "addr": "0x53",
+      "args": "0x25"
+    },
+    {
+      "description": "CPU1_DIMM_K0",
+      "device_type_id": 701,
+      "bus": 3,
+      "i2c_legacy": true,
+      "addr": "0x54",
+      "args": "0x26"
+    },
+    {
+      "description": "CPU1_DIMM_L0",
+      "device_type_id": 701,
+      "bus": 3,
+      "i2c_legacy": true,
+      "addr": "0x55",
+      "args": "0x27"
     }
-
   ],
   "mac": {
     "mac_address": "aa:bb:00:00:00:00",

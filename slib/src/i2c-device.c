@@ -3,6 +3,7 @@
 //
 
 #include "i2c-device.h"
+#include "i3c-device.h"
 
 enum i2c_event {
     I2C_START_RECV,
@@ -12,6 +13,7 @@ enum i2c_event {
     I2C_NACK /* Masker NACKed a reception byte.  */
 };
 
+I2C_DIMM_TMP_RWCNT_sTYPE i2ctoi3cDataBuff;
 /**************************************** Device 0  ****************************************/
 void init_I2cEmptyDevice0(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
     FUNC_DEBUG("function: init_I2cEmptyDevice0()")
@@ -335,24 +337,20 @@ void send_I2cEmptyDevice1(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
 //    pthread_mutex_unlock(&ptrI2CBpCpldSType->mutex);
 };
 
-
-/**************************************** Device 2 ****************************************/
 void init_I2cEmptyDevice2(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
-
-};
-
-int event_I2cEmptyDevice2(uint8_t i2CEvent, PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
-    return 0;
-};
+}
 
 uint8_t recv_I2cEmptyDevice2(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
     return 0;
-};
+}
 
 void send_I2cEmptyDevice2(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
+}
 
-};
-
+int event_I2cEmptyDevice2(uint8_t event, PTR_I2C_DEVICE_DATA ptrI2cDeviceData)
+{
+    return 0;
+}
 
 /**************************************** Device 3 ****************************************/
 void init_I2cEmptyDevice3(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
@@ -389,4 +387,127 @@ void send_I2cEmptyDevice4(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
 
 };
 
+void init_I2cLegacyEmptyDevice0(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
+    PTR_I2C_LEGACY_DIMM_TMP_sTYPE ptrI2cDimmTmpSType;
+    if (ptrI2CDeviceData->data_buf == NULL) {
+        ptrI2CDeviceData->data_buf = (uint8_t *) malloc(sizeof(I2C_LEGACY_DIMM_TMP_sTYPE));
+        memset(ptrI2CDeviceData->data_buf, 0, sizeof(I2C_LEGACY_DIMM_TMP_sTYPE));
+        ptrI2cDimmTmpSType = (PTR_I2C_LEGACY_DIMM_TMP_sTYPE) ptrI2CDeviceData->data_buf;
+        i2ctoi3cDataBuff.receive_times = &((PTR_I2C_LEGACY_DIMM_TMP_sTYPE)ptrI2CDeviceData->data_buf)->receive_times;
+        i2ctoi3cDataBuff.write_times = &((PTR_I2C_LEGACY_DIMM_TMP_sTYPE)ptrI2CDeviceData->data_buf)->write_times;
+        /* 第一次创建，需要初始化互斥锁 */
+        pthread_mutex_init(&ptrI2cDimmTmpSType->mutex, NULL);
+        ptrI2cDimmTmpSType->device_index = get_device_index(ptrI2CDeviceData);
+    } else {
+        /* 初始值 */
+        ptrI2cDimmTmpSType = (PTR_I2C_LEGACY_DIMM_TMP_sTYPE) ptrI2CDeviceData->data_buf;
+    }
+    /* 根据参数修改数据 */
+    dynamic_change_data(I3C_DIMM_TEMP, ptrI2CDeviceData, ptrI2CDeviceData->ptrDeviceConfig->args);
+    ptrI2cDimmTmpSType->offset = 0;
+}
 
+uint8_t recv_I2cLegacyEmptyDevice0(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
+    uint8_t ret;
+    PTR_I2C_LEGACY_DIMM_TMP_sTYPE ptrI2cDimmTmpSType = (PTR_I2C_LEGACY_DIMM_TMP_sTYPE) ptrI2CDeviceData->data_buf;
+
+    printf("%x, %x\n", ptrI2cDimmTmpSType->offset, ptrI2cDimmTmpSType->temperature);
+    ptrI2cDimmTmpSType->receive_times ++;
+    printf("receive_times:%ld\n", *(i2ctoi3cDataBuff.receive_times));
+    if (ptrI2cDimmTmpSType->offset == 0) {
+        ptrI2cDimmTmpSType->offset = 1;
+        ret = ptrI2cDimmTmpSType->temperature << 4;
+        return ret;
+    } else if (ptrI2cDimmTmpSType->offset == 1) {
+        ptrI2cDimmTmpSType->offset = 0;
+        ret = ptrI2cDimmTmpSType->temperature >> 4;
+        return ret;
+    } else {
+        ptrI2cDimmTmpSType->offset = 0;
+        ret = ptrI2cDimmTmpSType->temperature << 4;
+        return ret;
+    }
+    return 0;
+}
+
+void send_I2cLegacyEmptyDevice0(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
+    PTR_I2C_LEGACY_DIMM_TMP_sTYPE ptrI2cDimmTmpSType = (PTR_I2C_LEGACY_DIMM_TMP_sTYPE) ptrI2CDeviceData->data_buf;
+    ptrI2cDimmTmpSType->write_times ++;
+    /* 有写操作，直接重置 offset */
+    ptrI2cDimmTmpSType->offset = 0;
+    printf("write_times:%ld\n", *(i2ctoi3cDataBuff.write_times));
+}
+
+int event_I2cLegacyEmptyDevice0(uint8_t event, PTR_I2C_DEVICE_DATA ptrI2cDeviceData)
+{
+    switch (event) {
+    case I2C_START_RECV:
+        break;
+    case I2C_START_SEND:
+        break;
+    case I2C_FINISH:
+        break;
+    case I2C_NACK:
+        break;
+    default:
+        return 0;
+    }
+
+    return 0;
+}
+
+void init_I2cLegacyEmptyDevice1(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
+}
+
+uint8_t recv_I2cLegacyEmptyDevice1(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
+    return 0;
+}
+
+void send_I2cLegacyEmptyDevice1(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
+}
+
+int event_I2cLegacyEmptyDevice1(uint8_t event, PTR_I2C_DEVICE_DATA ptrI2cDeviceData){
+    return 0;
+}
+
+void init_I2cLegacyEmptyDevice2(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
+}
+
+uint8_t recv_I2cLegacyEmptyDevice2(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
+    return 0;
+}
+
+void send_I2cLegacyEmptyDevice2(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
+}
+
+int event_I2cLegacyEmptyDevice2(uint8_t event, PTR_I2C_DEVICE_DATA ptrI2cDeviceData){
+    return 0;
+}
+
+void init_I2cLegacyEmptyDevice3(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
+}
+
+uint8_t recv_I2cLegacyEmptyDevice3(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
+    return 0;
+}
+
+void send_I2cLegacyEmptyDevice3(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
+}
+
+int event_I2cLegacyEmptyDevice3(uint8_t event, PTR_I2C_DEVICE_DATA ptrI2cDeviceData){
+    return 0;
+}
+
+void init_I2cLegacyEmptyDevice4(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
+}
+
+uint8_t recv_I2cLegacyEmptyDevice4(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
+    return 0;
+}
+
+void send_I2cLegacyEmptyDevice4(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
+}
+
+int event_I2cLegacyEmptyDevice4(uint8_t event, PTR_I2C_DEVICE_DATA ptrI2cDeviceData){
+    return 0;
+}

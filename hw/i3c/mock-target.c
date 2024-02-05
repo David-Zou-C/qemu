@@ -111,7 +111,6 @@ static int mock_target_tx(I3CTarget *i3c, const uint8_t *data,
 static int mock_target_event(I3CTarget *i3c, enum I3CEvent event)
 {
     MockTargetState *s = MOCK_TARGET(i3c);
-
     trace_mock_target_event(event);
     if (event == I3C_STOP) {
         s->in_ccc = false;

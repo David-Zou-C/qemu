@@ -562,7 +562,7 @@ static int aspeed_i3c_device_recv_data(AspeedI3CDevice *s, bool is_i2c,
                                        uint32_t *num_read)
 {
     int ret;
-
+    
     if (is_i2c) {
         for (uint16_t i = 0; i < num_to_read; i++) {
             data[i] = legacy_i2c_recv(s->bus);
@@ -570,6 +570,7 @@ static int aspeed_i3c_device_recv_data(AspeedI3CDevice *s, bool is_i2c,
         /* I2C devices can neither NACK a read, nor end transfers early. */
         *num_read = num_to_read;
         trace_aspeed_i3c_device_recv_data(s->id, *num_read);
+        
         return 0;
     }
     /* I3C devices can NACK if the controller sends an unsupported CCC. */
@@ -586,7 +587,6 @@ static int aspeed_i3c_device_recv_data(AspeedI3CDevice *s, bool is_i2c,
     }
 
     trace_aspeed_i3c_device_recv_data(s->id, *num_read);
-
     return ret;
 }
 
@@ -1137,7 +1137,6 @@ static uint64_t aspeed_i3c_device_read(void *opaque, hwaddr offset,
         value = s->regs[addr];
         break;
     }
-
     trace_aspeed_i3c_device_read(s->id, offset, value);
 
     return value;
@@ -1546,7 +1545,6 @@ static void aspeed_i3c_device_addr_assign_cmd(AspeedI3CDevice *s,
 {
     uint8_t i = 0;
     uint8_t err = ASPEED_I3C_RESP_QUEUE_ERR_NONE;
-
     if (!aspeed_i3c_device_has_entdaa(s)) {
         qemu_log_mask(LOG_GUEST_ERROR, "%s: ENTDAA is not supported\n",
                       object_get_canonical_path(OBJECT(s)));
@@ -1761,7 +1759,6 @@ static void aspeed_i3c_device_write(void *opaque, hwaddr offset,
     AspeedI3CDevice *s = ASPEED_I3C_DEVICE(opaque);
     uint32_t addr = offset >> 2;
     uint32_t val32 = (uint32_t)value;
-
     trace_aspeed_i3c_device_write(s->id, offset, value);
 
     val32 &= ~ast2600_i3c_device_ro[addr];
@@ -1864,7 +1861,6 @@ static uint64_t aspeed_i3c_read(void *opaque, hwaddr addr, unsigned int size)
     uint64_t val = 0;
 
     val = s->regs[addr >> 2];
-
     trace_aspeed_i3c_read(addr, val);
 
     return val;
@@ -1882,6 +1878,7 @@ static void aspeed_i3c_write(void *opaque,
     addr >>= 2;
 
     data &= ~ast2600_i3c_controller_ro[addr];
+
     /* I3C controller register */
     switch (addr) {
     case R_I3C1_REG1:
@@ -1980,7 +1977,6 @@ static void aspeed_i3c_realize(DeviceState *dev, Error **errp)
         memory_region_add_subregion(&s->iomem_container,
                 0x2000 + i * 0x1000, &s->devices[i].mr);
     }
-
 }
 
 static Property aspeed_i3c_device_properties[] = {
@@ -2020,7 +2016,6 @@ static const VMStateDescription vmstate_aspeed_i3c = {
 static void aspeed_i3c_class_init(ObjectClass *klass, void *data)
 {
     DeviceClass *dc = DEVICE_CLASS(klass);
-
     dc->realize = aspeed_i3c_realize;
     dc->reset = aspeed_i3c_reset;
     dc->desc = "Aspeed I3C Controller";
@@ -2042,3 +2037,14 @@ static void aspeed_i3c_register_types(void)
 }
 
 type_init(aspeed_i3c_register_types);
+
+I3CBus *aspeed_i3c_get_bus(AspeedI3CState *s, int busnr)
+{
+    I3CBus *bus = NULL;
+
+    if (busnr >= 0 && busnr < ASPEED_I3C_NR_DEVICES) {
+        bus = s->devices[busnr].bus;
+    }
+
+    return bus;
+}

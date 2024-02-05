@@ -633,10 +633,19 @@ static void ast2600_evb_i2c_init(AspeedMachineState *bmc)
 
     file_log("Function Add ... ", LOG_TIME_END);
     while (pDeviceConfig != NULL) {
-        I2CBus *master_bus;
+        I2CBus *master_bus = NULL;
+        I3CBus *i3c_bus = NULL;
         int master_bus_device_index = -1;
         if (pDeviceConfig->i2c_dev.device_index == 0) {
-            master_bus = aspeed_i2c_get_bus(&soc->i2c, pDeviceConfig->bus);
+            if (pDeviceConfig->deviceType != I3C_DEVICE_TYPE){
+                master_bus = aspeed_i2c_get_bus(&soc->i2c, pDeviceConfig->bus);
+            } else{
+                i3c_bus = aspeed_i3c_get_bus(&soc->i3c, pDeviceConfig->bus);
+                if (pDeviceConfig->i2clegacy == true){
+                    I2cFunctionPtr i2CLegacyFunctionPtr = getI2cLegacyDeviceAddFunc(0);
+                    i2CLegacyFunctionPtr(i3c_bus, pDeviceConfig);
+                }
+            }
         } else {
             if (pDeviceConfig->i2c_dev.device_index > 0) {
                 master_bus_device_index = pDeviceConfig->i2c_dev.device_index;
@@ -690,7 +699,10 @@ static void ast2600_evb_i2c_init(AspeedMachineState *bmc)
             pca_device_add(master_bus, pDeviceConfig);
         } else if (pDeviceConfig->deviceType == PWM_TACH_DEVICE_TYPE) {
             pwm_device_add(pDeviceConfig);
-        }
+        } else if (pDeviceConfig->deviceType == I3C_DEVICE_TYPE) {
+            I3cFunctionPtr i3CFunctionPtr = getI3cDeviceAddFunc(pDeviceConfig->device_type_id);
+            i3CFunctionPtr(i3c_bus, pDeviceConfig);
+        } 
 
         if (pDeviceConfig->next == NULL) {
             break;

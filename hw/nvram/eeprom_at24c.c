@@ -18,6 +18,7 @@
 #include "sysemu/block-backend.h"
 #include "qom/object.h"
 #include "slib/inc/i2c-device.h"
+#include "hw/i3c/i3c.h"
 
 /* #define DEBUG_AT24C */
 
@@ -301,7 +302,6 @@ type_init(at24c_eeprom_register)
         PTR_I2C_DEVICE_DATA ptrI2cDeviceData = &(it->i2cDeviceData); \
         return recv_##InstanceType(ptrI2cDeviceData);  \
     };
-
 #define EMPTY_I2C_DEVICE_SEND_FUNC(InstanceType, OBJ_NAME) \
     static int InstanceType##_send(I2CSlave *s, uint8_t data) { \
         InstanceType *it = OBJ_NAME(s);                \
@@ -433,3 +433,56 @@ int getI2cDeviceTypeId(I2cFunctionPtr functionPtr){
     return -1;
 };
 
+#define EMPTY_I2C_LEGACY_DEVICE_REALIZE_FUNC(InstanceType, OBJ_NAME) \
+    static void InstanceType##_realize(DeviceState *dev, Error **errp){ \
+        InstanceType##_reset(dev);                       \
+    };
+
+#define EMPTY_I2C_LEGACY_DEVICE_ADD_FUNC(InstanceType, OBJ_NAME) \
+    void InstanceType##_add(void *bus, PTR_DEVICE_CONFIG ptrDeviceConfig) {  \
+        InstanceType *it;                                              \
+        it = OBJ_NAME(i2c_slave_new(TYPE_##OBJ_NAME, ptrDeviceConfig->addr));        \
+        it->i2cDeviceData.ptrDeviceConfig = ptrDeviceConfig;           \
+        i2c_slave_realize_and_unref(I2C_SLAVE(it), (I3C_BUS(bus))->i2c_bus, &error_abort); \
+    };
+
+#define INIT_I2C_LEGACY_FUNC(InstanceType, OBJ_NAME) \
+    OBJECT_DECLARE_INSTANCE(InstanceType, OBJ_NAME) \
+    INSTANCE_STRUCT(InstanceType)              \
+    EMPTY_I2C_DEVICE_EVENT_FUNC(InstanceType, OBJ_NAME) \
+    EMPTY_I2C_DEVICE_RECV_FUNC(InstanceType, OBJ_NAME)  \
+    EMPTY_I2C_DEVICE_SEND_FUNC(InstanceType, OBJ_NAME)  \
+    EMPTY_I2C_DEVICE_RESET_FUNC(InstanceType, OBJ_NAME) \
+    EMPTY_I2C_LEGACY_DEVICE_REALIZE_FUNC(InstanceType, OBJ_NAME) \
+    EMPTY_I2C_DEVICE_PROPERTY(InstanceType, OBJ_NAME)   \
+    EMPTY_I2C_DEVICE_CLASS_INIT(InstanceType, OBJ_NAME) \
+    EMPTY_I2C_DEVICE_TYPEINFO(InstanceType, OBJ_NAME)   \
+    EMPTY_I2C_DEVICE_REGISTER_INIT(InstanceType, OBJ_NAME)   \
+    EMPTY_I2C_LEGACY_DEVICE_ADD_FUNC(InstanceType, OBJ_NAME)
+
+#define TYPE_I2C_LEGACY_EMPTY_0 "i2c-legacy-empty-0"
+INIT_I2C_LEGACY_FUNC(I2cLegacyEmptyDevice0, I2C_LEGACY_EMPTY_0)
+
+#define TYPE_I2C_LEGACY_EMPTY_1 "i2c-legacy-empty-1"
+INIT_I2C_LEGACY_FUNC(I2cLegacyEmptyDevice1, I2C_LEGACY_EMPTY_1)
+
+#define TYPE_I2C_LEGACY_EMPTY_2 "i2c-legacy-empty-2"
+INIT_I2C_LEGACY_FUNC(I2cLegacyEmptyDevice2, I2C_LEGACY_EMPTY_2)
+
+#define TYPE_I2C_LEGACY_EMPTY_3 "i2c-legacy-empty-3"
+INIT_I2C_LEGACY_FUNC(I2cLegacyEmptyDevice3, I2C_LEGACY_EMPTY_3)
+
+#define TYPE_I2C_LEGACY_EMPTY_4 "i2c-legacy-empty-4"
+INIT_I2C_LEGACY_FUNC(I2cLegacyEmptyDevice4, I2C_LEGACY_EMPTY_4)
+
+I2cFunctionPtr getI2cLegacyDeviceAddFunc(int device_type_id){
+    static I2cFunctionPtr i2CFunctionPtr_static[] = {
+        I2cLegacyEmptyDevice0_add,
+        I2cLegacyEmptyDevice1_add,
+        I2cLegacyEmptyDevice2_add,
+        I2cLegacyEmptyDevice3_add,
+        I2cLegacyEmptyDevice4_add
+    };
+
+    return i2CFunctionPtr_static[device_type_id];
+};

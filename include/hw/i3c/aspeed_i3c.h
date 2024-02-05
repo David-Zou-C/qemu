@@ -204,4 +204,7 @@ typedef struct AspeedI3CState {
     uint32_t regs[ASPEED_I3C_NR_REGS];
     AspeedI3CDevice devices[ASPEED_I3C_NR_DEVICES];
 } AspeedI3CState;
+
+I3CBus *aspeed_i3c_get_bus(AspeedI3CState *s, int busnr);
+
 #endif /* ASPEED_I3C_H */
