@@ -26,7 +26,8 @@ typedef enum DEVICE_TYPE_ {
     GPIO_DEVICE_TYPE,
     ADC_DEVICE_TYPE,
     PCA954X_DEVICE_TYPE,
-    PWM_TACH_DEVICE_TYPE
+    PWM_TACH_DEVICE_TYPE,
+    I3C_DEVICE_TYPE
 } DEVICE_TYPE, *PTR_DEVICE_TYPE;
 
 typedef enum DEVICE_TYPE_ID_ {
@@ -50,7 +51,9 @@ typedef enum DEVICE_TYPE_ID_ {
     /* PMBUS */
     PMBUS_PSU = 501,
     /* PWM_TACH */
-    PWM_TACH = 601
+    PWM_TACH = 601,
+    /* i3C */
+    I3C_DIMM_TEMP = 701
 } DEVICE_TYPE_ID, *PTR_DEVICE_TYPE_ID;
 
 
@@ -129,6 +132,7 @@ typedef struct DEVICE_CONFIG_ {
         int device_index;
         char device_name[DEVICE_NAME_MAX_LEN];
     } i2c_dev;
+    _Bool i2clegacy;
     uint32_t pin_nums;
     PTR_GPIO_SIGNAL ptrGpioSignal;
     PTR_GPIO_OUTPUT_LOGIC_INIT ptrGpioOutputLogicInit;

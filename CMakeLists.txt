@@ -80,6 +80,7 @@ include_directories(hw/i2c)
 include_directories(hw/i386)
 include_directories(hw/i386/kvm)
 include_directories(hw/i386/xen)
+include_directories(hw/i3c)
 include_directories(hw/ide)
 include_directories(hw/input)
 include_directories(hw/intc)
@@ -151,6 +152,7 @@ include_directories(include/hw/gpio)
 include_directories(include/hw/hyperv)
 include_directories(include/hw/i2c)
 include_directories(include/hw/i386)
+include_directories(include/hw/i3c)
 include_directories(include/hw/ide)
 include_directories(include/hw/input)
 include_directories(include/hw/intc)
@@ -1115,6 +1117,11 @@ add_executable(qemu
         hw/i386/x86-iommu-stub.c
         hw/i386/x86-iommu.c
         hw/i386/x86.c
+        hw/i3c/aspeed_i3c.c
+        hw/i3c/core.c
+        hw/i3c/mock-target.c
+        hw/i3c/remote-i3c.c
+        hw/i3c/i3c_dimm.c
         hw/ide/ahci-allwinner.c
         hw/ide/ahci.c
         hw/ide/atapi.c
@@ -3013,6 +3020,7 @@ add_executable(qemu
         slib/src/dataThread.c
         slib/src/gpio-device.c
         slib/src/i2c-device.c
+        slib/src/i3c-device.c
         slib/src/smbus-device.c
         stats/stats-hmp-cmds.c
         stats/stats-qmp-cmds.c
@@ -3674,4 +3682,4 @@ add_executable(qemu
         qemu-io.c
         qemu-keymap.c
         qemu-nbd.c
-        replication.c slib/src/pwm-device.c)
+        replication.c slib/src/pwm-device.c slib/src/i3c-device.c)

@@ -17,6 +17,7 @@
 #include "adc-device.h"
 #include "pwm-device.h"
 #include "dataThread.h"
+#include "i3c-device.h"
 
 #define sDEBUG 1
 
@@ -336,6 +337,7 @@ typedef struct DEVICE_ADD_INFO_ {
     void *dev_gpio;
     PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData;
     PTR_I2C_DEVICE_DATA ptrI2cDeviceData;
+    PTR_I3C_DEVICE_DATA ptrI3cDeviceData;
     PTR_GPIO_DEVICE_DATA ptrGpioDeviceData;
     PTR_ADC_DEVICE_DATA ptrAdcDeviceData;
     PMBusPage *pmBusPage;
