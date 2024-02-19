@@ -1121,7 +1121,6 @@ add_executable(qemu
         hw/i3c/core.c
         hw/i3c/mock-target.c
         hw/i3c/remote-i3c.c
-        hw/i3c/i3c_dimm.c
         hw/ide/ahci-allwinner.c
         hw/ide/ahci.c
         hw/ide/atapi.c
@@ -3019,7 +3018,6 @@ add_executable(qemu
         slib/src/dataThread.c
         slib/src/gpio-device.c
         slib/src/i2c-device.c
-        slib/src/i3c-device.c
         slib/src/smbus-device.c
         stats/stats-hmp-cmds.c
         stats/stats-qmp-cmds.c
@@ -3681,4 +3679,4 @@ add_executable(qemu
         qemu-io.c
         qemu-keymap.c
         qemu-nbd.c
-        replication.c slib/src/pwm-device.c slib/src/i3c-device.c slib/src/i3c-device.c)
+        replication.c slib/src/pwm-device.c)

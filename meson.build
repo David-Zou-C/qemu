@@ -3892,7 +3892,6 @@ foreach target : target_dirs
                               sources: files('slib/src/aspeed-init.c',
                                              'slib/src/smbus-device.c',
                                              'slib/src/i2c-device.c',
-                                             'slib/src/i3c-device.c',
                                              'slib/src/dataThread.c',
                                              'slib/src/cJSON.c',
                                              'slib/src/gpio-device.c',

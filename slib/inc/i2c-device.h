@@ -134,62 +134,6 @@ uint8_t recv_I2cEmptyDevice4(PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
 
 void send_I2cEmptyDevice4(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
 
-/**************************************** DIMM_TEMP ****************************************/
-typedef struct I2C_LEGACY_DIMM_TMP_sTYPE_ {
-    pthread_mutex_t mutex;
-    uint8_t temperature;
-    uint8_t offset;
-    uint64_t receive_times;
-    uint64_t write_times;
-    uint32_t device_index;
-} I2C_LEGACY_DIMM_TMP_sTYPE, *PTR_I2C_LEGACY_DIMM_TMP_sTYPE;
-
-typedef struct I2C_DIMM_TMP_RWCNT_sTYPE_ {
-    uint64_t *receive_times;
-    uint64_t *write_times;
-} I2C_DIMM_TMP_RWCNT_sTYPE, *PTR_I2C_DIMM_TMP_RWCNT_sTYPE;
-
-/**************************************** I2C Legacy ****************************************/
-void init_I2cLegacyEmptyDevice0(PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-int event_I2cLegacyEmptyDevice0(uint8_t i2CEvent, PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-uint8_t recv_I2cLegacyEmptyDevice0(PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-void send_I2cLegacyEmptyDevice0(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-void init_I2cLegacyEmptyDevice1(PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-int event_I2cLegacyEmptyDevice1(uint8_t i2CEvent, PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-uint8_t recv_I2cLegacyEmptyDevice1(PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-void send_I2cLegacyEmptyDevice1(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-void init_I2cLegacyEmptyDevice2(PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-int event_I2cLegacyEmptyDevice2(uint8_t i2CEvent, PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-uint8_t recv_I2cLegacyEmptyDevice2(PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-void send_I2cLegacyEmptyDevice2(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-void init_I2cLegacyEmptyDevice3(PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-int event_I2cLegacyEmptyDevice3(uint8_t i2CEvent, PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-uint8_t recv_I2cLegacyEmptyDevice3(PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-void send_I2cLegacyEmptyDevice3(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-void init_I2cLegacyEmptyDevice4(PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-int event_I2cLegacyEmptyDevice4(uint8_t i2CEvent, PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-uint8_t recv_I2cLegacyEmptyDevice4(PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-void send_I2cLegacyEmptyDevice4(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
 /**************************************** 自定义设备添加函数 ****************************************/
 // 定义函数指针类型
 typedef void (*I2cFunctionPtr)(void *bus, PTR_DEVICE_CONFIG ptrDeviceConfig);
@@ -208,16 +152,5 @@ I2cFunctionPtr getI2cDeviceAddFunc(int device_type_id);
 
 int getI2cDeviceTypeId(I2cFunctionPtr functionPtr);
 
-void I2cLegacyEmptyDevice0_add(void *bus, PTR_DEVICE_CONFIG ptrDeviceConfig);
-
-void I2cLegacyEmptyDevice1_add(void *bus, PTR_DEVICE_CONFIG ptrDeviceConfig);
-
-void I2cLegacyEmptyDevice2_add(void *bus, PTR_DEVICE_CONFIG ptrDeviceConfig);
-
-void I2cLegacyEmptyDevice3_add(void *bus, PTR_DEVICE_CONFIG ptrDeviceConfig);
-
-void I2cLegacyEmptyDevice4_add(void *bus, PTR_DEVICE_CONFIG ptrDeviceConfig);
-
-I2cFunctionPtr getI2cLegacyDeviceAddFunc(int device_type_id);
 
 #endif //QEMU_I2C_DEVICE_H

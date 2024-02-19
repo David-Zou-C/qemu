@@ -68,10 +68,6 @@ int device_add(DEVICE_TYPE_ID device_type_id, const char *device_name, void *vPt
                 deviceAddList[i].ptrAdcDeviceData = vPtrDeviceData;
                 deviceAddList[i].device_type = ADC_DEVICE_TYPE;
                 deviceAddList[i].ptrDeviceConfig = deviceAddList[i].ptrAdcDeviceData->ptrDeviceConfig;
-            } else if ((device_type_id >= I3C_DEVICE_TYPE_ID_OFFSET) &&
-                       (device_type_id < I3C_DEVICE_TYPE_ID_OFFSET + I3C_DEVICE_TOTAL_NUM)) {
-                deviceAddList[i].ptrI3cDeviceData = vPtrDeviceData;
-                deviceAddList[i].device_type = I3C_DEVICE_TYPE;
             } else if (device_type_id == PCA9546 || device_type_id == PCA9548) {
                 deviceAddList[i].pca954x = vPtrDeviceData;
                 deviceAddList[i].device_type = PCA954X_DEVICE_TYPE;
@@ -134,9 +130,6 @@ DEVICE_TYPE get_device_type(DEVICE_TYPE_ID device_type_id) {
     } else if ((device_type_id >= ADC_DEVICE_TYPE_ID_OFFSET) &&
                (device_type_id < ADC_DEVICE_TYPE_ID_OFFSET + ADC_DEVICE_TOTAL_NUM)) {
         return ADC_DEVICE_TYPE;
-    } else if ((device_type_id >= I3C_DEVICE_TYPE_ID_OFFSET) &&
-               (device_type_id < I3C_DEVICE_TYPE_ID_OFFSET + I3C_DEVICE_TOTAL_NUM)) {
-        return I3C_DEVICE_TYPE;
     } else if (device_type_id == PCA9546 || device_type_id == PCA9548) {
         return PCA954X_DEVICE_TYPE;
     } else if (device_type_id == PWM_TACH) {
@@ -498,7 +491,6 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
     PTR_GPIO_DEVICE_DATA ptrGpioDeviceData;
     PTR_GPIO_SWITCH_sTYPE ptrGpioSwitchSType;
     PTR_ADC_DEVICE_DATA ptrAdcDeviceData;
-    PTR_I2C_LEGACY_DIMM_TMP_sTYPE ptrI3cDimmTmpSType;
     PTR_PWM_TACH_DEVICE ptrPwmTachDevice;
     PMBusPage *pmBusPage;
     char temp[128];
@@ -734,19 +726,6 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                 }
             }
             free(ctrl_data);
-            break;
-        case I3C_DIMM_TEMP:
-            /* I3C DIMM_TMP */
-            ptrI3cDimmTmpSType = (PTR_I2C_LEGACY_DIMM_TMP_sTYPE) ((PTR_I2C_DEVICE_DATA) vPtrDeviceData)->data_buf;
-            initial_data = detachArgsData(args, DETACH_INITIAL_DATA, NULL, &len);
-            sprintf(temp, "temperature change - %d ==> ", ptrI3cDimmTmpSType->temperature);
-            file_log(temp, LOG_TIME);
-            if (len >= 1) {
-                ptrI3cDimmTmpSType->temperature = initial_data[0];
-            }
-            free(initial_data);
-            sprintf(temp, "%d C ", ptrI3cDimmTmpSType->temperature);
-            file_log(temp, LOG_END);
             break;
         case PMBUS_PSU:
             pmBusPage = (PMBusPage *)vPtrDeviceData;
@@ -1096,8 +1075,7 @@ PTR_CONFIG_DATA parse_configuration(void) {
         if (deviceType == SMBUS_DEVICE_TYPE ||
             deviceType == I2C_DEVICE_TYPE ||
             deviceType == PMBUS_DEVICE_TYPE ||
-            deviceType == PCA954X_DEVICE_TYPE ||
-            deviceType == I3C_DEVICE_TYPE) {
+            deviceType == PCA954X_DEVICE_TYPE) {
             /* bus */
             if (bus == NULL) {
                 printf("The devices[%d]: 'bus' not found, but it is necessary! \n", i);

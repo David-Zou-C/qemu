@@ -27,7 +27,6 @@ typedef enum DEVICE_TYPE_ {
     ADC_DEVICE_TYPE,
     PCA954X_DEVICE_TYPE,
     PWM_TACH_DEVICE_TYPE,
-    I3C_DEVICE_TYPE
 } DEVICE_TYPE, *PTR_DEVICE_TYPE;
 
 typedef enum DEVICE_TYPE_ID_ {
@@ -51,9 +50,7 @@ typedef enum DEVICE_TYPE_ID_ {
     /* PMBUS */
     PMBUS_PSU = 501,
     /* PWM_TACH */
-    PWM_TACH = 601,
-    /* i3C */
-    I3C_DIMM_TEMP = 701
+    PWM_TACH = 601
 } DEVICE_TYPE_ID, *PTR_DEVICE_TYPE_ID;
 
 
