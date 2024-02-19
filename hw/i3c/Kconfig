@@ -16,7 +16,3 @@ config I3C_DEVICES
 #    select I3C
 #    default y if I3C_DEVICES
 
-config I3C_DIMM
-    bool
-    select I3C
-    default y if I3C_DEVICES

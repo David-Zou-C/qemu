@@ -24,7 +24,6 @@ static char receive_times_str[] = "receive_times";
 static char write_times_str[] = "write_times";
 
 int (*power_callback)(const char *gpio_name, uint8_t level) = NULL;
-extern I2C_DIMM_TMP_RWCNT_sTYPE i2ctoi3cDataBuff;
 
 static void create_pipe(void *pVoid) {
     FUNC_DEBUG("function: create_pipe()")
@@ -67,7 +66,6 @@ static void *send_thread(void *pVoid) {
     PTR_SMBUS_DIMM_TMP_sTYPE ptrSmbusDimmTmpSType;
     PTR_I2C_EEPROM_sTYPE ptrI2CEepromSType;
     PTR_I2C_BP_CPLD_sTYPE ptrI2CBpCpldSType;
-    PTR_I3C_DIMM_TMP_sTYPE ptrI3cDimmTmpSType;
     PTR_SMBUS_TPA626_sTYPE ptrSmbusTpa626SType;
     PTR_GPIO_SWITCH_sTYPE ptrGpioSwitchSType;
     PMBusPage *pmBusPage;
@@ -302,27 +300,6 @@ static void *send_thread(void *pVoid) {
                         cJSON_AddNumberToObject(device, receive_times_str, (double) ptrI2CBpCpldSType->receive_times);
                         cJSON_AddNumberToObject(device, write_times_str, (double) ptrI2CBpCpldSType->write_times);
                         break;
-                    case I3C_DIMM_TEMP:
-                        /* {
-                         *      "index": 0,
-                         *      "description": "",
-                         *      "temperature": 30,
-                         *      "receive_times": 0,
-                         *      "write_times": 0
-                         * } */
-                        /* Device1 - TMP */
-                        ptrI3cDimmTmpSType = (PTR_I3C_DIMM_TMP_sTYPE) (deviceAddList[i].ptrI3cDeviceData->data_buf);
-                        ((PTR_I3C_DIMM_TMP_sTYPE) deviceAddList[i].ptrI3cDeviceData->data_buf)->receive_times = *(i2ctoi3cDataBuff.receive_times);
-                        ((PTR_I3C_DIMM_TMP_sTYPE) deviceAddList[i].ptrI3cDeviceData->data_buf)->write_times = *(i2ctoi3cDataBuff.write_times);
-                        /**************************************** 数据处理并发送 - S ****************************************/
-                        /* 先发送 desc 信息 */
-                        cJSON_AddStringToObject(device, "description", deviceAddList[i].ptrI3cDeviceData->ptrDeviceConfig->description);
-                        /* 发送温度数据 */
-                        cJSON_AddNumberToObject(device, "temperature", ptrI3cDimmTmpSType->temperature);
-                        cJSON_AddNumberToObject(device, receive_times_str, (double) ptrI3cDimmTmpSType->receive_times);
-                        cJSON_AddNumberToObject(device, write_times_str, (double) ptrI3cDimmTmpSType->write_times);
-                        /**************************************** 数据处理并发送 - N ****************************************/
-                        break;
                     case GPIO_SWITCH:
                         /* GPIO Device0 - SWITCH */
                         ptrGpioSwitchSType = (PTR_GPIO_SWITCH_sTYPE) (deviceAddList[i].ptrGpioDeviceData->data_buf);
@@ -438,7 +415,6 @@ static void *read_data_thread(void *pVoid) {
     PTR_SMBUS_DIMM_TMP_sTYPE ptrSmbusDimmTmpSType;
     PTR_I2C_EEPROM_sTYPE ptrI2CEepromSType;
     PTR_I2C_BP_CPLD_sTYPE ptrI2CBpCpldSType;
-    PTR_I3C_DIMM_TMP_sTYPE ptrI3cDimmTmpSType;
     PTR_SMBUS_TPA626_sTYPE ptrSmbusTpa626SType;
     PTR_GPIO_SWITCH_sTYPE ptrGpioSwitchSType;
     /* 读取数据 */
@@ -537,19 +513,6 @@ static void *read_data_thread(void *pVoid) {
                             dynamic_change_data(deviceAddList[device_index].device_type_id,
                                                 deviceAddList[device_index].ptrI2cDeviceData, endPtr);
                             pthread_mutex_unlock(&ptrI2CBpCpldSType->mutex);
-                            break;
-                        case I3C_DIMM_TEMP:
-                            /* TMP */
-                            ptrI3cDimmTmpSType = (PTR_I3C_DIMM_TMP_sTYPE) (deviceAddList[device_index].ptrI3cDeviceData->data_buf);
-                            pthread_mutex_lock(&ptrI3cDimmTmpSType->mutex);
-                            /* 动态改变数据 */
-                            /**************************************** 动态改变数据 - S ****************************************/
-                            dynamic_change_data(deviceAddList[device_index].device_type_id,
-                                                deviceAddList[device_index].ptrI3cDeviceData, endPtr);
-                            /**************************************** 动态改变数据 - N ****************************************/
-                            pthread_mutex_unlock(&ptrI3cDimmTmpSType->mutex);
-                            sprintf(temp, "device type id - '%d'  ", deviceAddList[device_index].device_type_id);
-                            file_log(temp, LOG_TIME_END);
                             break;
                         case PMBUS_PSU:
                             dynamic_change_data(deviceAddList[device_index].device_type_id,
