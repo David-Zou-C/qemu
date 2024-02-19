@@ -9,7 +9,7 @@
 #include "slib-common.h"
 
 #define I3C_DEVICE_TYPE_ID_OFFSET 701
-#define I3C_DEVICE_TOTAL_NUM 6
+#define I3C_DEVICE_TOTAL_NUM 4
 
 typedef struct I3C_DEVICE_DATA_ {
     uint8_t *data_buf;

@@ -1309,7 +1309,6 @@ add_executable(qemu
         hw/misc/armsse-mhu.c
         hw/misc/armv7m_ras.c
         hw/misc/aspeed_hace.c
-        hw/misc/aspeed_i3c.c
         hw/misc/aspeed_lpc.c
         hw/misc/aspeed_peci.c
         hw/misc/aspeed_pwm.c
@@ -3682,4 +3681,4 @@ add_executable(qemu
         qemu-io.c
         qemu-keymap.c
         qemu-nbd.c
-        replication.c slib/src/pwm-device.c slib/src/i3c-device.c)
+        replication.c slib/src/pwm-device.c slib/src/i3c-device.c slib/src/i3c-device.c)
