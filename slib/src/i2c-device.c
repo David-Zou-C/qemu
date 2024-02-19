@@ -12,7 +12,6 @@ enum i2c_event {
     I2C_NACK /* Masker NACKed a reception byte.  */
 };
 
-I2C_DIMM_TMP_RWCNT_sTYPE i2ctoi3cDataBuff;
 /**************************************** Device 0  ****************************************/
 void init_I2cEmptyDevice0(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
     FUNC_DEBUG("function: init_I2cEmptyDevice0()")
