@@ -515,6 +515,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
     PTR_SMBUS_DIMM_TMP_sTYPE ptrSmbusDimmTmpSType;
     PTR_I2C_EEPROM_sTYPE ptrI2CEepromSType;
     PTR_I2C_BP_CPLD_sTYPE ptrI2CBpCpldSType;
+    PTR_I2C_DIMM_TMP_sTYPE ptrI2CDimmTmpSType;
     PTR_SMBUS_TPA626_sTYPE ptrSmbusTpa626SType;
     PTR_GPIO_DEVICE_DATA ptrGpioDeviceData;
     PTR_GPIO_SWITCH_sTYPE ptrGpioSwitchSType;
@@ -754,6 +755,18 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                 }
             }
             free(ctrl_data);
+            break;
+        case I2C_DIMM_TEMP:
+            ptrI2CDimmTmpSType = (PTR_I2C_DIMM_TMP_sTYPE) ((PTR_I2C_DEVICE_DATA) vPtrDeviceData)->data_buf;
+            initial_data = detachArgsData(args, DETACH_INITIAL_DATA, NULL, &len);
+            sprintf(temp, "temperature change - %d ==> ", ptrSmbusDimmTmpSType->temperature);
+            file_log(temp, LOG_TIME);
+            if (len >= 1) {
+                ptrI2CDimmTmpSType->temperature = initial_data[0];
+            }
+            free(initial_data);
+            sprintf(temp, "%d C ", ptrI2CDimmTmpSType->temperature);
+            file_log(temp, LOG_END);
             break;
         case PMBUS_PSU:
             pmBusPage = (PMBusPage *)vPtrDeviceData;

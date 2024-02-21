@@ -40,6 +40,7 @@ typedef enum DEVICE_TYPE_ID_ {
     /* I2c */
     I2C_EEPROM = 101,
     I2C_BP_CPLD = 102,
+    I2C_DIMM_TEMP = 103,
     /* GPIO */
     GPIO_SWITCH = 201,
     /* ADC */

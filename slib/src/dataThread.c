@@ -66,6 +66,7 @@ static void *send_thread(void *pVoid) {
     PTR_SMBUS_DIMM_TMP_sTYPE ptrSmbusDimmTmpSType;
     PTR_I2C_EEPROM_sTYPE ptrI2CEepromSType;
     PTR_I2C_BP_CPLD_sTYPE ptrI2CBpCpldSType;
+    PTR_I2C_DIMM_TMP_sTYPE ptrI2CDimmTmpSType;
     PTR_SMBUS_TPA626_sTYPE ptrSmbusTpa626SType;
     PTR_GPIO_SWITCH_sTYPE ptrGpioSwitchSType;
     PMBusPage *pmBusPage;
@@ -335,6 +336,27 @@ static void *send_thread(void *pVoid) {
                         cJSON_AddNumberToObject(device, receive_times_str, (double) ptrI2CBpCpldSType->receive_times);
                         cJSON_AddNumberToObject(device, write_times_str, (double) ptrI2CBpCpldSType->write_times);
                         break;
+                    case I2C_DIMM_TEMP:
+                        ptrI2CDimmTmpSType = (PTR_I2C_DIMM_TMP_sTYPE) (deviceAddList[i].ptrSmbusDeviceData->data_buf);
+
+                       cJSON_AddStringToObject(device, "description",
+                                                deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
+                        cJSON_AddStringToObject(device, "master_device", deviceAddList[i].ptrDeviceConfig->master.device_name);
+                        if (deviceAddList[i].ptrDeviceConfig->master.i2CType == I2C) {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i2c");
+                        } else {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i3c");
+                        }
+                        cJSON_AddNumberToObject(device, "bus",
+                                                deviceAddList[i].ptrDeviceConfig->bus);
+                        sprintf(addr, "0x%02x", deviceAddList[i].ptrDeviceConfig->addr);
+                        cJSON_AddStringToObject(device, "address", addr);
+                        /* 发送温度数据 */
+                        cJSON_AddNumberToObject(device, "temperature", ptrI2CDimmTmpSType->temperature);
+                        cJSON_AddNumberToObject(device, receive_times_str, (double) ptrI2CDimmTmpSType->receive_times);
+                        cJSON_AddNumberToObject(device, write_times_str, (double) ptrI2CDimmTmpSType->write_times);
+                        break;
                     case GPIO_SWITCH:
                         /* GPIO Device0 - SWITCH */
                         ptrGpioSwitchSType = (PTR_GPIO_SWITCH_sTYPE) (deviceAddList[i].ptrGpioDeviceData->data_buf);
@@ -455,6 +477,7 @@ static void *read_data_thread(void *pVoid) {
     PTR_SMBUS_DIMM_TMP_sTYPE ptrSmbusDimmTmpSType;
     PTR_I2C_EEPROM_sTYPE ptrI2CEepromSType;
     PTR_I2C_BP_CPLD_sTYPE ptrI2CBpCpldSType;
+    PTR_I2C_DIMM_TMP_sTYPE ptrI2CDimmTmpSType;
     PTR_SMBUS_TPA626_sTYPE ptrSmbusTpa626SType;
     PTR_GPIO_SWITCH_sTYPE ptrGpioSwitchSType;
     /* 读取数据 */
@@ -553,6 +576,13 @@ static void *read_data_thread(void *pVoid) {
                             dynamic_change_data(deviceAddList[device_index].device_type_id,
                                                 deviceAddList[device_index].ptrI2cDeviceData, endPtr);
                             pthread_mutex_unlock(&ptrI2CBpCpldSType->mutex);
+                            break;
+                        case I2C_DIMM_TEMP:
+                            ptrI2CDimmTmpSType = (PTR_I2C_DIMM_TMP_sTYPE) (deviceAddList[device_index].ptrI2cDeviceData->data_buf);
+                            pthread_mutex_lock(&ptrI2CDimmTmpSType->mutex);
+                            dynamic_change_data(deviceAddList[device_index].device_type_id,
+                                                deviceAddList[device_index].ptrI2cDeviceData, endPtr);
+                            pthread_mutex_unlock(&ptrI2CDimmTmpSType->mutex);
                             break;
                         case PMBUS_PSU:
                             dynamic_change_data(deviceAddList[device_index].device_type_id,
