@@ -374,7 +374,7 @@ static void isl_pmbus_vr_register_types(void)
 
 type_init(isl_pmbus_vr_register_types)
 
-void pmbus_vr_add(struct I2CBus *bus, uint8_t address, const char *type, PTR_DEVICE_CONFIG ptrDeviceConfig) {
+void pmbus_vr_add(void *bus, uint8_t address, const char *type, PTR_DEVICE_CONFIG ptrDeviceConfig) {
     DeviceState *dev;
     dev = qdev_new(type);
     qdev_prop_set_uint8(dev, "address", address);

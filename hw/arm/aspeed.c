@@ -633,7 +633,7 @@ static void ast2600_evb_i2c_init(AspeedMachineState *bmc)
 
     file_log("Function Add ... ", LOG_TIME_END);
     while (pDeviceConfig != NULL) {
-        I2CBus *master_bus;
+        void *master_bus;
         int master_bus_device_index = -1;
         if (pDeviceConfig->master.device_index == 0) {
             if (pDeviceConfig->master.i2CType == I2C){
