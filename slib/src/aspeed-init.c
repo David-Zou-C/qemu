@@ -759,7 +759,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
         case I2C_DIMM_TEMP:
             ptrI2CDimmTmpSType = (PTR_I2C_DIMM_TMP_sTYPE) ((PTR_I2C_DEVICE_DATA) vPtrDeviceData)->data_buf;
             initial_data = detachArgsData(args, DETACH_INITIAL_DATA, NULL, &len);
-            sprintf(temp, "temperature change - %d ==> ", ptrSmbusDimmTmpSType->temperature);
+            sprintf(temp, "temperature change - %d ==> ", ptrI2CDimmTmpSType->temperature);
             file_log(temp, LOG_TIME);
             if (len >= 1) {
                 ptrI2CDimmTmpSType->temperature = initial_data[0];
