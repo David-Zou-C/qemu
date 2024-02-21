@@ -1133,15 +1133,17 @@ PTR_CONFIG_DATA parse_configuration(void) {
 
             /* master */
             if (master == NULL) {
-                /* 没有指定 i2c 字段，即默认为 0 - BMC，应自动填充 index 和 name 字段，以方便直接使用 */
+                /* 没有指定 master 字段，即默认为 0 - BMC，应自动填充 index 和 name 字段 以及 i2CType，以方便直接使用 */
                 tempConfigJson->master.device_index = 0;
                 sprintf(tempConfigJson->master.device_name, "BMC");
+                tempConfigJson->master.i2CType = I2C;
             } else if (master->type == cJSON_Object) {
                 /* i2c_device */
                 cJSON *i2c_device = cJSON_GetObjectItem(master, "device");
                 if (i2c_device == NULL) {
-                    printf("The devices[%d]: 'master > device' not found ! \n", i);
-                    exit(1);
+                    /* 没有指定 device，默认为 0 - BMC */
+                    tempConfigJson->master.device_index = 0;
+                    sprintf(tempConfigJson->master.device_name, "BMC");
                 } else if (i2c_device->type == cJSON_Number) {
                     tempConfigJson->master.device_index = i2c_device->valueint;
                     sprintf(tempConfigJson->master.device_name, "device[%d]", tempConfigJson->master.device_index);
