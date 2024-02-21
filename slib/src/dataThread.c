@@ -108,7 +108,7 @@ static void *send_thread(void *pVoid) {
                         /* 先发送 desc 信息 */
                         cJSON_AddStringToObject(device, "description", deviceAddList[i].ptrDeviceConfig->description);
                         cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
-                        cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->i2c_dev.device_name);
+                        cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->master.device_name);
                         cJSON_AddNumberToObject(device, "bus",
                                                 deviceAddList[i].ptrDeviceConfig->bus);
                         sprintf(addr, "0x%02x", deviceAddList[i].ptrDeviceConfig->addr);
@@ -137,7 +137,7 @@ static void *send_thread(void *pVoid) {
                         /* 先发送 desc 信息 */
                         cJSON_AddStringToObject(device, "description", deviceAddList[i].ptrDeviceConfig->description);
                         cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
-                        cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->i2c_dev.device_name);
+                        cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->master.device_name);
                         cJSON_AddNumberToObject(device, "bus",
                                                 deviceAddList[i].ptrDeviceConfig->bus);
                         sprintf(addr, "0x%02x", deviceAddList[i].ptrDeviceConfig->addr);
@@ -156,7 +156,7 @@ static void *send_thread(void *pVoid) {
                         /**************************************** 数据处理并发送 - S ****************************************/
                         cJSON_AddStringToObject(device, "description", deviceAddList[i].ptrDeviceConfig->description);
                         cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
-                        cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->i2c_dev.device_name);
+                        cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->master.device_name);
                         cJSON_AddNumberToObject(device, "bus",
                                                 deviceAddList[i].ptrDeviceConfig->bus);
                         sprintf(addr, "0x%02x", deviceAddList[i].ptrDeviceConfig->addr);
@@ -185,7 +185,7 @@ static void *send_thread(void *pVoid) {
                         cJSON_AddStringToObject(device, "description",
                                                 deviceAddList[i].ptrDeviceConfig->description);
                         cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
-                        cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->i2c_dev.device_name);
+                        cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->master.device_name);
                         cJSON_AddNumberToObject(device, "bus",
                                                 deviceAddList[i].ptrDeviceConfig->bus);
                         sprintf(addr, "0x%02x", deviceAddList[i].ptrDeviceConfig->addr);
@@ -201,7 +201,7 @@ static void *send_thread(void *pVoid) {
                         pmBusPage = (PMBusPage *) deviceAddList[i].pmBusPage;
                         cJSON_AddStringToObject(device, "description", pmBusPage->ptrDeviceConfig->description);
                         cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
-                        cJSON_AddStringToObject(device, "master", pmBusPage->ptrDeviceConfig->i2c_dev.device_name);
+                        cJSON_AddStringToObject(device, "master", pmBusPage->ptrDeviceConfig->master.device_name);
                         cJSON_AddNumberToObject(device, "bus",
                                                 deviceAddList[i].pmBusPage->ptrDeviceConfig->bus);
                         sprintf(addr, "0x%02x", deviceAddList[i].pmBusPage->ptrDeviceConfig->addr);
@@ -241,7 +241,7 @@ static void *send_thread(void *pVoid) {
                         cJSON_AddStringToObject(device, "description",
                                                 deviceAddList[i].ptrDeviceConfig->description);
                         cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
-                        cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->i2c_dev.device_name);
+                        cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->master.device_name);
                         cJSON_AddNumberToObject(device, "bus",
                                                 deviceAddList[i].ptrDeviceConfig->bus);
                         sprintf(addr, "0x%02x", deviceAddList[i].ptrDeviceConfig->addr);
@@ -268,7 +268,7 @@ static void *send_thread(void *pVoid) {
                         cJSON_AddStringToObject(device, "description",
                                                 deviceAddList[i].ptrDeviceConfig->description);
                         cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
-                        cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->i2c_dev.device_name);
+                        cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->master.device_name);
                         cJSON_AddNumberToObject(device, "bus",
                                                 deviceAddList[i].ptrDeviceConfig->bus);
                         sprintf(addr, "0x%02x", deviceAddList[i].ptrDeviceConfig->addr);
@@ -359,7 +359,7 @@ static void *send_thread(void *pVoid) {
                         cJSON_AddStringToObject(device, "description",
                                                 deviceAddList[i].ptrDeviceConfig->description);
                         cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
-                        cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->i2c_dev.device_name);
+                        cJSON_AddStringToObject(device, "master", deviceAddList[i].ptrDeviceConfig->master.device_name);
                         cJSON_AddNumberToObject(device, "bus",
                                                 deviceAddList[i].ptrDeviceConfig->bus);
                         sprintf(addr, "0x%02x", deviceAddList[i].ptrDeviceConfig->addr);
