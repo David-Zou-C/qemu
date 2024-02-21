@@ -536,18 +536,18 @@ static void ast2500_evb_i2c_init(AspeedMachineState *bmc)
     while (pDeviceConfig != NULL) {
         I2CBus *master_bus;
         int master_bus_device_index = -1;
-        if (pDeviceConfig->i2c_dev.device_index == 0) {
+        if (pDeviceConfig->master.device_index == 0) {
             master_bus = aspeed_i2c_get_bus(&soc->i2c, pDeviceConfig->bus);
         } else {
-            if (pDeviceConfig->i2c_dev.device_index > 0) {
-                master_bus_device_index = pDeviceConfig->i2c_dev.device_index;
+            if (pDeviceConfig->master.device_index > 0) {
+                master_bus_device_index = pDeviceConfig->master.device_index;
             } else {
                 /* device_index < 0 */
                 int device_index;
-                get_dev_index_for_name(pDeviceConfig->i2c_dev.device_name, &device_index);
+                get_dev_index_for_name(pDeviceConfig->master.device_name, &device_index);
                 if (device_index < 0) {
                     /* -1: 没有找到对应名称的设备 */
-                    printf("The  name \"%s\" not found! \n", pDeviceConfig->i2c_dev.device_name);
+                    printf("The  name \"%s\" not found! \n", pDeviceConfig->master.device_name);
                     exit(1);
                 } else {
                     master_bus_device_index = device_index;
@@ -635,18 +635,22 @@ static void ast2600_evb_i2c_init(AspeedMachineState *bmc)
     while (pDeviceConfig != NULL) {
         I2CBus *master_bus;
         int master_bus_device_index = -1;
-        if (pDeviceConfig->i2c_dev.device_index == 0) {
-            master_bus = aspeed_i2c_get_bus(&soc->i2c, pDeviceConfig->bus);
+        if (pDeviceConfig->master.device_index == 0) {
+            if (pDeviceConfig->master.i2CType == I2C){
+                master_bus = aspeed_i2c_get_bus(&soc->i2c, pDeviceConfig->bus);
+            } else {
+                master_bus = aspeed_i3c_get_bus(&soc->i3c, pDeviceConfig->bus);
+            }
         } else {
-            if (pDeviceConfig->i2c_dev.device_index > 0) {
-                master_bus_device_index = pDeviceConfig->i2c_dev.device_index;
+            if (pDeviceConfig->master.device_index > 0) {
+                master_bus_device_index = pDeviceConfig->master.device_index;
             } else {
                 /* device_index < 0 */
                 int device_index;
-                get_dev_index_for_name(pDeviceConfig->i2c_dev.device_name, &device_index);
+                get_dev_index_for_name(pDeviceConfig->master.device_name, &device_index);
                 if (device_index < 0) {
                     /* -1: 没有找到对应名称的设备 */
-                    printf("The  name \"%s\" not found! \n", pDeviceConfig->i2c_dev.device_name);
+                    printf("The  name \"%s\" not found! \n", pDeviceConfig->master.device_name);
                     exit(1);
                 } else {
                     master_bus_device_index = device_index;

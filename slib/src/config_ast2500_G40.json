@@ -755,7 +755,7 @@
       "name": "CPLD",
       "bus": 0,
       "addr": "0x1a",
-      "i2c": {
+      "master": {
         "device": "PCA9546_13_0x71"
       },
       "args": "0x01 0x10 0xff 0x11 0xff 0x12 0xff 0x13 0xff 0x14 0xff 0x20 0x00 0x21 0x00 0x2f 0xff 0x40 0xfc 0x41 0x03 0x42 0xf3 0x43 0xf0 0x44 0xff 0x48 0xff 0x50 0xfe 0x70 0x49 0x71 0x50 0x72 0xf2 0x74 0x01 0x80 0x00"
@@ -772,7 +772,7 @@
       "device_type_id": 4,
       "bus": 0,
       "addr": "0x19",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x14"
@@ -782,7 +782,7 @@
       "device_type_id": 4,
       "bus": 0,
       "addr": "0x18",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x15"
@@ -792,7 +792,7 @@
       "device_type_id": 4,
       "bus": 0,
       "addr": "0x1b",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x16"
@@ -802,7 +802,7 @@
       "device_type_id": 4,
       "bus": 0,
       "addr": "0x1a",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x17"
@@ -812,7 +812,7 @@
       "device_type_id": 4,
       "bus": 0,
       "addr": "0x1d",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x18"
@@ -822,7 +822,7 @@
       "device_type_id": 4,
       "bus": 0,
       "addr": "0x1c",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x19"
@@ -832,7 +832,7 @@
       "device_type_id": 4,
       "bus": 0,
       "addr": "0x1f",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x1a"
@@ -842,7 +842,7 @@
       "device_type_id": 4,
       "bus": 0,
       "addr": "0x1e",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x1b"
@@ -852,7 +852,7 @@
       "device_type_id": 4,
       "bus": 1,
       "addr": "0x19",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x1c"
@@ -862,7 +862,7 @@
       "device_type_id": 4,
       "bus": 1,
       "addr": "0x18",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x1d"
@@ -872,7 +872,7 @@
       "device_type_id": 4,
       "bus": 1,
       "addr": "0x1b",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x1e"
@@ -882,7 +882,7 @@
       "device_type_id": 4,
       "bus": 1,
       "addr": "0x1a",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x1f"
@@ -892,7 +892,7 @@
       "device_type_id": 4,
       "bus": 1,
       "addr": "0x1d",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x20"
@@ -902,7 +902,7 @@
       "device_type_id": 4,
       "bus": 1,
       "addr": "0x1c",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x21"
@@ -912,7 +912,7 @@
       "device_type_id": 4,
       "bus": 1,
       "addr": "0x1f",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x22"
@@ -922,7 +922,7 @@
       "device_type_id": 4,
       "bus": 1,
       "addr": "0x1e",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x23"
@@ -932,7 +932,7 @@
       "device_type_id": 4,
       "bus": 2,
       "addr": "0x19",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x24"
@@ -942,7 +942,7 @@
       "device_type_id": 4,
       "bus": 2,
       "addr": "0x18",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x25"
@@ -952,7 +952,7 @@
       "device_type_id": 4,
       "bus": 2,
       "addr": "0x1b",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x26"
@@ -962,7 +962,7 @@
       "device_type_id": 4,
       "bus": 2,
       "addr": "0x1a",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x27"
@@ -972,7 +972,7 @@
       "device_type_id": 4,
       "bus": 2,
       "addr": "0x1d",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x28"
@@ -982,7 +982,7 @@
       "device_type_id": 4,
       "bus": 2,
       "addr": "0x1c",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x29"
@@ -992,7 +992,7 @@
       "device_type_id": 4,
       "bus": 2,
       "addr": "0x1f",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x2a"
@@ -1002,7 +1002,7 @@
       "device_type_id": 4,
       "bus": 2,
       "addr": "0x1e",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x2b"
@@ -1012,7 +1012,7 @@
       "device_type_id": 4,
       "bus": 3,
       "addr": "0x19",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x2c"
@@ -1022,7 +1022,7 @@
       "device_type_id": 4,
       "bus": 3,
       "addr": "0x18",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x2d"
@@ -1032,7 +1032,7 @@
       "device_type_id": 4,
       "bus": 3,
       "addr": "0x1b",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x2e"
@@ -1042,7 +1042,7 @@
       "device_type_id": 4,
       "bus": 3,
       "addr": "0x1a",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x2f"
@@ -1052,7 +1052,7 @@
       "device_type_id": 4,
       "bus": 3,
       "addr": "0x1d",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x30"
@@ -1062,7 +1062,7 @@
       "device_type_id": 4,
       "bus": 3,
       "addr": "0x1c",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x31"
@@ -1072,7 +1072,7 @@
       "device_type_id": 4,
       "bus": 3,
       "addr": "0x1f",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x32"
@@ -1082,7 +1082,7 @@
       "device_type_id": 4,
       "bus": 3,
       "addr": "0x1e",
-      "i2c": {
+      "master": {
         "device": "PCA9546_8_0x70"
       },
       "args": "0x33"

@@ -262,7 +262,7 @@
       "description": "RiserA_Temp1",
       "device_type_id": 2,
       "bus": 0,
-      "i2c": {
+      "master": {
         "device": "PCA9546_9_0x70"
       },
       "addr": "0x4c",
@@ -272,7 +272,7 @@
       "description": "RiserA_Temp2",
       "device_type_id": 2,
       "bus": 0,
-      "i2c": {
+      "master": {
         "device": "PCA9546_9_0x70"
       },
       "addr": "0x4d",
@@ -297,7 +297,7 @@
       "description": "RiserB_Temp1",
       "device_type_id": 2,
       "bus": 0,
-      "i2c": {
+      "master": {
         "device": "PCA9546_11_0x70"
       },
       "addr": "0x4c",
@@ -307,7 +307,7 @@
       "description": "RiserB_Temp2",
       "device_type_id": 2,
       "bus": 0,
-      "i2c": {
+      "master": {
         "device": "PCA9546_11_0x70"
       },
       "addr": "0x4d",
@@ -326,7 +326,7 @@
       "device_type_id": 401,
       "name": "PCA9546_12_0_0x70",
       "bus": 0,
-      "i2c": {
+      "master": {
         "device": "PCA9546_12_0x70"
       },
       "addr": "0x77"
@@ -335,7 +335,7 @@
       "description": "RiserC_Temp",
       "device_type_id": 2,
       "bus": 0,
-      "i2c": {
+      "master": {
         "device": "PCA9546_12_0_0x70"
       },
       "addr": "0x48",
@@ -346,7 +346,7 @@
       "device_type_id": 401,
       "name": "PCA9546_12_1_0x70",
       "bus": 1,
-      "i2c": {
+      "master": {
         "device": "PCA9546_12_0x70"
       },
       "addr": "0x77"
@@ -355,7 +355,7 @@
       "description": "RiserD_Temp",
       "device_type_id": 2,
       "bus": 0,
-      "i2c": {
+      "master": {
         "device": "PCA9546_12_1_0x70"
       },
       "addr": "0x48",
@@ -366,7 +366,7 @@
       "device_type_id": 401,
       "name": "PCA9546_12_2_0x70",
       "bus": 2,
-      "i2c": {
+      "master": {
         "device": "PCA9546_12_0x70"
       },
       "addr": "0x77"
@@ -375,7 +375,7 @@
       "description": "RiserE_Temp",
       "device_type_id": 2,
       "bus": 0,
-      "i2c": {
+      "master": {
         "device": "PCA9546_12_2_0x70"
       },
       "addr": "0x48",
@@ -386,7 +386,7 @@
       "device_type_id": 401,
       "name": "PCA9546_12_3_0x70",
       "bus": 3,
-      "i2c": {
+      "master": {
         "device": "PCA9546_12_0x70"
       },
       "addr": "0x77"
@@ -395,7 +395,7 @@
       "description": "RiserF_Temp",
       "device_type_id": 2,
       "bus": 0,
-      "i2c": {
+      "master": {
         "device": "PCA9546_12_3_0x70"
       },
       "addr": "0x48",
@@ -414,7 +414,7 @@
       "device_type_id": 401,
       "name": "PCA9546_12_0_0x71",
       "bus": 0,
-      "i2c": {
+      "master": {
         "device": "PCA9546_12_0x71"
       },
       "addr": "0x72"
@@ -423,7 +423,7 @@
       "description": "RiserG_Temp",
       "device_type_id": 2,
       "bus": 0,
-      "i2c": {
+      "master": {
         "device": "PCA9546_12_0_0x71"
       },
       "addr": "0x48",
@@ -434,7 +434,7 @@
       "device_type_id": 401,
       "name": "PCA9546_12_1_0x71",
       "bus": 1,
-      "i2c": {
+      "master": {
         "device": "PCA9546_12_0x71"
       },
       "addr": "0x72"
@@ -443,7 +443,7 @@
       "description": "RiserH_Temp",
       "device_type_id": 2,
       "bus": 0,
-      "i2c": {
+      "master": {
         "device": "PCA9546_12_1_0x71"
       },
       "addr": "0x48",
@@ -454,7 +454,7 @@
       "device_type_id": 401,
       "name": "PCA9546_12_2_0x71",
       "bus": 2,
-      "i2c": {
+      "master": {
         "device": "PCA9546_12_0x71"
       },
       "addr": "0x72"
@@ -463,7 +463,7 @@
       "description": "RiserI_Temp",
       "device_type_id": 2,
       "bus": 0,
-      "i2c": {
+      "master": {
         "device": "PCA9546_12_2_0x71"
       },
       "addr": "0x48",
@@ -474,7 +474,7 @@
       "device_type_id": 401,
       "name": "PCA9546_12_3_0x71",
       "bus": 3,
-      "i2c": {
+      "master": {
         "device": "PCA9546_12_0x71"
       },
       "addr": "0x72"
@@ -483,7 +483,7 @@
       "description": "RiserJ_Temp",
       "device_type_id": 2,
       "bus": 0,
-      "i2c": {
+      "master": {
         "device": "PCA9546_12_3_0x71"
       },
       "addr": "0x48",
@@ -1221,193 +1221,241 @@
     },
     {
       "description": "CPU0_DIMM_A0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 0,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x50",
       "args": "0x10"
     },
     {
       "description": "CPU0_DIMM_B0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 0,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x51",
       "args": "0x11"
     },
     {
       "description": "CPU0_DIMM_C0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 0,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x52",
       "args": "0x12"
     },
     {
       "description": "CPU0_DIMM_D0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 0,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x53",
       "args": "0x13"
     },
     {
       "description": "CPU0_DIMM_E0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 0,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x54",
       "args": "0x14"
     },
     {
       "description": "CPU0_DIMM_F0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 0,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x55",
       "args": "0x15"
     },
     {
       "description": "CPU0_DIMM_G0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 1,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x50",
       "args": "0x16"
     },
     {
       "description": "CPU0_DIMM_H0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 1,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x51",
       "args": "0x17"
     },
     {
       "description": "CPU0_DIMM_I0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 1,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x52",
       "args": "0x18"
     },
     {
       "description": "CPU0_DIMM_J0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 1,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x53",
       "args": "0x19"
     },
     {
       "description": "CPU0_DIMM_K0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 1,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x54",
       "args": "0x1a"
     },
     {
       "description": "CPU0_DIMM_L0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 1,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x55",
       "args": "0x1b"
     },
     {
       "description": "CPU1_DIMM_A0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 2,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x50",
       "args": "0x1c"
     },
     {
       "description": "CPU1_DIMM_B0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 2,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x51",
       "args": "0x1d"
     },
     {
       "description": "CPU1_DIMM_C0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 2,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x52",
       "args": "0x1e"
     },
     {
       "description": "CPU1_DIMM_D0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 2,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x53",
       "args": "0x1f"
     },
     {
       "description": "CPU1_DIMM_E0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 2,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x54",
       "args": "0x20"
     },
     {
       "description": "CPU1_DIMM_F0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 2,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x55",
       "args": "0x21"
     },
     {
       "description": "CPU1_DIMM_G0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 3,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x50",
       "args": "0x22"
     },
     {
       "description": "CPU1_DIMM_H0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 3,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x51",
       "args": "0x23"
     },
     {
       "description": "CPU1_DIMM_I0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 3,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x52",
       "args": "0x24"
     },
     {
       "description": "CPU1_DIMM_J0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 3,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x53",
       "args": "0x25"
     },
     {
       "description": "CPU1_DIMM_K0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 3,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x54",
       "args": "0x26"
     },
     {
       "description": "CPU1_DIMM_L0",
-      "device_type_id": 701,
+      "device_type_id": 4,
       "bus": 3,
-      "i2c_legacy": true,
+      "master": {
+        "i2c_type": "i3c"
+      },
       "addr": "0x55",
       "args": "0x27"
     }

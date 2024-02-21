@@ -116,6 +116,11 @@ typedef struct GPIO_SIGNAL_ {
     struct GPIO_SIGNAL_ *next;
 } GPIO_SIGNAL, *PTR_GPIO_SIGNAL;
 
+typedef enum I2C_TYPE_ {
+    I2C,
+    I3C
+} I2C_TYPE, *PTR_I2C_TYPE;
+
 typedef struct DEVICE_CONFIG_ {
     char *description;
     DEVICE_TYPE deviceType;
@@ -128,8 +133,8 @@ typedef struct DEVICE_CONFIG_ {
     struct {
         int device_index;
         char device_name[DEVICE_NAME_MAX_LEN];
-    } i2c_dev;
-    _Bool i2clegacy;
+        I2C_TYPE i2CType;
+    } master;
     uint32_t pin_nums;
     PTR_GPIO_SIGNAL ptrGpioSignal;
     PTR_GPIO_OUTPUT_LOGIC_INIT ptrGpioOutputLogicInit;
@@ -199,6 +204,8 @@ typedef struct PIN_WAVEFORM_GENERATOR_ {
     uint8_t stop_waveform_generator;    /* 是否停止产生波形 */
     uint8_t has_update;                 /* 有更新 */
 }PIN_WAVEFORM_GENERATOR, *PTR_PIN_WAVEFORM_GENERATOR;
+
+int compareIgnoreCase(const char *str1, const char *str2);
 
 void oscilloscope_init(PTR_PIN_OSCILLOSCOPE ptrPinOscilloscope);
 uint8_t oscilloscope_add_status_bit(PTR_PIN_OSCILLOSCOPE ptrPinOscilloscope, uint8_t status_bit);

@@ -364,8 +364,12 @@ type_init(at24c_eeprom_register)
     void InstanceType##_add(void *bus, PTR_DEVICE_CONFIG ptrDeviceConfig) {  \
         InstanceType *it;                                              \
         it = OBJ_NAME(i2c_slave_new(TYPE_##OBJ_NAME, ptrDeviceConfig->addr));        \
-        it->i2cDeviceData.ptrDeviceConfig = ptrDeviceConfig;           \
-        i2c_slave_realize_and_unref(I2C_SLAVE(it), bus, &error_abort); \
+        it->i2cDeviceData.ptrDeviceConfig = ptrDeviceConfig;                 \
+        if(ptrDeviceConfig->master.i2CType == I2C) {      \
+            i2c_slave_realize_and_unref(I2C_SLAVE(it), bus, &error_abort); \
+        } else {                                          \
+            i2c_slave_realize_and_unref(I2C_SLAVE(it), (I3C_BUS(bus))->i2c_bus, &error_abort); \
+        }        \
     };
 
 

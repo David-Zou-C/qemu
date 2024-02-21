@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <libgen.h> // 用于 dirname 函数
 #include <time.h>
+#include <ctype.h>
 
 uint16_t (*adc_get_value)(void *opaque, uint8_t channel) = NULL;
 void (*adc_set_value)(void *opaque, uint8_t channel, uint16_t value) = NULL;
@@ -32,6 +33,33 @@ MAC_DEVICE_INFO macDeviceInfo[MAC_DEVICE_INFO_MAX_NUM] = {
         },
         { /* end of list */ }
 };
+
+int compareIgnoreCase(const char *str1, const char *str2) {
+    // 确保两个字符串都不为NULL
+    if (str1 == NULL || str2 == NULL) {
+        return -1; // 或者其他表示错误的值
+    }
+
+    // 使用strlen确定字符串的长度，然后循环比较每个字符
+    size_t len1 = strlen(str1);
+    size_t len2 = strlen(str2);
+
+    // 如果两个字符串长度不同，它们肯定不相等
+    if (len1 != len2) {
+        return 0; // 返回0表示字符串不同
+    }
+
+    // 循环遍历每个字符并进行比较
+    for (size_t i = 0; i < len1; ++i) {
+        // 使用tolower函数将字符转换为小写，并进行比较
+        if (tolower((unsigned char)str1[i]) != tolower((unsigned char)str2[i])) {
+            return 0; // 如果发现不同的字符，返回0表示字符串不同
+        }
+    }
+
+    // 如果所有字符都相同，返回1表示字符串相同
+    return 1;
+}
 
 int device_add(DEVICE_TYPE_ID device_type_id, const char *device_name, void *vPtrDeviceData, void *vPtrDevGpio) {
     FUNC_DEBUG("function: device_add()")
@@ -1024,9 +1052,8 @@ PTR_CONFIG_DATA parse_configuration(void) {
         cJSON *device_type_id = cJSON_GetObjectItem(device, "device_type_id");
         cJSON *bus = cJSON_GetObjectItem(device, "bus");
         cJSON *addr = cJSON_GetObjectItem(device, "addr");
-        cJSON *i2c = cJSON_GetObjectItem(device, "i2c");
+        cJSON *master = cJSON_GetObjectItem(device, "master");
         cJSON *args = cJSON_GetObjectItem(device, "args");
-        cJSON *i2c_legacy = cJSON_GetObjectItem(device, "i2c_legacy");
 
         cJSON *adc_channel = cJSON_GetObjectItem(device, "adc_channel");
         cJSON *division = cJSON_GetObjectItem(device, "division");
@@ -1104,40 +1131,49 @@ PTR_CONFIG_DATA parse_configuration(void) {
                 exit(1);
             }
 
-            /* i2c */
-            if (i2c == NULL) {
+            /* master */
+            if (master == NULL) {
                 /* 没有指定 i2c 字段，即默认为 0 - BMC，应自动填充 index 和 name 字段，以方便直接使用 */
-                tempConfigJson->i2c_dev.device_index = 0;
-                sprintf(tempConfigJson->i2c_dev.device_name, "BMC");
-            } else if (i2c->type == cJSON_Object) {
+                tempConfigJson->master.device_index = 0;
+                sprintf(tempConfigJson->master.device_name, "BMC");
+            } else if (master->type == cJSON_Object) {
                 /* i2c_device */
-                cJSON *i2c_device = cJSON_GetObjectItem(i2c, "device");
+                cJSON *i2c_device = cJSON_GetObjectItem(master, "device");
                 if (i2c_device == NULL) {
-                    printf("The devices[%d]: 'i2c > device' not found ! \n", i);
+                    printf("The devices[%d]: 'master > device' not found ! \n", i);
                     exit(1);
                 } else if (i2c_device->type == cJSON_Number) {
-                    tempConfigJson->i2c_dev.device_index = i2c_device->valueint;
-                    sprintf(tempConfigJson->i2c_dev.device_name, "device[%d]", tempConfigJson->i2c_dev.device_index);
+                    tempConfigJson->master.device_index = i2c_device->valueint;
+                    sprintf(tempConfigJson->master.device_name, "device[%d]", tempConfigJson->master.device_index);
                 } else if (i2c_device->type == cJSON_String) {
-                    tempConfigJson->i2c_dev.device_index = -1;  /* 设置为 -1，表示是无效的，index 应该留至之后设置 */
-                    strcpy(tempConfigJson->i2c_dev.device_name, i2c_device->valuestring);
+                    tempConfigJson->master.device_index = -1;  /* 设置为 -1，表示是无效的，index 应该留至之后设置 */
+                    strcpy(tempConfigJson->master.device_name, i2c_device->valuestring);
                 } else {
-                    printf("The devices[%d]: 'i2c > device' is not a number or string ! \n", i);
+                    printf("The devices[%d]: 'master > device' is not a number or string ! \n", i);
+                    exit(1);
+                }
+                /* i2c_type */
+                cJSON *i2c_type = cJSON_GetObjectItem(master, "i2c_type");
+                if (i2c_type == NULL) {
+                    /* 没有指定 i2c_type，默认为 i2c */
+                    tempConfigJson->master.i2CType = I2C;
+                } else if (i2c_type->type == cJSON_String) {
+                    if (compareIgnoreCase("i2c", i2c_type->valuestring)) {
+                        /* i2c */
+                        tempConfigJson->master.i2CType = I2C;
+                    } else if (compareIgnoreCase("i3c", i2c_type->valuestring)) {
+                        /* i3c */
+                        tempConfigJson->master.i2CType = I3C;
+                    }
+                } else {
+                    printf("The devices[%d]: 'master > i2c_type' is not string ! \n", i);
                     exit(1);
                 }
             } else {
-                printf("The devices[%d]: 'i2c' is not a object ! \n", i);
+                printf("The devices[%d]: 'master' is not a object ! \n", i);
                 exit(1);
             }
 
-            /* i2c Legacy mode*/
-            if (i2c_legacy == NULL) {
-            } else if (i2c_legacy->type != cJSON_False && i2c_legacy->type != cJSON_True) {
-                printf("The devices[%d]: 'i2c_legacy' is not a bool ! \n", i);
-                exit(1);
-            } else {
-                tempConfigJson->i2clegacy = i2c_legacy->valueint;
-            }
         }
             /**************************************** adc_channel ****************************************/
         else if (deviceType == ADC_DEVICE_TYPE) {

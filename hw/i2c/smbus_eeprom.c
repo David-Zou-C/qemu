@@ -33,6 +33,7 @@
 #include "hw/i2c/smbus_eeprom.h"
 #include "qom/object.h"
 #include "slib/inc/smbus-device.h"
+#include "hw/i3c/i3c.h"
 
 //#define DEBUG
 
@@ -401,8 +402,12 @@ uint8_t *spd_data_generate(enum sdram_type type, ram_addr_t ram_size)
         DeviceState *dev;                                \
         dev = qdev_new(TYPE_##NAME);                     \
         qdev_prop_set_uint8(dev, "address", ptrDeviceConfig->addr);    \
-        NAME(dev)->smbus_device_data.ptrDeviceConfig= ptrDeviceConfig; \
-        qdev_realize_and_unref(dev, (BusState *)smbus, &error_fatal);   \
+        NAME(dev)->smbus_device_data.ptrDeviceConfig= ptrDeviceConfig;      \
+        if (ptrDeviceConfig->master.i2CType == I2C) {    \
+            qdev_realize_and_unref(dev, (BusState *)smbus, &error_fatal);   \
+        } else {                                         \
+            qdev_realize_and_unref(dev, (BusState *)((I3C_BUS(bus))->i2c_bus), &error_fatal);   \
+        }    \
     }
 
 

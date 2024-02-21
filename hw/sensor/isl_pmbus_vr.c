@@ -13,6 +13,7 @@
 #include "qapi/visitor.h"
 #include "qemu/log.h"
 #include "qemu/module.h"
+#include "hw/i3c/i3c.h"
 
 static uint8_t isl_pmbus_vr_read_byte(PMBusDevice *pmdev)
 {
@@ -378,6 +379,9 @@ void pmbus_vr_add(struct I2CBus *bus, uint8_t address, const char *type, PTR_DEV
     dev = qdev_new(type);
     qdev_prop_set_uint8(dev, "address", address);
     PMBUS_DEVICE(dev)->ptrDeviceConfig = ptrDeviceConfig;
-
-    qdev_realize_and_unref(dev, (BusState *) bus, &error_fatal);
+    if (ptrDeviceConfig->master.i2CType == I2C) {
+        qdev_realize_and_unref(dev, (BusState *) bus, &error_fatal);
+    } else {
+        qdev_realize_and_unref(dev, (BusState *)((I3C_BUS(bus))->i2c_bus), &error_fatal);
+    }
 };
