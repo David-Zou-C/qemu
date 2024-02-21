@@ -337,7 +337,7 @@ static void *send_thread(void *pVoid) {
                         cJSON_AddNumberToObject(device, write_times_str, (double) ptrI2CBpCpldSType->write_times);
                         break;
                     case I2C_DIMM_TEMP:
-                        ptrI2CDimmTmpSType = (PTR_I2C_DIMM_TMP_sTYPE) (deviceAddList[i].ptrSmbusDeviceData->data_buf);
+                        ptrI2CDimmTmpSType = (PTR_I2C_DIMM_TMP_sTYPE) (deviceAddList[i].ptrI2cDeviceData->data_buf);
 
                        cJSON_AddStringToObject(device, "description",
                                                 deviceAddList[i].ptrDeviceConfig->description);
