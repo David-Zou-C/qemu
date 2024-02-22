@@ -632,9 +632,6 @@
       "device_type_id": 201,
       "pin_nums": 2,
       "signal": {
-        "output_lines": [
-          ["BMC", 48, 1]
-        ],
         "output_logic_init": [
           [0, "1", 0]
         ],
@@ -644,7 +641,7 @@
       }
     },
     {
-      "description": "Power Button out: line_0(GPIO P1) 输入下降沿和上升沿后，翻转 SystemPower的 line_0",
+      "description": "Power Button out: line_0(GPIO P1) 输入下降沿和上升沿后，翻转 BMC_48",
       "name": "PowerButtonOut",
       "device_type_id": 201,
       "pin_nums": 2,
@@ -653,7 +650,7 @@
           ["BMC", 121, 0]
         ],
         "output_lines": [
-          ["SystemPower", 0, 1]
+          ["BMC", 48, 1]
         ],
         "output_logic_init": [
           [1, "1", 0]
