@@ -8,6 +8,13 @@
       "args": "0x20"
     },
     {
+      "description": "CPU1_Temp",
+      "device_type_id": 2,
+      "bus": 3,
+      "addr": "0x4c",
+      "args": "0x21"
+    },
+    {
       "description": "BP CPLD 0",
       "device_type_id": 102,
       "bus": 1,
