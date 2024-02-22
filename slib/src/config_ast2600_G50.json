@@ -1221,7 +1221,7 @@
     },
     {
       "description": "CPU0_DIMM_A0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 0,
       "master": {
         "i2c_type": "i3c"
@@ -1231,7 +1231,7 @@
     },
     {
       "description": "CPU0_DIMM_B0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 0,
       "master": {
         "i2c_type": "i3c"
@@ -1241,7 +1241,7 @@
     },
     {
       "description": "CPU0_DIMM_C0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 0,
       "master": {
         "i2c_type": "i3c"
@@ -1251,7 +1251,7 @@
     },
     {
       "description": "CPU0_DIMM_D0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 0,
       "master": {
         "i2c_type": "i3c"
@@ -1261,7 +1261,7 @@
     },
     {
       "description": "CPU0_DIMM_E0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 0,
       "master": {
         "i2c_type": "i3c"
@@ -1271,7 +1271,7 @@
     },
     {
       "description": "CPU0_DIMM_F0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 0,
       "master": {
         "i2c_type": "i3c"
@@ -1281,7 +1281,7 @@
     },
     {
       "description": "CPU0_DIMM_G0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 1,
       "master": {
         "i2c_type": "i3c"
@@ -1291,7 +1291,7 @@
     },
     {
       "description": "CPU0_DIMM_H0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 1,
       "master": {
         "i2c_type": "i3c"
@@ -1301,7 +1301,7 @@
     },
     {
       "description": "CPU0_DIMM_I0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 1,
       "master": {
         "i2c_type": "i3c"
@@ -1311,7 +1311,7 @@
     },
     {
       "description": "CPU0_DIMM_J0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 1,
       "master": {
         "i2c_type": "i3c"
@@ -1321,7 +1321,7 @@
     },
     {
       "description": "CPU0_DIMM_K0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 1,
       "master": {
         "i2c_type": "i3c"
@@ -1331,7 +1331,7 @@
     },
     {
       "description": "CPU0_DIMM_L0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 1,
       "master": {
         "i2c_type": "i3c"
@@ -1341,7 +1341,7 @@
     },
     {
       "description": "CPU1_DIMM_A0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 2,
       "master": {
         "i2c_type": "i3c"
@@ -1351,7 +1351,7 @@
     },
     {
       "description": "CPU1_DIMM_B0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 2,
       "master": {
         "i2c_type": "i3c"
@@ -1361,7 +1361,7 @@
     },
     {
       "description": "CPU1_DIMM_C0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 2,
       "master": {
         "i2c_type": "i3c"
@@ -1371,7 +1371,7 @@
     },
     {
       "description": "CPU1_DIMM_D0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 2,
       "master": {
         "i2c_type": "i3c"
@@ -1381,7 +1381,7 @@
     },
     {
       "description": "CPU1_DIMM_E0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 2,
       "master": {
         "i2c_type": "i3c"
@@ -1391,7 +1391,7 @@
     },
     {
       "description": "CPU1_DIMM_F0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 2,
       "master": {
         "i2c_type": "i3c"
@@ -1401,7 +1401,7 @@
     },
     {
       "description": "CPU1_DIMM_G0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 3,
       "master": {
         "i2c_type": "i3c"
@@ -1411,7 +1411,7 @@
     },
     {
       "description": "CPU1_DIMM_H0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 3,
       "master": {
         "i2c_type": "i3c"
@@ -1421,7 +1421,7 @@
     },
     {
       "description": "CPU1_DIMM_I0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 3,
       "master": {
         "i2c_type": "i3c"
@@ -1431,7 +1431,7 @@
     },
     {
       "description": "CPU1_DIMM_J0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 3,
       "master": {
         "i2c_type": "i3c"
@@ -1441,7 +1441,7 @@
     },
     {
       "description": "CPU1_DIMM_K0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 3,
       "master": {
         "i2c_type": "i3c"
@@ -1451,7 +1451,7 @@
     },
     {
       "description": "CPU1_DIMM_L0",
-      "device_type_id": 103,
+      "device_type_id": 4,
       "bus": 3,
       "master": {
         "i2c_type": "i3c"
