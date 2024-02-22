@@ -337,15 +337,15 @@ uint8_t recv_I2cEmptyDevice2(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
     ptrI2CDimmTmpSType->receive_times++;
     if (ptrI2CDimmTmpSType->offset == 0) {
         ptrI2CDimmTmpSType->offset = 1;
-        ret = ptrI2CDimmTmpSType->temperature >> 4;
+        ret = ptrI2CDimmTmpSType->temperature << 4;
         return ret;
     } else if (ptrI2CDimmTmpSType->offset == 1) {
         ptrI2CDimmTmpSType->offset = 0;
-        ret = ptrI2CDimmTmpSType->temperature << 4;
+        ret = ptrI2CDimmTmpSType->temperature >> 4;
         return ret;
     } else {
         ptrI2CDimmTmpSType->offset = 0;
-        ret = ptrI2CDimmTmpSType->temperature >> 4;
+        ret = ptrI2CDimmTmpSType->temperature << 4;
         return ret;
     }
     return 0;
