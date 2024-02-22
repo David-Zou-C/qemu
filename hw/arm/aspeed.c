@@ -689,7 +689,7 @@ static void ast2600_evb_i2c_init(AspeedMachineState *bmc)
             GpioFunctionPtr gpioFunctionPtr = getGpioDeviceAddFunc(pDeviceConfig->device_type_id);
             gpioFunctionPtr(OBJECT(bmc), pDeviceConfig);
         } else if (pDeviceConfig->deviceType == ADC_DEVICE_TYPE) {
-            adc_device_add0(&(soc->adc.engines[0]), pDeviceConfig);
+            adc_device_add1(&(soc->adc.engines[0]), &(soc->adc.engines[1]), pDeviceConfig);  /* ! ast2600 adc 与 ast2500 不同 */
         } else if (pDeviceConfig->deviceType == PCA954X_DEVICE_TYPE) {
             pca_device_add(master_bus, pDeviceConfig);
         } else if (pDeviceConfig->deviceType == PWM_TACH_DEVICE_TYPE) {

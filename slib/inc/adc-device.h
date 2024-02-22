@@ -42,4 +42,6 @@ void init_ADCDevice0(PTR_ADC_DEVICE_DATA ptrAdcDeviceData);
 
 void adc_device_add0(void *obj, PTR_DEVICE_CONFIG ptrDeviceConfig);
 
+void adc_device_add1(void *obj_0, void *obj_1, PTR_DEVICE_CONFIG ptrDeviceConfig);
+
 #endif //QEMU_ADC_DEVICE_H

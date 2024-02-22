@@ -512,3 +512,37 @@ void adc_device_add0(void *obj, PTR_DEVICE_CONFIG ptrDeviceConfig) {
     init_ADCDevice0(ptrAdcDeviceData);
     device_add(ADC, ptrDeviceConfig->name, ptrAdcDeviceData, NULL);
 }
+
+void adc_device_add1(void *obj_0, void *obj_1, PTR_DEVICE_CONFIG ptrDeviceConfig) {
+    AspeedADCEngineState *s0 = ASPEED_ADC_ENGINE(obj_0);
+    AspeedADCEngineState *s1 = ASPEED_ADC_ENGINE(obj_1);
+    AspeedADCEngineState *s;
+
+    PTR_ADC_DEVICE_DATA ptrAdcDeviceData = (PTR_ADC_DEVICE_DATA) malloc(sizeof(ADC_DEVICE_DATA));
+    memset(ptrAdcDeviceData, 0, sizeof(ADC_DEVICE_DATA));
+    ptrAdcDeviceData->ptrDeviceConfig = ptrDeviceConfig;
+
+    assert(ptrAdcDeviceData->ptrDeviceConfig->adc_channel <= 15);
+
+    if (ptrAdcDeviceData->ptrDeviceConfig->adc_channel < 8) {
+        s = s0;
+    } else {
+        s = s1;
+    }
+
+    if (ptrAdcDeviceData->ptrDeviceConfig->adc_channel % 2 == 0) {
+        ptrAdcDeviceData->adcRegType = REG_L;
+    } else {
+        ptrAdcDeviceData->adcRegType = REG_H;
+    }
+
+    uint32_t reg_addr = DATA_CHANNEL_1_AND_0 + (ptrAdcDeviceData->ptrDeviceConfig->adc_channel % 8)/2;
+
+    ptrAdcDeviceData->ptrAdcReg = (PTR_ADC_REG)&(s->regs[reg_addr]);
+
+    ptrAdcDeviceData->division = (uint32_t )(ptrAdcDeviceData->ptrDeviceConfig->division * 1000);
+
+    init_ADCDevice0(ptrAdcDeviceData);
+    device_add(ADC, ptrDeviceConfig->name, ptrAdcDeviceData, NULL);
+}
+
