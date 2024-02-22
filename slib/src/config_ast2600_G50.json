@@ -11,7 +11,7 @@
       "description": "CPU1_Temp",
       "device_type_id": 2,
       "bus": 3,
-      "addr": "0x4c",
+      "addr": "0x4d",
       "args": "0x21"
     },
     {
