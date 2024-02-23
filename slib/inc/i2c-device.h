@@ -46,12 +46,13 @@ uint8_t recv_I2cEmptyDevice0(PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
 
 void send_I2cEmptyDevice0(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
 
+/**************************************** Device 1 ****************************************/
 /**************************************** SAS EXP BP CPLD ****************************************/
 #define I2C_BP_MAX_HDD_NUM 64
 
 typedef struct BP_HDD_STATUS_ {
     uint8_t Fail :1;
-    uint8_t Rebuid :1;
+    uint8_t Rebuild :1;
     uint8_t Locate :1;
     uint8_t Idle_Act :1;
     uint8_t Present :2;
@@ -110,7 +111,16 @@ uint8_t recv_I2cEmptyDevice1(PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
 
 void send_I2cEmptyDevice1(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
 
-/**************************************** - ****************************************/
+/**************************************** Device 2 ****************************************/
+typedef struct I2C_DIMM_TMP_sTYPE_ {
+    pthread_mutex_t mutex;
+    uint8_t temperature;
+    uint8_t offset;
+    uint64_t receive_times;
+    uint64_t write_times;
+    uint32_t device_index;
+} I2C_DIMM_TMP_sTYPE, *PTR_I2C_DIMM_TMP_sTYPE;
+
 void init_I2cEmptyDevice2(PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
 
 int event_I2cEmptyDevice2(uint8_t i2CEvent, PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
@@ -118,6 +128,8 @@ int event_I2cEmptyDevice2(uint8_t i2CEvent, PTR_I2C_DEVICE_DATA ptrI2CDeviceData
 uint8_t recv_I2cEmptyDevice2(PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
 
 void send_I2cEmptyDevice2(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
+
+/**************************************** Device 3 ****************************************/
 
 void init_I2cEmptyDevice3(PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
 
@@ -127,6 +139,8 @@ uint8_t recv_I2cEmptyDevice3(PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
 
 void send_I2cEmptyDevice3(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
 
+/**************************************** Device 4 ****************************************/
+
 void init_I2cEmptyDevice4(PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
 
 int event_I2cEmptyDevice4(uint8_t i2CEvent, PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
@@ -134,8 +148,6 @@ int event_I2cEmptyDevice4(uint8_t i2CEvent, PTR_I2C_DEVICE_DATA ptrI2CDeviceData
 uint8_t recv_I2cEmptyDevice4(PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
 
 void send_I2cEmptyDevice4(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData);
-
-
 
 /**************************************** 自定义设备添加函数 ****************************************/
 // 定义函数指针类型
@@ -151,9 +163,9 @@ void I2cEmptyDevice3_add(void *bus, PTR_DEVICE_CONFIG ptrDeviceConfig);
 
 void I2cEmptyDevice4_add(void *bus, PTR_DEVICE_CONFIG ptrDeviceConfig);
 
-
 I2cFunctionPtr getI2cDeviceAddFunc(int device_type_id);
 
 int getI2cDeviceTypeId(I2cFunctionPtr functionPtr);
+
 
 #endif //QEMU_I2C_DEVICE_H

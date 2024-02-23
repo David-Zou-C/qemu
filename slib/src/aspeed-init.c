@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <libgen.h> // 用于 dirname 函数
 #include <time.h>
+#include <ctype.h>
 
 uint16_t (*adc_get_value)(void *opaque, uint8_t channel) = NULL;
 void (*adc_set_value)(void *opaque, uint8_t channel, uint16_t value) = NULL;
@@ -33,7 +34,34 @@ MAC_DEVICE_INFO macDeviceInfo[MAC_DEVICE_INFO_MAX_NUM] = {
         { /* end of list */ }
 };
 
-void device_add(DEVICE_TYPE_ID device_type_id, const char *device_name, void *vPtrDeviceData, void *vPtrDevGpio) {
+int compareIgnoreCase(const char *str1, const char *str2) {
+    // 确保两个字符串都不为NULL
+    if (str1 == NULL || str2 == NULL) {
+        return -1; // 或者其他表示错误的值
+    }
+
+    // 使用strlen确定字符串的长度，然后循环比较每个字符
+    size_t len1 = strlen(str1);
+    size_t len2 = strlen(str2);
+
+    // 如果两个字符串长度不同，它们肯定不相等
+    if (len1 != len2) {
+        return 0; // 返回0表示字符串不同
+    }
+
+    // 循环遍历每个字符并进行比较
+    for (size_t i = 0; i < len1; ++i) {
+        // 使用tolower函数将字符转换为小写，并进行比较
+        if (tolower((unsigned char)str1[i]) != tolower((unsigned char)str2[i])) {
+            return 0; // 如果发现不同的字符，返回0表示字符串不同
+        }
+    }
+
+    // 如果所有字符都相同，返回1表示字符串相同
+    return 1;
+}
+
+int device_add(DEVICE_TYPE_ID device_type_id, const char *device_name, void *vPtrDeviceData, void *vPtrDevGpio) {
     FUNC_DEBUG("function: device_add()")
     for (int i = 0; i < DEVICE_MAX_NUM; ++i) {
         if (deviceAddList[i].exist == 0) {
@@ -48,30 +76,43 @@ void device_add(DEVICE_TYPE_ID device_type_id, const char *device_name, void *vP
                        (device_type_id < SMBUS_DEVICE_TYPE_ID_OFFSET + SMBUS_DEVICE_TOTAL_NUM)) {
                 deviceAddList[i].ptrSmbusDeviceData = vPtrDeviceData;
                 deviceAddList[i].device_type = SMBUS_DEVICE_TYPE;
+                deviceAddList[i].ptrDeviceConfig = deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig;
             } else if (device_type_id == PMBUS_PSU){
                 deviceAddList[i].pmBusPage = vPtrDeviceData;
                 deviceAddList[i].device_type = PMBUS_DEVICE_TYPE;
+                deviceAddList[i].ptrDeviceConfig = deviceAddList[i].pmBusPage->ptrDeviceConfig;
             } else if ((device_type_id >= I2C_DEVICE_TYPE_ID_OFFSET) &&
                        (device_type_id < I2C_DEVICE_TYPE_ID_OFFSET + I2C_DEVICE_TOTAL_NUM)) {
                 deviceAddList[i].ptrI2cDeviceData = vPtrDeviceData;
                 deviceAddList[i].device_type = I2C_DEVICE_TYPE;
+                deviceAddList[i].ptrDeviceConfig = deviceAddList[i].ptrI2cDeviceData->ptrDeviceConfig;
             } else if ((device_type_id >= GPIO_DEVICE_TYPE_ID_OFFSET) &&
                        (device_type_id < GPIO_DEVICE_TYPE_ID_OFFSET + GPIO_DEVICE_TOTAL_NUM)) {
                 deviceAddList[i].ptrGpioDeviceData = vPtrDeviceData;
                 deviceAddList[i].device_type = GPIO_DEVICE_TYPE;
+                deviceAddList[i].ptrDeviceConfig = deviceAddList[i].ptrGpioDeviceData->ptrDeviceConfig;
             } else if ((device_type_id >= ADC_DEVICE_TYPE_ID_OFFSET) &&
                        (device_type_id < ADC_DEVICE_TYPE_ID_OFFSET + ADC_DEVICE_TOTAL_NUM)) {
                 deviceAddList[i].ptrAdcDeviceData = vPtrDeviceData;
                 deviceAddList[i].device_type = ADC_DEVICE_TYPE;
+                deviceAddList[i].ptrDeviceConfig = deviceAddList[i].ptrAdcDeviceData->ptrDeviceConfig;
             } else if (device_type_id == PCA9546 || device_type_id == PCA9548) {
                 deviceAddList[i].pca954x = vPtrDeviceData;
                 deviceAddList[i].device_type = PCA954X_DEVICE_TYPE;
+                /* 对于 PCA954X 而言 ptrDeviceConfig 无法在此处直接赋值，返回索引值后，由设备的 realize 函数中赋值 */
+            } else if (device_type_id == PWM_TACH) {
+                deviceAddList[i].ptrPwmTachDevice = vPtrDeviceData;
+                deviceAddList[i].device_type = PWM_TACH_DEVICE_TYPE;
+                deviceAddList[i].ptrDeviceConfig = deviceAddList[i].ptrPwmTachDevice->ptrDeviceConfig;
             }
-            return;
+                
+            return i;
         }
     }
+
     printf("device exceed max num! \n");
     exit(1);
+    return -1;
 }
 
 int get_device_index(void *vPtrDeviceData) {
@@ -119,6 +160,8 @@ DEVICE_TYPE get_device_type(DEVICE_TYPE_ID device_type_id) {
         return ADC_DEVICE_TYPE;
     } else if (device_type_id == PCA9546 || device_type_id == PCA9548) {
         return PCA954X_DEVICE_TYPE;
+    } else if (device_type_id == PWM_TACH) {
+        return PWM_TACH_DEVICE_TYPE;
     } else {
         return UNDEFINED;
     }
@@ -156,6 +199,7 @@ void get_dev_index_for_name(const char *name, int *index) {
             }
         }
     }
+    printf("get index for name (\"%s\") failed! \n", name);
     *index = -1;
 }
 
@@ -276,7 +320,7 @@ cJSON *read_config_file(const char *filename) {
         exit(1);
     }
 
-    printf("read json file over! \n");
+    printf("read json file (%s) over! \n", CONFIG_FILE);
     return root;
 }
 
@@ -471,12 +515,15 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
     PTR_SMBUS_DIMM_TMP_sTYPE ptrSmbusDimmTmpSType;
     PTR_I2C_EEPROM_sTYPE ptrI2CEepromSType;
     PTR_I2C_BP_CPLD_sTYPE ptrI2CBpCpldSType;
+    PTR_I2C_DIMM_TMP_sTYPE ptrI2CDimmTmpSType;
     PTR_SMBUS_TPA626_sTYPE ptrSmbusTpa626SType;
     PTR_GPIO_DEVICE_DATA ptrGpioDeviceData;
     PTR_GPIO_SWITCH_sTYPE ptrGpioSwitchSType;
     PTR_ADC_DEVICE_DATA ptrAdcDeviceData;
+    PTR_PWM_TACH_DEVICE ptrPwmTachDevice;
     PMBusPage *pmBusPage;
     char temp[128];
+    char *end=NULL;
     uint64_t len;
     uint32_t *initial_data = NULL;
     uint32_t *ctrl_data = NULL;
@@ -497,8 +544,8 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                             ptrSmbusEepromSType->buf[j] = initial_data[i];
                         } else {
                             /* 越界 ！ */
-                            printf("smbus eeprom buf size is 256, but args is more - '%lu'", len - 1);
-                            exit(1);
+//                            printf("smbus eeprom buf size is 256, but args is more - '%lu'", len - 1);
+//                            exit(1);
                         }
                     }
                     i--; /* 此时的 i 就等于 len，所以 i-1 此处等同于 initial data 的最后一个值 */
@@ -514,8 +561,8 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                             ptrSmbusEepromSType->buf[initial_data[addr_i]] = initial_data[val_i];
                         } else {
                             /* 越界 ！ */
-                            printf("This address - '%02x' exceeds the maximum! \n", initial_data[addr_i]);
-                            exit(1);
+//                            printf("This address - '%02x' exceeds the maximum! \n", initial_data[addr_i]);
+//                            exit(1);
                         }
                     }
                 }
@@ -690,7 +737,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                             ptrI2CBpCpldSType->i2CBpCpldData.exp_manufacture = initial_data[val_i];
                             break;
                         case 0xA0 ... 0xBF:
-                            ptrI2CBpCpldSType->i2CBpCpldData.bp_name[reg_i - 0xA0] = (char )initial_data[val_i];
+                            ptrI2CBpCpldSType->i2CBpCpldData.bp_name[initial_data[reg_i] - 0xA0] = (char )initial_data[val_i];
                             break;
                         default:
                             break;
@@ -709,44 +756,115 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
             }
             free(ctrl_data);
             break;
+        case I2C_DIMM_TEMP:
+            ptrI2CDimmTmpSType = (PTR_I2C_DIMM_TMP_sTYPE) ((PTR_I2C_DEVICE_DATA) vPtrDeviceData)->data_buf;
+            initial_data = detachArgsData(args, DETACH_INITIAL_DATA, NULL, &len);
+            sprintf(temp, "temperature change - %d ==> ", ptrI2CDimmTmpSType->temperature);
+            file_log(temp, LOG_TIME);
+            if (len >= 1) {
+                ptrI2CDimmTmpSType->temperature = initial_data[0];
+            }
+            free(initial_data);
+            sprintf(temp, "%d C ", ptrI2CDimmTmpSType->temperature);
+            file_log(temp, LOG_END);
+            break;
         case PMBUS_PSU:
             pmBusPage = (PMBusPage *)vPtrDeviceData;
             initial_data = detachArgsData(args, DETACH_INITIAL_DATA, NULL, &len);
             if (len < 2) {
                 break;
             }
-            /* 第 0 个表示 寄存器数 */
-            switch (initial_data[0]) {
-                case PMBUS_READ_VIN:
-                    pmBusPage->read_vin = (uint16_t) initial_data[1];
-                    break;
-                case PMBUS_READ_IIN:
-                    pmBusPage->read_iin = (uint16_t) initial_data[1];
-                    break;
-                case PMBUS_READ_PIN:
-                    pmBusPage->read_pin = (uint16_t) initial_data[1];
-                    break;
-                case PMBUS_READ_VOUT:
-                    pmBusPage->read_pout = (uint16_t) initial_data[1];
-                    break;
-                case PMBUS_READ_IOUT:
-                    pmBusPage->read_iout = (uint16_t) initial_data[1];
-                    break;
-                case PMBUS_READ_POUT:
-                    pmBusPage->read_pout = (uint16_t) initial_data[1];
-                    break;
-                case PMBUS_READ_TEMPERATURE_1:
-                    pmBusPage->read_temperature_1 = (uint16_t) initial_data[1];
-                    break;
-                case PMBUS_READ_TEMPERATURE_2:
-                    pmBusPage->read_temperature_2 = (uint16_t) initial_data[1];
-                    break;
-                case PMBUS_READ_FAN_SPEED_1:
-                    pmBusPage->read_fan_speed_1 = (uint16_t) initial_data[1];
-                    break;
-                default:
-                    printf("unknown psu register !\n");
-                    break;
+            int data_i = 0;
+            uint32_t n = 0, kj = 0;
+            uint32_t reg_type;
+            char *temp_mfr;
+            while (data_i < len) {
+                reg_type = initial_data[data_i++];
+                switch (reg_type) {
+                    case 0 ... 6:
+                        /* 0 mfr_id
+                         * 1 mfr_model
+                         * 2 mfr_revision
+                         * 3 mfr_location
+                         * 4 mfr_date
+                         * 5 mfr_serial
+                         * 6 mfr_version   */
+                        /* 第一个数表述数据长度 n */
+                        /* 后续 n 个字符被视为 char 类型 */
+                        if (data_i >= len) {
+                            break;
+                        }
+                        n = initial_data[data_i++];
+                        if (data_i - 1 + n >= len) {
+                            break;
+                        }
+                        if (reg_type == 0) {
+                            temp_mfr = pmBusPage->mfr_id;
+                        } else if (reg_type == 1) {
+                            temp_mfr = pmBusPage->mfr_model;
+                        } else if (reg_type == 2) {
+                            temp_mfr = pmBusPage->mfr_revision;
+                        } else if (reg_type == 3) {
+                            temp_mfr = pmBusPage->mfr_location;
+                        } else if (reg_type == 4) {
+                            temp_mfr = pmBusPage->mfr_date;
+                        } else if (reg_type == 5) {
+                            temp_mfr = pmBusPage->mfr_serial;
+                        } else if (reg_type == 6) {
+                            temp_mfr = pmBusPage->version;
+                        }
+                        for (kj = 0; kj < n && kj < 50-1; ++kj) {
+                            temp_mfr[kj] = (char) initial_data[data_i++];
+                        }
+                        temp_mfr[kj] = 0;
+                        break;
+                    case 7:
+                        /* mfr_specific */
+                        if (data_i >= len) {
+                            break;
+                        }
+                        pmBusPage->status_mfr_specific = (int8_t) initial_data[data_i++];
+                        break;
+                    case 8 ... 18:
+                        /* mfr_pout_max 
+                         * read_vout
+                         * read_iout
+                         * read_pout
+                         * read_vin
+                         * read_iin
+                         * read_pin
+                         * read_temperature_1
+                         * read_temperature_2
+                         * read_fan_speed_1
+                         **/
+                        if (data_i >= len) {
+                            break;
+                        }
+                        if (reg_type == 8) {
+                            pmBusPage->mfr_pout_max = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 9) {
+                            pmBusPage->read_vout = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 10) {
+                            pmBusPage->read_iout = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 11) {
+                            pmBusPage->read_pout = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 12) {
+                            pmBusPage->read_vin = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 13) {
+                            pmBusPage->read_iin = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 14) {
+                            pmBusPage->read_pin = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 15) {
+                            pmBusPage->read_temperature_1 = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 16) {
+                            pmBusPage->read_temperature_2 = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 17) {
+                            pmBusPage->read_fan_speed_1 = (uint16_t) initial_data[data_i++];
+                        }
+                        break;
+                    default:
+                        break;
+                }
             }
             free(initial_data);
             break;
@@ -764,11 +882,11 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                 break;
             }
 
-            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "WAVEFORM", &len);
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_WAVEFORM", &len);
             if (len > 0) {
                 pthread_mutex_lock(&ptrGpioSwitchSType->pin_state_mutex[initial_data[0]]);
                 ptrGpioSwitchSType->pinWaveformGenerator_list[initial_data[0]].waveform_len = 0;
-                for (int k = 0; k < len; ++k) {
+                for (int k = 0; k < len && k < PIN_WAVEFORM_BUF_MAX_BIT-1; ++k) {
                     if (ctrl_data[k] == 0) {
                         ptrGpioSwitchSType->pinWaveformGenerator_list[initial_data[0]]
                         .waveform_buf[ptrGpioSwitchSType->pinWaveformGenerator_list[initial_data[0]].waveform_len++] = FALSE;
@@ -783,7 +901,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
             }
             free(ctrl_data);
 
-            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "WAVEFORM_TYPE", &len);
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_WAVEFORM_TYPE", &len);
             if (len > 0) {
                 pthread_mutex_lock(&ptrGpioSwitchSType->pin_state_mutex[initial_data[0]]);
                 if (ctrl_data[0] == 0) {
@@ -799,7 +917,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
             }
             free(ctrl_data);
 
-            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "WAVEFORM_RATE", &len);
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_WAVEFORM_RATE", &len);
             if (len > 0) {
                 pthread_mutex_lock(&ptrGpioSwitchSType->pin_state_mutex[initial_data[0]]);
                 if (ctrl_data[0] <= PIN_WAVEFORM_RATE_MAX) {
@@ -811,7 +929,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
             }
             free(ctrl_data);
 
-            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "WAVEFORM_STOP", &len);
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_WAVEFORM_STOP", &len);
             if (len > 0) {
                 pthread_mutex_lock(&ptrGpioSwitchSType->pin_state_mutex[initial_data[0]]);
                 ptrGpioSwitchSType->pinWaveformGenerator_list[initial_data[0]].stop_waveform_generator = (ctrl_data[0] != 0);
@@ -828,17 +946,82 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
             if (len < 1) {
                 ;
             } else {
-                ptrAdcDeviceData->set_adc_value = initial_data[0];
+                uint32_t temp_adc_value;
+                sprintf(temp, "%2x", initial_data[0]);
+                temp_adc_value = strtoul(temp, &end, 10);
+                if (*end != '\0') {
+                    /* 停止符 不为 \0，表示遇到非10进制字符，此时非预期值，应该跳出设置 */
+                    ;
+                } else {
+                    ptrAdcDeviceData->set_adc_value = temp_adc_value;
+                }
             }
 
-            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "DIVISION", &len);
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_ADC_REGISTER", &len);
+            if (len < 1) {
+                ;
+            } else {
+                if (ptrAdcDeviceData->adcRegType == REG_L) {
+                    ptrAdcDeviceData->ptrAdcReg->reg_lh.l = ctrl_data[0];
+                } else {
+                    ptrAdcDeviceData->ptrAdcReg->reg_lh.h = ctrl_data[0];
+                }
+            }
+            free(ctrl_data);
+
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_DIVISION", &len);
             if (len < 1) {
                 ;
             } else {
                 ptrAdcDeviceData->division = ctrl_data[0];
             }
+            free(ctrl_data);
 
             free(initial_data);
+            break;
+        case PWM_TACH:
+            /* PWM_TACH */
+            ptrPwmTachDevice = (PTR_PWM_TACH_DEVICE) vPtrDeviceData;
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_MIN_RPM", &len);
+            if (len < 1) {
+                ;
+            } else {
+                ptrPwmTachDevice->ptrRpmDuty->min_rpm = ctrl_data[0];
+            }
+            free(ctrl_data);
+            
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_MAX_RPM", &len);
+            if (len < 1) {
+                ;
+            } else {
+                ptrPwmTachDevice->ptrRpmDuty->max_rpm = ctrl_data[0];
+            }
+            free(ctrl_data);
+            
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_MIN_OFFSET", &len);
+            if (len < 1) {
+                ;
+            } else {
+                ptrPwmTachDevice->ptrRpmDuty->min_offset = (ctrl_data[0] % 1001) / 1000.0;
+            }
+            free(ctrl_data);
+            
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_MAX_OFFSET", &len);
+            if (len < 1) {
+                ;
+            } else {
+                ptrPwmTachDevice->ptrRpmDuty->max_offset = (ctrl_data[0] % 1001) / 1000.0;
+            }
+            free(ctrl_data);
+            
+            ctrl_data = detachArgsData(args, DETACH_CTRL_DATA, "_RAND_DEVIATION_RATE", &len);
+            if (len < 1) {
+                ;
+            } else {
+                ptrPwmTachDevice->ptrRpmDuty->rand_deviation_rate = (int)ctrl_data[0];
+            }
+            free(ctrl_data);
+            
             break;
         default:
             break;
@@ -882,12 +1065,13 @@ PTR_CONFIG_DATA parse_configuration(void) {
         cJSON *device_type_id = cJSON_GetObjectItem(device, "device_type_id");
         cJSON *bus = cJSON_GetObjectItem(device, "bus");
         cJSON *addr = cJSON_GetObjectItem(device, "addr");
-        cJSON *i2c = cJSON_GetObjectItem(device, "i2c");
+        cJSON *master = cJSON_GetObjectItem(device, "master");
         cJSON *args = cJSON_GetObjectItem(device, "args");
 
         cJSON *adc_channel = cJSON_GetObjectItem(device, "adc_channel");
         cJSON *division = cJSON_GetObjectItem(device, "division");
 
+        cJSON *pwm_tach_num = cJSON_GetObjectItem(device, "pwm_tach_num");
         /* 校验 */
         if (description == NULL) {
             sprintf(temp_desc, "devices[%d] ", i+1);  /* i+1, 因为第 0 个 device 是 BMC SOC */
@@ -921,9 +1105,10 @@ PTR_CONFIG_DATA parse_configuration(void) {
             exit(1);
         }
         tempConfigJson->device_type_id = device_type_id->valueint;
-        tempConfigJson->deviceType = get_device_type(tempConfigJson->device_type_id);
 
         DEVICE_TYPE deviceType = get_device_type(device_type_id->valueint);
+
+        tempConfigJson->deviceType = deviceType;
 
         /**************************************** bus addr i2c args ****************************************/
         FUNC_DEBUG("function: parse_configuration() -> bus & addr")
@@ -959,28 +1144,51 @@ PTR_CONFIG_DATA parse_configuration(void) {
                 exit(1);
             }
 
-            /* i2c */
-            if (i2c == NULL) {
-            } else if (i2c->type == cJSON_Object) {
+            /* master */
+            if (master == NULL) {
+                /* 没有指定 master 字段，即默认为 0 - BMC，应自动填充 index 和 name 字段 以及 i2CType，以方便直接使用 */
+                tempConfigJson->master.device_index = 0;
+                sprintf(tempConfigJson->master.device_name, "BMC");
+                tempConfigJson->master.i2CType = I2C;
+            } else if (master->type == cJSON_Object) {
                 /* i2c_device */
-                cJSON *i2c_device = cJSON_GetObjectItem(i2c, "device");
+                cJSON *i2c_device = cJSON_GetObjectItem(master, "device");
                 if (i2c_device == NULL) {
-                    printf("The devices[%d]: 'i2c > device' not found ! \n", i);
-                    exit(1);
+                    /* 没有指定 device，默认为 0 - BMC */
+                    tempConfigJson->master.device_index = 0;
+                    sprintf(tempConfigJson->master.device_name, "BMC");
                 } else if (i2c_device->type == cJSON_Number) {
-                    tempConfigJson->i2c_dev.device_index = i2c_device->valueint;
-                    tempConfigJson->i2c_dev.device_name[0] = 0;
+                    tempConfigJson->master.device_index = i2c_device->valueint;
+                    sprintf(tempConfigJson->master.device_name, "device[%d]", tempConfigJson->master.device_index);
                 } else if (i2c_device->type == cJSON_String) {
-                    tempConfigJson->i2c_dev.device_index = -1;
-                    strcpy(tempConfigJson->i2c_dev.device_name, i2c_device->valuestring);
+                    tempConfigJson->master.device_index = -1;  /* 设置为 -1，表示是无效的，index 应该留至之后设置 */
+                    strcpy(tempConfigJson->master.device_name, i2c_device->valuestring);
                 } else {
-                    printf("The devices[%d]: 'i2c > device' is not a number or string ! \n", i);
+                    printf("The devices[%d]: 'master > device' is not a number or string ! \n", i);
+                    exit(1);
+                }
+                /* i2c_type */
+                cJSON *i2c_type = cJSON_GetObjectItem(master, "i2c_type");
+                if (i2c_type == NULL) {
+                    /* 没有指定 i2c_type，默认为 i2c */
+                    tempConfigJson->master.i2CType = I2C;
+                } else if (i2c_type->type == cJSON_String) {
+                    if (compareIgnoreCase("i2c", i2c_type->valuestring)) {
+                        /* i2c */
+                        tempConfigJson->master.i2CType = I2C;
+                    } else if (compareIgnoreCase("i3c", i2c_type->valuestring)) {
+                        /* i3c */
+                        tempConfigJson->master.i2CType = I3C;
+                    }
+                } else {
+                    printf("The devices[%d]: 'master > i2c_type' is not string ! \n", i);
                     exit(1);
                 }
             } else {
-                printf("The devices[%d]: 'i2c' is not a object ! \n", i);
+                printf("The devices[%d]: 'master' is not a object ! \n", i);
                 exit(1);
             }
+
         }
             /**************************************** adc_channel ****************************************/
         else if (deviceType == ADC_DEVICE_TYPE) {
@@ -1003,6 +1211,18 @@ PTR_CONFIG_DATA parse_configuration(void) {
                 exit(1);
             }
             tempConfigJson->division = division->valuedouble;
+        }
+        /**************************************** pwm_tach ****************************************/
+        else if (deviceType == PWM_TACH_DEVICE_TYPE) {
+            /* pwm_tach_num */
+            if (pwm_tach_num == NULL) {
+                printf("The devices[%d]: 'pwm_tach_num' not found, but it is necessary! \n", i);
+                exit(1);
+            } else if (pwm_tach_num->type != cJSON_Number) {
+                printf("The devices[%d]: 'pwm_tach_num' it is not a number! \n", i);
+                exit(1);
+            }
+            tempConfigJson->pwm_tach_num = pwm_tach_num->valueint;
         }
 
         FUNC_DEBUG("function: parse_configuration() -> args")

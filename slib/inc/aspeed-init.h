@@ -15,13 +15,14 @@
 #include "i2c-device.h"
 #include "gpio-device.h"
 #include "adc-device.h"
+#include "pwm-device.h"
 #include "dataThread.h"
 
 #define sDEBUG 1
 
 #define FUNC_DEBUG(message) file_log(message, LOG_TIME_END);
 
-#define CONFIG_FILE "config_ast2600.json"
+#define CONFIG_FILE "config_ast2600_G60.json"
 
 #define LOG_FILE "log.txt"
 
@@ -292,12 +293,12 @@ typedef struct PMBusPage {
     uint16_t read_pout;                /* Read-Only word */
     uint16_t read_pin;                 /* Read-Only word */
     uint8_t revision;                  /* Read-Only byte */
-    const char *mfr_id;                /* R/W block */
-    const char *mfr_model;             /* R/W block */
-    const char *mfr_revision;          /* R/W block */
-    const char *mfr_location;          /* R/W block */
-    const char *mfr_date;              /* R/W block */
-    const char *mfr_serial;            /* R/W block */
+    char mfr_id[50];                /* R/W block */
+    char mfr_model[50];             /* R/W block */
+    char mfr_revision[50];          /* R/W block */
+    char mfr_location[50];          /* R/W block */
+    char mfr_date[50];              /* R/W block */
+    char mfr_serial[50];            /* R/W block */
     const char *app_profile_support;   /* Read-Only block-read */
     uint16_t mfr_vin_min;              /* Read-Only word */
     uint16_t mfr_vin_max;              /* Read-Only word */
@@ -315,6 +316,10 @@ typedef struct PMBusPage {
     uint16_t mfr_max_temp_1;           /* R/W word */
     uint16_t mfr_max_temp_2;           /* R/W word */
     uint16_t mfr_max_temp_3;           /* R/W word */
+    char version[50];
+    PTR_DEVICE_CONFIG ptrDeviceConfig;
+    uint64_t receive_times;
+    uint64_t write_times;
 } PMBusPage;
 
 
@@ -335,6 +340,8 @@ typedef struct DEVICE_ADD_INFO_ {
     PTR_ADC_DEVICE_DATA ptrAdcDeviceData;
     PMBusPage *pmBusPage;
     void *pca954x;
+    PTR_PWM_TACH_DEVICE ptrPwmTachDevice;
+    PTR_DEVICE_CONFIG ptrDeviceConfig;
 } DEVICE_ADD_INFO, *PTR_DEVICE_ADD_INFO;
 
 extern DEVICE_ADD_INFO deviceAddList[DEVICE_MAX_NUM];
@@ -344,7 +351,7 @@ extern pthread_mutex_t file_log_lock;
 
 extern MAC_DEVICE_INFO macDeviceInfo[MAC_DEVICE_INFO_MAX_NUM];
 
-void device_add(DEVICE_TYPE_ID device_type_id, const char *device_name, void *vPtrDeviceData, void *vPtrDevGpio);
+int device_add(DEVICE_TYPE_ID device_type_id, const char *device_name, void *vPtrDeviceData, void *vPtrDevGpio);
 int get_device_index(void *vPtrDeviceData);
 DEVICE_TYPE get_device_type(DEVICE_TYPE_ID device_type_id);
 void *get_dev_gpio(int32_t device_index, const char *device_name);

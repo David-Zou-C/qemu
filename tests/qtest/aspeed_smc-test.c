@@ -65,8 +65,8 @@ enum {
     ERASE_SECTOR = 0xd8,
 };
 
-#define FLASH_JEDEC         0x20ba19  /* n25q256a */
-#define FLASH_SIZE          (32 * 1024 * 1024)
+#define FLASH_JEDEC         0x20ba20  /* n25q512a */
+#define FLASH_SIZE          (64 * 1024 * 1024)
 
 #define FLASH_PAGE_SIZE           256
 

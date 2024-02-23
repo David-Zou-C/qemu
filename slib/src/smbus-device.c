@@ -27,15 +27,12 @@ void init_SMBusEmptyDevice0(PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
         ptrSmbusEepromSType = (PTR_SMBUS_EEPROM_sTYPE) ptrSmbusDeviceData->data_buf;
         /* 如果是第一次创建，则需要进行互斥锁的初始化操作 */
         pthread_mutex_init(&ptrSmbusEepromSType->mutex, NULL);
-//        pthread_mutex_lock(&ptrSmbusEepromSType->mutex);
         /* 获取 device_index */
         ptrSmbusEepromSType->device_index = get_device_index(ptrSmbusDeviceData);
-//        pthread_mutex_unlock(&ptrSmbusEepromSType->mutex); /* 释放锁 */
     } else {
         ptrSmbusEepromSType = (PTR_SMBUS_EEPROM_sTYPE) ptrSmbusDeviceData->data_buf;
     }
 
-//    pthread_mutex_lock(&ptrSmbusEepromSType->mutex); /* 处理数据前，先获取锁 */
     /* 1. buf 全部置为 0xff，offset置0 */
     for (int i = 0; i < SMBUS_EEPROM_BUF_SIZE; ++i) {
         ptrSmbusEepromSType->buf[i] = 0xff;
@@ -47,7 +44,6 @@ void init_SMBusEmptyDevice0(PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
 
     dynamic_change_data(SMBUS_EEPROM_S, ptrSmbusDeviceData, ptrSmbusDeviceData->ptrDeviceConfig->args);
 
-//    pthread_mutex_unlock(&ptrSmbusEepromSType->mutex); /* 释放锁 */
 }
 
 /**
@@ -58,11 +54,9 @@ void init_SMBusEmptyDevice0(PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
 uint8_t receive_SMBusEmptyDevice0(PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
     PTR_SMBUS_EEPROM_sTYPE ptrSmbusEepromSType = (PTR_SMBUS_EEPROM_sTYPE) ptrSmbusDeviceData->data_buf;
     /* 逻辑处理前，先获取锁 */
-//    pthread_mutex_lock(&ptrSmbusEepromSType->mutex);
     ptrSmbusEepromSType->receive_times++;
     uint8_t res = ptrSmbusEepromSType->buf[ptrSmbusEepromSType->offset++];
 
-//    pthread_mutex_unlock(&ptrSmbusEepromSType->mutex); /* 释放锁 */
 
     return res;
 }
@@ -78,7 +72,6 @@ int write_SMBusEmptyDevice0(unsigned char *buf, unsigned char len, PTR_SMBUS_DEV
     PTR_SMBUS_EEPROM_sTYPE ptrSmbusEepromSType = (PTR_SMBUS_EEPROM_sTYPE) ptrSmbusDeviceData->data_buf;
 
     /* 逻辑处理前，先获取锁 */
-//    pthread_mutex_lock(&ptrSmbusEepromSType->mutex);
 
     ptrSmbusEepromSType->write_times++;
     ptrSmbusEepromSType->offset = buf[0];
@@ -88,7 +81,6 @@ int write_SMBusEmptyDevice0(unsigned char *buf, unsigned char len, PTR_SMBUS_DEV
         ptrSmbusEepromSType->buf[ptrSmbusEepromSType->offset++] = *buf++;
     }
 
-//    pthread_mutex_unlock(&ptrSmbusEepromSType->mutex); /* 释放锁 */
     return 0;
 }
 
@@ -105,50 +97,40 @@ void init_SMBusEmptyDevice1(PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
         ptrSmbusTmpSType = (PTR_SMBUS_TMP_sTYPE) ptrSmbusDeviceData->data_buf;
         /* 如果是第一次创建，则需要进行互斥锁的初始化操作 */
         pthread_mutex_init(&ptrSmbusTmpSType->mutex, NULL);
-//        pthread_mutex_lock(&ptrSmbusTmpSType->mutex);
         ptrSmbusTmpSType->device_index = get_device_index(ptrSmbusDeviceData); /* 获取 device index,仅一次即可 */
-//        pthread_mutex_unlock(&ptrSmbusTmpSType->mutex);
     } else {
         /* 初始值的设定 */
         ptrSmbusTmpSType = (PTR_SMBUS_TMP_sTYPE) ptrSmbusDeviceData->data_buf;
     }
 
-//    pthread_mutex_lock(&ptrSmbusTmpSType->mutex);
     /* 根据参数修改数据 */
     dynamic_change_data(SMBUS_TMP, ptrSmbusDeviceData, ptrSmbusDeviceData->ptrDeviceConfig->args);
     ptrSmbusTmpSType->offset = 0;
 
-//    pthread_mutex_unlock(&ptrSmbusTmpSType->mutex);
 }
 
 uint8_t receive_SMBusEmptyDevice1(PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
     PTR_SMBUS_TMP_sTYPE ptrSmbusTmpSType = (PTR_SMBUS_TMP_sTYPE) ptrSmbusDeviceData->data_buf;
-//    pthread_mutex_lock(&ptrSmbusTmpSType->mutex);
 
     ptrSmbusTmpSType->receive_times++;
     if (ptrSmbusTmpSType->offset == 0) {
         ptrSmbusTmpSType->offset = 1;
-//        pthread_mutex_unlock(&ptrSmbusTmpSType->mutex);
         return ptrSmbusTmpSType->temperature_integer;
     } else if (ptrSmbusTmpSType->offset == 1) {
         ptrSmbusTmpSType->offset = 0;
-//        pthread_mutex_unlock(&ptrSmbusTmpSType->mutex);
         return ptrSmbusTmpSType->temperature_decimal;
     } else {
         ptrSmbusTmpSType->offset = 0;
-//        pthread_mutex_unlock(&ptrSmbusTmpSType->mutex);
         return ptrSmbusTmpSType->temperature_integer;
     }
 }
 
 int write_SMBusEmptyDevice1(unsigned char *buf, unsigned char len, PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
     PTR_SMBUS_TMP_sTYPE ptrSmbusTmpSType = (PTR_SMBUS_TMP_sTYPE) ptrSmbusDeviceData->data_buf;
-//    pthread_mutex_lock(&ptrSmbusTmpSType->mutex);
 
     ptrSmbusTmpSType->write_times++;
     /* 有写操作，直接重置 offset  */
     ptrSmbusTmpSType->offset = 0;
-//    pthread_mutex_unlock(&ptrSmbusTmpSType->mutex);
     return 0;
 }
 
@@ -163,21 +145,17 @@ void init_SMBusEmptyDevice2(PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
         ptrSmbusTpa626SType = (PTR_SMBUS_TPA626_sTYPE) ptrSmbusDeviceData->data_buf;
         /* 如果第一次创建，还需要进行互斥锁的初始化操作 */
         pthread_mutex_init(&ptrSmbusTpa626SType->mutex, NULL);
-//        pthread_mutex_lock(&ptrSmbusTpa626SType->mutex);
         ptrSmbusTpa626SType->device_index = get_device_index(ptrSmbusDeviceData); /* 获取 device_index，获取一次即可 */
-//        pthread_mutex_unlock(&ptrSmbusTpa626SType->mutex);
     } else {
         /* 并非第一次初始化，变量赋值即可 */
         ptrSmbusTpa626SType = (PTR_SMBUS_TPA626_sTYPE) ptrSmbusDeviceData->data_buf;
     }
 
-//    pthread_mutex_lock(&ptrSmbusTpa626SType->mutex);
     /* 根据参数修改数据 */
     dynamic_change_data(SMBUS_TPA626, ptrSmbusDeviceData, ptrSmbusDeviceData->ptrDeviceConfig->args);
     ptrSmbusTpa626SType->offset = 0;
     ptrSmbusTpa626SType->reg_val_offset = 0;
 
-//    pthread_mutex_unlock(&ptrSmbusTpa626SType->mutex);
 }
 
 uint8_t receive_SMBusEmptyDevice2(PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
@@ -185,7 +163,6 @@ uint8_t receive_SMBusEmptyDevice2(PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
     /* 逻辑处理 */
     uint8_t res;
     uint8_t success = 1;
-//    pthread_mutex_lock(&ptrSmbusTpa626SType->mutex);
     ptrSmbusTpa626SType->receive_times++;
     switch (ptrSmbusTpa626SType->offset) {
         case 0x00: /* 00h  R/W 配置寄存器 */
@@ -231,7 +208,6 @@ uint8_t receive_SMBusEmptyDevice2(PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
     } else {
     }
 
-//    pthread_mutex_unlock(&ptrSmbusTpa626SType->mutex);
     return res;
 }
 
@@ -240,7 +216,6 @@ int write_SMBusEmptyDevice2(unsigned char *buf, unsigned char len, PTR_SMBUS_DEV
 
     /* 逻辑处理区 */
     uint16_t write_data;
-//    pthread_mutex_lock(&ptrSmbusTpa626SType->mutex);
     ptrSmbusTpa626SType->write_times ++;
     ptrSmbusTpa626SType->offset = buf[0];
     ptrSmbusTpa626SType->reg_val_offset = 0;
@@ -288,7 +263,6 @@ int write_SMBusEmptyDevice2(unsigned char *buf, unsigned char len, PTR_SMBUS_DEV
         }
     }
     
-//    pthread_mutex_unlock(&ptrSmbusTpa626SType->mutex);
     return 0;
 }
 
@@ -301,43 +275,34 @@ void init_SMBusEmptyDevice3(PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
         ptrSmbusDimmTmpSType = (PTR_SMBUS_DIMM_TMP_sTYPE) ptrSmbusDeviceData->data_buf;
         /* 第一次创建，需要初始化互斥锁 */
         pthread_mutex_init(&ptrSmbusDimmTmpSType->mutex, NULL);
-//        pthread_mutex_lock(&ptrSmbusDimmTmpSType->mutex);
         ptrSmbusDimmTmpSType->device_index = get_device_index(ptrSmbusDeviceData);
-//        pthread_mutex_unlock(&ptrSmbusDimmTmpSType->mutex);
     } else {
         /* 初始值 */
         ptrSmbusDimmTmpSType = (PTR_SMBUS_DIMM_TMP_sTYPE) ptrSmbusDeviceData->data_buf;
     }
 
-//    pthread_mutex_lock(&ptrSmbusDimmTmpSType->mutex);
     /* 根据参数修改数据 */
     dynamic_change_data(SMBUS_DIMM_TEMP, ptrSmbusDeviceData, ptrSmbusDeviceData->ptrDeviceConfig->args);
     ptrSmbusDimmTmpSType->offset = 0;
 
-//    pthread_mutex_unlock(&ptrSmbusDimmTmpSType->mutex);
 }
 
 uint8_t receive_SMBusEmptyDevice3(PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
     uint8_t ret;
     PTR_SMBUS_DIMM_TMP_sTYPE ptrSmbusDimmTmpSType = (PTR_SMBUS_DIMM_TMP_sTYPE) ptrSmbusDeviceData->data_buf;
-//    pthread_mutex_lock(&ptrSmbusDimmTmpSType->mutex);
 
     ptrSmbusDimmTmpSType->receive_times ++;
     if (ptrSmbusDimmTmpSType->offset == 0) {
         ptrSmbusDimmTmpSType->offset = 1;
         ret = ptrSmbusDimmTmpSType->temperature >> 4;
-//        pthread_mutex_unlock(&ptrSmbusDimmTmpSType->mutex);
         return ret;
     } else if (ptrSmbusDimmTmpSType->offset == 1) {
         ptrSmbusDimmTmpSType->offset = 0;
         ret = ptrSmbusDimmTmpSType->temperature << 4;
-//        pthread_mutex_unlock(&ptrSmbusDimmTmpSType->mutex);
         return ret;
     } else {
         ptrSmbusDimmTmpSType->offset = 0;
-//        pthread_mutex_unlock(&ptrSmbusDimmTmpSType->mutex);
         ret = ptrSmbusDimmTmpSType->temperature >> 4;
-//        pthread_mutex_unlock(&ptrSmbusDimmTmpSType->mutex);
         return ret;
     }
     return 0;
@@ -345,13 +310,11 @@ uint8_t receive_SMBusEmptyDevice3(PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
 
 int write_SMBusEmptyDevice3(unsigned char *buf, unsigned char len, PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
     PTR_SMBUS_DIMM_TMP_sTYPE ptrSmbusDimmTmpSType = (PTR_SMBUS_DIMM_TMP_sTYPE) ptrSmbusDeviceData->data_buf;
-//    pthread_mutex_lock(&ptrSmbusDimmTmpSType->mutex);
 
     ptrSmbusDimmTmpSType->write_times ++;
     /* 有写操作，直接重置 offset */
     ptrSmbusDimmTmpSType->offset = 0;
 
-//    pthread_mutex_unlock(&ptrSmbusDimmTmpSType->mutex);
     return 0;
 }
 

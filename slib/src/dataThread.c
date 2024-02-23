@@ -8,17 +8,20 @@
 #include <unistd.h>
 #include <sys/stat.h>
 
-#define MAX_SEND_DATA_LEN 102400
+#define MAX_SEND_DATA_LEN (1024*1024)
 #define MAX_READ_DATA_LEN 102400
 
-#define READ_PIPE "i2cReadPipe"     // read pipe：外部使用者只能读此管道的数据
-#define WRITE_PIPE "i2cWritePipe"   // write pipe: 外部使用者只能向此管道写数据
+#define READ_PIPE "ReadPipe"     // read pipe：外部使用者只能读此管道的数据
+#define WRITE_PIPE "WritePipe"   // write pipe: 外部使用者只能向此管道写数据
 
 
 pthread_mutex_t pthreadMutex_sendData;
 
 static char *send_pipe_file_Path;
 static char *read_pipe_file_Path;
+
+static char receive_times_str[] = "receive_times";
+static char write_times_str[] = "write_times";
 
 int (*power_callback)(const char *gpio_name, uint8_t level) = NULL;
 
@@ -63,16 +66,16 @@ static void *send_thread(void *pVoid) {
     PTR_SMBUS_DIMM_TMP_sTYPE ptrSmbusDimmTmpSType;
     PTR_I2C_EEPROM_sTYPE ptrI2CEepromSType;
     PTR_I2C_BP_CPLD_sTYPE ptrI2CBpCpldSType;
+    PTR_I2C_DIMM_TMP_sTYPE ptrI2CDimmTmpSType;
     PTR_SMBUS_TPA626_sTYPE ptrSmbusTpa626SType;
     PTR_GPIO_SWITCH_sTYPE ptrGpioSwitchSType;
     PMBusPage *pmBusPage;
     pthread_mutex_lock(&pthreadMutex_sendData); /* 获取锁，并不再释放，作为数据发送线程的启动条件 */
     FUNC_DEBUG("function: send_thread() unlocked, it's running !")
 
-    char eeprom_prefix[] = "eeprom: ";
-    char temp_prefix[] = "tmp: ";
     char temp[1024];
-    char send_str[MAX_SEND_DATA_LEN] = {0};
+    char addr[10];
+    char *json_str;
     int fd;
     ssize_t bytes_written;
     while (1) {
@@ -82,284 +85,385 @@ static void *send_thread(void *pVoid) {
             usleep(500 * 1000); /* 休眠 0.5 秒 */
             continue; /* 没有打开成功，无需进行后续的数据拼接操作 */
         }
-        file_log("open send pipe succeed !", LOG_TIME_END);
+        cJSON *root = cJSON_CreateObject();
+        cJSON *devices = cJSON_CreateArray();
 
         /**************************************** Devices ****************************************/
         for (int i = 0; i < DEVICE_MAX_NUM; ++i) {
             if (deviceAddList[i].exist) {
-                sprintf(temp, "\n>>>>>>>>>>>>>>>>>>>> device index: %d <<<<<<<<<<<<<<<<<<<<\n", i);
-                strcat(send_str, temp);
+                cJSON *device = cJSON_CreateObject();
+                cJSON_AddNumberToObject(device, "index", i);
+                cJSON_AddNumberToObject(device, "device_type_id", deviceAddList[i].device_type_id);
                 switch (deviceAddList[i].device_type_id) {
                     case SMBUS_EEPROM_S:
+                        /* {
+                         *      "index": 0,
+                         *      "description": "",
+                         *      "eeprom_data": [0, 1, 2, ...],
+                         *      "receive_times": 0,
+                         *      "write_times": 0
+                         * } */
                         /* Device0 - EEPROM */
                         ptrSmbusEepromSType = (PTR_SMBUS_EEPROM_sTYPE) (deviceAddList[i].ptrSmbusDeviceData->data_buf);
-                        pthread_mutex_lock(&ptrSmbusEepromSType->mutex); /* 获取锁 */
-                        /**************************************** 数据处理并发送 - S ****************************************/
+                        /**************************************** 数据处理 - S ****************************************/
                         /* 先发送 desc 信息 */
-                        sprintf(temp, "desc: %s \n", deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->description);
-                        strcat(send_str, temp);
-                        /* 发送 buf 的所有数据 */
-                        strcat(send_str, eeprom_prefix);
-                        for (int j = 0; j < SMBUS_EEPROM_BUF_SIZE; ++j) {
-                            sprintf(temp, "%02x ", ptrSmbusEepromSType->buf[j]);
-                            strcat(send_str, temp);
+                        cJSON_AddStringToObject(device, "description", deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
+                        cJSON_AddStringToObject(device, "master_device", deviceAddList[i].ptrDeviceConfig->master.device_name);
+                        if (deviceAddList[i].ptrDeviceConfig->master.i2CType == I2C) {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i2c");
+                        } else {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i3c");
                         }
-                        strcat(send_str, "\n");
-                        sprintf(temp, "receive times: %lu \n", ptrSmbusEepromSType->receive_times);
-                        strcat(send_str, temp);
-                        sprintf(temp, "write times: %lu \n", ptrSmbusEepromSType->write_times);
-                        strcat(send_str, temp);
-                        /**************************************** 数据处理并发送 - N ****************************************/
-                        pthread_mutex_unlock(&ptrSmbusEepromSType->mutex); /* 释放锁 */
+                        cJSON_AddNumberToObject(device, "bus",
+                                                deviceAddList[i].ptrDeviceConfig->bus);
+                        sprintf(addr, "0x%02x", deviceAddList[i].ptrDeviceConfig->addr);
+                        cJSON_AddStringToObject(device, "address", addr);
+                        cJSON *eeprom_data = cJSON_CreateArray();
+                        for (int j = 0; j < SMBUS_EEPROM_BUF_SIZE; ++j) {
+                            cJSON_AddItemToArray(eeprom_data, cJSON_CreateNumber(ptrSmbusEepromSType->buf[j]));
+                        }
+                        cJSON_AddItemToObject(device, "eeprom_data", eeprom_data);
+                        cJSON_AddNumberToObject(device, receive_times_str, (double) ptrSmbusEepromSType->receive_times);
+                        cJSON_AddNumberToObject(device, write_times_str, (double) ptrSmbusEepromSType->write_times);
+                        /**************************************** 数据处理 - N ****************************************/
                         break;
 
                     case SMBUS_TMP:
+                        /* {
+                         *      "index": 0,
+                         *      "description": "",
+                         *      "temperature": 30,
+                         *      "receive_times": 0,
+                         *      "write_times": 0
+                         * } */
                         /* Device1 - TMP */
                         ptrSmbusTmpSType = (PTR_SMBUS_TMP_sTYPE) (deviceAddList[i].ptrSmbusDeviceData->data_buf);
-                        pthread_mutex_lock(&ptrSmbusTmpSType->mutex);
                         /**************************************** 数据处理并发送 - S ****************************************/
                         /* 先发送 desc 信息 */
-                        sprintf(temp, "desc: %s \n", deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->description);
-                        strcat(send_str, temp);
+                        cJSON_AddStringToObject(device, "description", deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
+                        cJSON_AddStringToObject(device, "master_device", deviceAddList[i].ptrDeviceConfig->master.device_name);
+                        if (deviceAddList[i].ptrDeviceConfig->master.i2CType == I2C) {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i2c");
+                        } else {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i3c");
+                        }
+                        cJSON_AddNumberToObject(device, "bus",
+                                                deviceAddList[i].ptrDeviceConfig->bus);
+                        sprintf(addr, "0x%02x", deviceAddList[i].ptrDeviceConfig->addr);
+                        cJSON_AddStringToObject(device, "address", addr);
                         /* 发送温度数据 */
-                        strcat(send_str, temp_prefix);
-                        sprintf(temp, "%02x \n", ptrSmbusTmpSType->temperature_integer);
-                        strcat(send_str, temp);
-                        sprintf(temp, "receive times: %lu \n", ptrSmbusTmpSType->receive_times);
-                        strcat(send_str, temp);
-                        sprintf(temp, "write times: %lu \n", ptrSmbusTmpSType->write_times);
-                        strcat(send_str, temp);
+                        cJSON_AddNumberToObject(device, "temperature_integer", ptrSmbusTmpSType->temperature_integer);
+                        cJSON_AddNumberToObject(device, "temperature_decimal", ptrSmbusTmpSType->temperature_decimal);
+                        cJSON_AddNumberToObject(device, receive_times_str, (double) ptrSmbusTmpSType->receive_times);
+                        cJSON_AddNumberToObject(device, write_times_str, (double) ptrSmbusTmpSType->write_times);
                         /**************************************** 数据处理并发送 - N ****************************************/
-                        pthread_mutex_unlock(&ptrSmbusTmpSType->mutex);
                         break;
 
                     case SMBUS_TPA626:
                         /* Device2 - TPA626 */
                         ptrSmbusTpa626SType = (PTR_SMBUS_TPA626_sTYPE) (deviceAddList[i].ptrSmbusDeviceData->data_buf);
-                        pthread_mutex_lock(&ptrSmbusTpa626SType->mutex);
                         /**************************************** 数据处理并发送 - S ****************************************/
-                        /* 先发送 desc 信息 */
-                        /* 先发送 desc 信息 */
-                        sprintf(temp, "desc: %s \n", deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->description);
-                        strcat(send_str, temp);
-                        sprintf(temp,
-                                "configuration register: 0x%04x \n"
-                                "shunt voltage register: 0x%04x \n"
-                                "bus voltage register: 0x%04x \n"
-                                "power register: 0x%04x \n"
-                                "current register: 0x%04x \n"
-                                "calibration register: 0x%04x \n"
-                                "mask enable register: 0x%04x \n"
-                                "alert_limit register: 0x%04x \n"
-                                "manufacturer ID register: 0x%04x \n"
-                                "die id register: 0x%04x \n",
-                                ptrSmbusTpa626SType->configuration_reg00,
-                                ptrSmbusTpa626SType->shunt_vol_reg01,
-                                ptrSmbusTpa626SType->bus_vol_reg02,
-                                ptrSmbusTpa626SType->power_reg03,
-                                ptrSmbusTpa626SType->current_reg04,
-                                ptrSmbusTpa626SType->calibration_reg05,
-                                ptrSmbusTpa626SType->mask_enable_reg06,
-                                ptrSmbusTpa626SType->alert_limit_reg07,
-                                ptrSmbusTpa626SType->manufacturer_id_regfe,
-                                ptrSmbusTpa626SType->die_id_regff);
-                        strcat(send_str, temp);
-                        sprintf(temp, "receive times: %lu \n", ptrSmbusTpa626SType->receive_times);
-                        strcat(send_str, temp);
-                        sprintf(temp, "write times: %lu \n", ptrSmbusTpa626SType->write_times);
-                        strcat(send_str, temp);
+                        cJSON_AddStringToObject(device, "description", deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
+                        cJSON_AddStringToObject(device, "master_device", deviceAddList[i].ptrDeviceConfig->master.device_name);
+                        if (deviceAddList[i].ptrDeviceConfig->master.i2CType == I2C) {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i2c");
+                        } else {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i3c");
+                        }
+                        cJSON_AddNumberToObject(device, "bus",
+                                                deviceAddList[i].ptrDeviceConfig->bus);
+                        sprintf(addr, "0x%02x", deviceAddList[i].ptrDeviceConfig->addr);
+                        cJSON_AddStringToObject(device, "address", addr);
+
+                        cJSON_AddNumberToObject(device, "configuration_reg00", ptrSmbusTpa626SType->configuration_reg00);
+                        cJSON_AddNumberToObject(device, "shunt_vol_reg01", ptrSmbusTpa626SType->shunt_vol_reg01);
+                        cJSON_AddNumberToObject(device, "bus_vol_reg02", ptrSmbusTpa626SType->bus_vol_reg02);
+                        cJSON_AddNumberToObject(device, "power_reg03", ptrSmbusTpa626SType->power_reg03);
+                        cJSON_AddNumberToObject(device, "current_reg04", ptrSmbusTpa626SType->current_reg04);
+                        cJSON_AddNumberToObject(device, "calibration_reg05", ptrSmbusTpa626SType->calibration_reg05);
+                        cJSON_AddNumberToObject(device, "mask_enable_reg06", ptrSmbusTpa626SType->mask_enable_reg06);
+                        cJSON_AddNumberToObject(device, "alert_limit_reg07", ptrSmbusTpa626SType->alert_limit_reg07);
+                        cJSON_AddNumberToObject(device, "manufacturer_id_regfe", ptrSmbusTpa626SType->manufacturer_id_regfe);
+                        cJSON_AddNumberToObject(device, "die_id_regff", ptrSmbusTpa626SType->die_id_regff);
+
+                        cJSON_AddNumberToObject(device, receive_times_str, (double) ptrSmbusTpa626SType->receive_times);
+                        cJSON_AddNumberToObject(device, write_times_str, (double) ptrSmbusTpa626SType->write_times);
                         /**************************************** 数据处理并发送 - N ****************************************/
-                        pthread_mutex_unlock(&ptrSmbusTpa626SType->mutex);
                         break;
 
                     case SMBUS_DIMM_TEMP:
                         ptrSmbusDimmTmpSType = (PTR_SMBUS_DIMM_TMP_sTYPE) (deviceAddList[i].ptrSmbusDeviceData->data_buf);
-                        pthread_mutex_lock(&ptrSmbusDimmTmpSType->mutex);
                         /**************************************** 数据处理并发送 - S ****************************************/
                         /* 先发送 desc 信息 */
-                        sprintf(temp, "desc: %s \n", deviceAddList[i].ptrSmbusDeviceData->ptrDeviceConfig->description);
-                        strcat(send_str, temp);
+                        cJSON_AddStringToObject(device, "description",
+                                                deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
+                        cJSON_AddStringToObject(device, "master_device", deviceAddList[i].ptrDeviceConfig->master.device_name);
+                        if (deviceAddList[i].ptrDeviceConfig->master.i2CType == I2C) {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i2c");
+                        } else {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i3c");
+                        }
+                        cJSON_AddNumberToObject(device, "bus",
+                                                deviceAddList[i].ptrDeviceConfig->bus);
+                        sprintf(addr, "0x%02x", deviceAddList[i].ptrDeviceConfig->addr);
+                        cJSON_AddStringToObject(device, "address", addr);
                         /* 发送温度数据 */
-                        strcat(send_str, temp_prefix);
-                        sprintf(temp, "%02x \n", ptrSmbusDimmTmpSType->temperature);
-                        strcat(send_str, temp);
-                        sprintf(temp, "receive times: %lu \n", ptrSmbusDimmTmpSType->receive_times);
-                        strcat(send_str, temp);
-                        sprintf(temp, "write times: %lu \n", ptrSmbusDimmTmpSType->write_times);
-                        strcat(send_str, temp);
+                        cJSON_AddNumberToObject(device, "temperature", ptrSmbusDimmTmpSType->temperature);
+                        cJSON_AddNumberToObject(device, receive_times_str, (double) ptrSmbusDimmTmpSType->receive_times);
+                        cJSON_AddNumberToObject(device, write_times_str, (double) ptrSmbusDimmTmpSType->write_times);
                         /**************************************** 数据处理并发送 - N ****************************************/
-                        pthread_mutex_unlock(&ptrSmbusDimmTmpSType->mutex);
                         break;
 
                     case PMBUS_PSU:
                         pmBusPage = (PMBusPage *) deviceAddList[i].pmBusPage;
-                        sprintf(temp, "desc: PMBUS PSU \n");
-                        strcat(send_str, temp);
+                        cJSON_AddStringToObject(device, "description", pmBusPage->ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
+                        cJSON_AddStringToObject(device, "master_device", deviceAddList[i].ptrDeviceConfig->master.device_name);
+                        if (deviceAddList[i].ptrDeviceConfig->master.i2CType == I2C) {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i2c");
+                        } else {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i3c");
+                        }
+                        cJSON_AddNumberToObject(device, "bus",
+                                                deviceAddList[i].pmBusPage->ptrDeviceConfig->bus);
+                        sprintf(addr, "0x%02x", deviceAddList[i].pmBusPage->ptrDeviceConfig->addr);
+                        cJSON_AddStringToObject(device, "address", addr);
 
-                        sprintf(temp, "PSU_Vin[0x88]: %04x \n", pmBusPage->read_vin);
-                        strcat(send_str, temp);
-
-                        sprintf(temp, "PSU_Iin[0x89]: %04x \n", pmBusPage->read_iin);
-                        strcat(send_str, temp);
-
-                        sprintf(temp, "PSU_Pin[0x97]: %04x \n", pmBusPage->read_pin);
-                        strcat(send_str, temp);
-
-                        sprintf(temp, "PSU_Vout[0x8B]: %04x \n", pmBusPage->read_vout);
-                        strcat(send_str, temp);
-
-                        sprintf(temp, "PSU_Iout[0x8C]: %04x \n", pmBusPage->read_iout);
-                        strcat(send_str, temp);
-
-                        sprintf(temp, "PSU_Pout[0x96]: %04x \n", pmBusPage->read_pout);
-                        strcat(send_str, temp);
-
-                        sprintf(temp, "PSU_Hs_Temp[0x8D]: %04x \n", pmBusPage->read_temperature_1);
-                        strcat(send_str, temp);
-
-                        sprintf(temp, "PSU_Amb_Temp[0x8E]: %04x \n", pmBusPage->read_temperature_2);
-                        strcat(send_str, temp);
-
-                        sprintf(temp, "PSU_FanSpeed[0x90]: %04x \n", pmBusPage->read_fan_speed_1);
-                        strcat(send_str, temp);
+                        cJSON_AddStringToObject(device, "MFR_id", pmBusPage->mfr_id);
+                        cJSON_AddStringToObject(device, "MFR_model", pmBusPage->mfr_model);
+                        cJSON_AddStringToObject(device, "MFR_revision", pmBusPage->mfr_revision);
+                        cJSON_AddStringToObject(device, "MFR_location", pmBusPage->mfr_location);
+                        cJSON_AddStringToObject(device, "MFR_date", pmBusPage->mfr_date);
+                        cJSON_AddStringToObject(device, "MFR_serial", pmBusPage->mfr_serial);
+                        cJSON_AddStringToObject(device, "MFR_version", pmBusPage->version);
+                        if (pmBusPage->status_mfr_specific == 1) {
+                            cJSON_AddStringToObject(device, "MFR_specific", "AC");
+                        } else if (pmBusPage->status_mfr_specific == 2) {
+                            cJSON_AddStringToObject(device, "MFR_specific", "DC");
+                        } else {
+                            cJSON_AddNullToObject(device, "MFR_specific");
+                        }
+                        cJSON_AddNumberToObject(device, "Pout_max", pmBusPage->mfr_pout_max);
+                        cJSON_AddNumberToObject(device, "Vin", pmBusPage->read_vin);
+                        cJSON_AddNumberToObject(device, "Iin", pmBusPage->read_iin);
+                        cJSON_AddNumberToObject(device, "Pin", pmBusPage->read_pin);
+                        cJSON_AddNumberToObject(device, "Vout", pmBusPage->read_vout);
+                        cJSON_AddNumberToObject(device, "Iout", pmBusPage->read_iout);
+                        cJSON_AddNumberToObject(device, "Pout", pmBusPage->read_pout);
+                        cJSON_AddNumberToObject(device, "Hs_Temp", pmBusPage->read_temperature_1);
+                        cJSON_AddNumberToObject(device, "Amb_Temp", pmBusPage->read_temperature_2);
+                        cJSON_AddNumberToObject(device, "FanSpeed", pmBusPage->read_fan_speed_1);
+                        cJSON_AddNumberToObject(device, receive_times_str, (double) pmBusPage->receive_times);
+                        cJSON_AddNumberToObject(device, write_times_str, (double) pmBusPage->write_times);
                         break;
                     case I2C_EEPROM:
                         /* I2C Device0 - EEPROM */
                         ptrI2CEepromSType = (PTR_I2C_EEPROM_sTYPE) (deviceAddList[i].ptrI2cDeviceData->data_buf);
-                        pthread_mutex_lock(&ptrI2CEepromSType->mutex);
                         /* 发送 */
-                        /* 先发送 desc 信息 */
-                        sprintf(temp, "desc: %s \n", deviceAddList[i].ptrI2cDeviceData->ptrDeviceConfig->description);
-                        strcat(send_str, temp);
+                        cJSON_AddStringToObject(device, "description",
+                                                deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
+                        cJSON_AddStringToObject(device, "master_device", deviceAddList[i].ptrDeviceConfig->master.device_name);
+                        if (deviceAddList[i].ptrDeviceConfig->master.i2CType == I2C) {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i2c");
+                        } else {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i3c");
+                        }
+                        cJSON_AddNumberToObject(device, "bus",
+                                                deviceAddList[i].ptrDeviceConfig->bus);
+                        sprintf(addr, "0x%02x", deviceAddList[i].ptrDeviceConfig->addr);
+                        cJSON_AddStringToObject(device, "address", addr);
+
+                        cJSON_AddNumberToObject(device, "size", ptrI2CEepromSType->total_size);
+                        cJSON *monitor_data = cJSON_CreateObject();
                         for (int j = 0; j < ptrI2CEepromSType->monitor_data_len; ++j) {
                             if (ptrI2CEepromSType->monitor_data[j] < ptrI2CEepromSType->total_size) {
-                                sprintf(temp, "monitor addr - '0x%02x' : 0x%02x \n",
-                                        ptrI2CEepromSType->monitor_data[j],
-                                        ptrI2CEepromSType->buf[ptrI2CEepromSType->monitor_data[j]]);
-                                strcat(send_str, temp);
+                                sprintf(temp, "0x%02x", ptrI2CEepromSType->monitor_data[j]);
+                                cJSON_AddNumberToObject(monitor_data, temp,
+                                                        ptrI2CEepromSType->buf[ptrI2CEepromSType->monitor_data[j]]);
                             } else {
-                                sprintf(temp, "monitor addr - '0x%02x' exceed eeprom total size - '0x%02x'!\n",
-                                        ptrI2CEepromSType->monitor_data[j],
-                                        ptrI2CEepromSType->total_size);
-                                strcat(send_str, temp);
+                                /* monitor data exceed total size ! */
                             }
                         }
-                        sprintf(temp, "receive times: %lu \n", ptrI2CEepromSType->receive_times);
-                        strcat(send_str, temp);
-                        sprintf(temp, "write times: %lu \n", ptrI2CEepromSType->write_times);
-                        strcat(send_str, temp);
-                        pthread_mutex_unlock(&ptrI2CEepromSType->mutex);
+                        cJSON_AddItemToObject(device, "monitor_data", monitor_data);
+                        cJSON_AddNumberToObject(device, receive_times_str, (double) ptrI2CEepromSType->receive_times);
+                        cJSON_AddNumberToObject(device, write_times_str, (double) ptrI2CEepromSType->write_times);
                         break;
                     case I2C_BP_CPLD:
                         ptrI2CBpCpldSType = (PTR_I2C_BP_CPLD_sTYPE) (deviceAddList[i].ptrI2cDeviceData->data_buf);
-                        pthread_mutex_lock(&ptrI2CBpCpldSType->mutex);
                         /* 先发送 desc 信息 */
-                        sprintf(temp, "desc: %s \n", deviceAddList[i].ptrI2cDeviceData->ptrDeviceConfig->description);
-                        strcat(send_str, temp);
+                        cJSON_AddStringToObject(device, "description",
+                                                deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
+                        cJSON_AddStringToObject(device, "master_device", deviceAddList[i].ptrDeviceConfig->master.device_name);
+                        if (deviceAddList[i].ptrDeviceConfig->master.i2CType == I2C) {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i2c");
+                        } else {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i3c");
+                        }
+                        cJSON_AddNumberToObject(device, "bus",
+                                                deviceAddList[i].ptrDeviceConfig->bus);
+                        sprintf(addr, "0x%02x", deviceAddList[i].ptrDeviceConfig->addr);
+                        cJSON_AddStringToObject(device, "address", addr);
                         /* cpld manufacture */
-                        sprintf(temp, "[0x74] cpld manufacture   : %02x \n"
-                                      "[0x90] max hdd num        : %02x \n"
-                                      "[0x96] cpld revision      : %02x \n"
-                                      "[0x97] bp_type_id         : %02x \n"
-                                      "[0x98] cpld update flag   : %02x \n"
-                                      "[0xA0 - 0xBF] bp name     : %s \n"
-                                      "|  Hdd_num  |  Predictive_Fail  |  Warning  |  Present  |  Idle/Act  |  Locate  |  Rebuild  |  Fail  |\n"
-                                      "|           |                   |           |           |            |          |           |        |\n",
-                                      ptrI2CBpCpldSType->i2CBpCpldData.cpld_manufacture,
-                                      ptrI2CBpCpldSType->i2CBpCpldData.max_hdd_num,
-                                      ptrI2CBpCpldSType->i2CBpCpldData.revision,
-                                      ptrI2CBpCpldSType->i2CBpCpldData.bp_type_id,
-                                      ptrI2CBpCpldSType->i2CBpCpldData.update_flag,
-                                      ptrI2CBpCpldSType->i2CBpCpldData.bp_name);
-                        strcat(send_str, temp);
+                        cJSON_AddNumberToObject(device, "cpld_manufacture",
+                                                ptrI2CBpCpldSType->i2CBpCpldData.cpld_manufacture);
+                        cJSON_AddNumberToObject(device, "max_hdd_num", ptrI2CBpCpldSType->i2CBpCpldData.max_hdd_num);
+                        cJSON_AddNumberToObject(device, "cpld_revision", ptrI2CBpCpldSType->i2CBpCpldData.revision);
+                        cJSON_AddNumberToObject(device, "bp_type_id", ptrI2CBpCpldSType->i2CBpCpldData.bp_type_id);
+                        cJSON_AddNumberToObject(device, "update_flag", ptrI2CBpCpldSType->i2CBpCpldData.update_flag);
+                        cJSON_AddNumberToObject(device, "exp_manufacture", ptrI2CBpCpldSType->i2CBpCpldData.exp_manufacture);
+                        cJSON_AddStringToObject(device, "bp_name", ptrI2CBpCpldSType->i2CBpCpldData.bp_name);
+                        cJSON *hdd_infos = cJSON_CreateArray();
 
                         for (int j = 0; j < ptrI2CBpCpldSType->i2CBpCpldData.max_hdd_num; ++j) {
-                            sprintf(temp,
-                                    "|   %3d     |        %d          |    %d      |      %d    |     %d      |    %d     |      %d    |    %d   |\n",
-                                    j,
-                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Predictive_Fail,
-                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Warning,
-                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Present,
-                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Idle_Act,
-                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Locate,
-                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Rebuid,
-                                    ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Fail);
-                            strcat(send_str, temp);
+                            cJSON *hdd_info = cJSON_CreateObject();
+                            cJSON_AddNumberToObject(hdd_info, "Hdd_num", j);
+                            cJSON_AddNumberToObject(hdd_info, "Predictive_Fail", ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Predictive_Fail);
+                            cJSON_AddNumberToObject(hdd_info, "Warning", ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Warning);
+                            cJSON_AddNumberToObject(hdd_info, "Present", ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Present);
+                            cJSON_AddNumberToObject(hdd_info, "Idle/Act", ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Idle_Act);
+                            cJSON_AddNumberToObject(hdd_info, "Locate", ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Locate);
+                            cJSON_AddNumberToObject(hdd_info, "Rebuild", ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Rebuild);
+                            cJSON_AddNumberToObject(hdd_info, "Fail", ptrI2CBpCpldSType->i2CBpCpldData.hdd_status[j].Fail);
+                            cJSON_AddItemToArray(hdd_infos, hdd_info);
                         }
-                        sprintf(temp, "receive times: %lu \n", ptrI2CBpCpldSType->receive_times);
-                        strcat(send_str, temp);
-                        sprintf(temp, "write times: %lu \n", ptrI2CBpCpldSType->write_times);
-                        strcat(send_str, temp);
+                        cJSON_AddItemToObject(device, "hdd_infos", hdd_infos);
+                        cJSON_AddNumberToObject(device, receive_times_str, (double) ptrI2CBpCpldSType->receive_times);
+                        cJSON_AddNumberToObject(device, write_times_str, (double) ptrI2CBpCpldSType->write_times);
+                        break;
+                    case I2C_DIMM_TEMP:
+                        ptrI2CDimmTmpSType = (PTR_I2C_DIMM_TMP_sTYPE) (deviceAddList[i].ptrI2cDeviceData->data_buf);
 
-                        pthread_mutex_unlock(&ptrI2CBpCpldSType->mutex);
+                       cJSON_AddStringToObject(device, "description",
+                                                deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
+                        cJSON_AddStringToObject(device, "master_device", deviceAddList[i].ptrDeviceConfig->master.device_name);
+                        if (deviceAddList[i].ptrDeviceConfig->master.i2CType == I2C) {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i2c");
+                        } else {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i3c");
+                        }
+                        cJSON_AddNumberToObject(device, "bus",
+                                                deviceAddList[i].ptrDeviceConfig->bus);
+                        sprintf(addr, "0x%02x", deviceAddList[i].ptrDeviceConfig->addr);
+                        cJSON_AddStringToObject(device, "address", addr);
+                        /* 发送温度数据 */
+                        cJSON_AddNumberToObject(device, "temperature", ptrI2CDimmTmpSType->temperature);
+                        cJSON_AddNumberToObject(device, receive_times_str, (double) ptrI2CDimmTmpSType->receive_times);
+                        cJSON_AddNumberToObject(device, write_times_str, (double) ptrI2CDimmTmpSType->write_times);
                         break;
                     case GPIO_SWITCH:
                         /* GPIO Device0 - SWITCH */
                         ptrGpioSwitchSType = (PTR_GPIO_SWITCH_sTYPE) (deviceAddList[i].ptrGpioDeviceData->data_buf);
-                        pthread_mutex_lock(&ptrGpioSwitchSType->mutex);
-                        sprintf(temp, "desc: %s \n", deviceAddList[i].ptrGpioDeviceData->ptrDeviceConfig->description);
-                        strcat(send_str, temp);
+                        cJSON_AddStringToObject(device, "description",
+                                                deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
+                        cJSON_AddNumberToObject(device, "pin_nums", deviceAddList[i].ptrGpioDeviceData->pin_nums);
+                        cJSON *pins = cJSON_CreateArray();
                         for (int j = 0; j < deviceAddList[i].ptrGpioDeviceData->pin_nums; ++j) {
+                            cJSON *pin = cJSON_CreateObject();
+                            cJSON_AddNumberToObject(pin, "pin_num", j);
                             if (deviceAddList[i].ptrGpioDeviceData->pin_type[j] == 0) {
                                 /* 没有配置此 pin */
                                 continue;
                             } else if (deviceAddList[i].ptrGpioDeviceData->pin_type[j] == 1) {
                                 /* 只配置为 INPUT */
-                                sprintf(temp, "[IN]     pin[%d]: ", j);
+                                cJSON_AddStringToObject(pin, "pin_type", "in");
                             } else if (deviceAddList[i].ptrGpioDeviceData->pin_type[j] == 2) {
                                 /* 只配置为 OUTPUT */
-                                sprintf(temp, "[OUT]    pin[%d]: ", j);
+                                cJSON_AddStringToObject(pin, "pin_type", "out");
                             } else if (deviceAddList[i].ptrGpioDeviceData->pin_type[j] == 3) {
                                 /* 同时配置为 INPUT 和 OUTPUT */
-                                sprintf(temp, "[IN|OUT] pin[%d]: ", j);
+                                cJSON_AddStringToObject(pin, "pin_type", "in/out");
                             } else {
                                 printf("device[%d] : error pin[%d]_type - %d \n", i, j, deviceAddList[i].ptrGpioDeviceData->pin_type[j]);
                                 exit(1);
                             }
-                            strcat(send_str, temp);
-                            pthread_mutex_lock(&ptrGpioSwitchSType->pin_state_mutex[j]);
+                            char pin_status[120] = {0};
                             for (uint32_t k = ptrGpioSwitchSType->pinOscilloscope_list[j].front; k != ptrGpioSwitchSType->pinOscilloscope_list[j].rear; k = (k+1)%(PIN_OSCILLOSCOPE_MAX_BITS+1)) {
                                 sprintf(temp, "%d", ptrGpioSwitchSType->pinOscilloscope_list[j].status_bit[k]);
-                                strcat(send_str, temp);
+                                strcat(pin_status, temp);
                             }
-                            pthread_mutex_unlock(&ptrGpioSwitchSType->pin_state_mutex[j]);
-                            sprintf(temp, "|\n");
-                            strcat(send_str, temp);
+                            cJSON_AddStringToObject(pin, "pin_status", pin_status);
+                            cJSON_AddItemToArray(pins, pin);
                         }
-                        pthread_mutex_unlock(&ptrGpioSwitchSType->mutex);
+                        cJSON_AddItemToObject(device, "pins", pins);
                         break;
                     case ADC:
                         /* ADC  */
-                        sprintf(temp, "desc: %s \n", deviceAddList[i].ptrAdcDeviceData->ptrDeviceConfig->description);
-                        strcat(send_str, temp);
-                        pthread_mutex_lock(&deviceAddList[i].ptrAdcDeviceData->value_mutex);
+                        cJSON_AddStringToObject(device, "description",
+                                                deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
+                        cJSON_AddNumberToObject(device, "adc_channel",
+                                                deviceAddList[i].ptrDeviceConfig->adc_channel);
                         if (deviceAddList[i].ptrAdcDeviceData->adcRegType == REG_L) {
-                            sprintf(temp, "adc_value : %04x \n", deviceAddList[i].ptrAdcDeviceData->ptrAdcReg->reg_lh.l);
+                            sprintf(temp, "%04x", deviceAddList[i].ptrAdcDeviceData->ptrAdcReg->reg_lh.l);
                         } else {
-                            sprintf(temp, "adc_value : %04x \n", deviceAddList[i].ptrAdcDeviceData->ptrAdcReg->reg_lh.h);
+                            sprintf(temp, "%04x", deviceAddList[i].ptrAdcDeviceData->ptrAdcReg->reg_lh.h);
                         }
-                        strcat(send_str, temp);
-                        sprintf(temp, "division: %.3f \n", deviceAddList[i].ptrAdcDeviceData->division/1000.0);
-                        strcat(send_str, temp);
-                        pthread_mutex_unlock(&deviceAddList[i].ptrAdcDeviceData->value_mutex);
+                        cJSON_AddStringToObject(device, "adc_register", temp);
+                        cJSON_AddNumberToObject(device, "adc_value", deviceAddList[i].ptrAdcDeviceData->set_adc_value);
+                        cJSON_AddNumberToObject(device, "division",
+                                                deviceAddList[i].ptrAdcDeviceData->division / 1000.0);
                         break;
                     case PCA9546:
                         /* PCA9546 */
+                        cJSON_AddStringToObject(device, "description",
+                                                deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
+                        cJSON_AddStringToObject(device, "master_device", deviceAddList[i].ptrDeviceConfig->master.device_name);
+                        if (deviceAddList[i].ptrDeviceConfig->master.i2CType == I2C) {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i2c");
+                        } else {
+                            cJSON_AddStringToObject(device, "master_i2c_type", "i3c");
+                        }
+                        cJSON_AddNumberToObject(device, "bus",
+                                                deviceAddList[i].ptrDeviceConfig->bus);
+                        sprintf(addr, "0x%02x", deviceAddList[i].ptrDeviceConfig->addr);
+                        cJSON_AddStringToObject(device, "address", addr);
+
+                        break;
+                    case PWM_TACH:
+                        /* PWM_TACH */
+                        cJSON_AddStringToObject(device, "description",
+                                                deviceAddList[i].ptrDeviceConfig->description);
+                        cJSON_AddStringToObject(device, "name", deviceAddList[i].ptrDeviceConfig->name);
+                        cJSON_AddNumberToObject(device, "pwm_tach_num",
+                                                deviceAddList[i].ptrPwmTachDevice->pwm_tach_num);
+                        cJSON_AddNumberToObject(device, "min_rpm",
+                                                deviceAddList[i].ptrPwmTachDevice->ptrRpmDuty->min_rpm);
+                        cJSON_AddNumberToObject(device, "max_rpm",
+                                                deviceAddList[i].ptrPwmTachDevice->ptrRpmDuty->max_rpm);
+                        cJSON_AddNumberToObject(device, "min_offset",
+                                                deviceAddList[i].ptrPwmTachDevice->ptrRpmDuty->min_offset);
+                        cJSON_AddNumberToObject(device, "max_offset",
+                                                deviceAddList[i].ptrPwmTachDevice->ptrRpmDuty->max_offset);
+                        cJSON_AddNumberToObject(device, "rand_deviation_rate",
+                                                deviceAddList[i].ptrPwmTachDevice->ptrRpmDuty->rand_deviation_rate);
                         break;
                     default:
                         break;
                 }
+                cJSON_AddItemToArray(devices, device);
             } else {
                 break;
             }
         }
-        bytes_written = write(fd, send_str, strlen(send_str));
+        cJSON_AddItemToObject(root, "devices", devices);
+        json_str = cJSON_PrintUnformatted(root);
+        bytes_written = write(fd, json_str, strlen(json_str));
         if (bytes_written == -1) {
             perror("write data to read pipe failed!");
             exit(1);
         }
         close(fd);
-        send_str[0] = 0;
+        cJSON_Delete(root);
+        free(json_str);
         usleep(500 * 1000); /* 休眠 0.5 秒 */
     }
     pthread_mutex_unlock(&pthreadMutex_sendData);
@@ -373,6 +477,7 @@ static void *read_data_thread(void *pVoid) {
     PTR_SMBUS_DIMM_TMP_sTYPE ptrSmbusDimmTmpSType;
     PTR_I2C_EEPROM_sTYPE ptrI2CEepromSType;
     PTR_I2C_BP_CPLD_sTYPE ptrI2CBpCpldSType;
+    PTR_I2C_DIMM_TMP_sTYPE ptrI2CDimmTmpSType;
     PTR_SMBUS_TPA626_sTYPE ptrSmbusTpa626SType;
     PTR_GPIO_SWITCH_sTYPE ptrGpioSwitchSType;
     /* 读取数据 */
@@ -404,7 +509,7 @@ static void *read_data_thread(void *pVoid) {
             file_log(buffer, LOG_END);
 
             /* 根据输入参数更改数据 */
-            device_index = strtoul(buffer, &endPtr, 16);
+            device_index = strtoul(buffer, &endPtr, 10);
             if (endPtr != buffer && (device_index < DEVICE_MAX_NUM)) {
                 /* device_index 有解析到值，且设备索引没有超过 最大边界 */
                 if (deviceAddList[device_index].exist) {
@@ -472,6 +577,13 @@ static void *read_data_thread(void *pVoid) {
                                                 deviceAddList[device_index].ptrI2cDeviceData, endPtr);
                             pthread_mutex_unlock(&ptrI2CBpCpldSType->mutex);
                             break;
+                        case I2C_DIMM_TEMP:
+                            ptrI2CDimmTmpSType = (PTR_I2C_DIMM_TMP_sTYPE) (deviceAddList[device_index].ptrI2cDeviceData->data_buf);
+                            pthread_mutex_lock(&ptrI2CDimmTmpSType->mutex);
+                            dynamic_change_data(deviceAddList[device_index].device_type_id,
+                                                deviceAddList[device_index].ptrI2cDeviceData, endPtr);
+                            pthread_mutex_unlock(&ptrI2CDimmTmpSType->mutex);
+                            break;
                         case PMBUS_PSU:
                             dynamic_change_data(deviceAddList[device_index].device_type_id,
                                                 deviceAddList[device_index].pmBusPage,
@@ -491,6 +603,11 @@ static void *read_data_thread(void *pVoid) {
                             dynamic_change_data(deviceAddList[device_index].device_type_id,
                                                 deviceAddList[device_index].ptrAdcDeviceData, endPtr);
                             pthread_mutex_unlock(&deviceAddList[device_index].ptrAdcDeviceData->value_mutex);
+                            break;
+                        case PWM_TACH:
+                            /* PWM_TACH */
+                            dynamic_change_data(deviceAddList[device_index].device_type_id,
+                                                deviceAddList[device_index].ptrPwmTachDevice, endPtr);
                             break;
                         default:
                             sprintf(temp, "device type id - '%d' not processed! ", deviceAddList[device_index].device_type_id);

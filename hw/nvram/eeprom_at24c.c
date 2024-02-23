@@ -17,6 +17,8 @@
 #include "hw/qdev-properties-system.h"
 #include "sysemu/block-backend.h"
 #include "qom/object.h"
+#include "slib/inc/i2c-device.h"
+#include "hw/i3c/i3c.h"
 
 /* #define DEBUG_AT24C */
 
@@ -272,3 +274,165 @@ static void at24c_eeprom_register(void)
 }
 
 type_init(at24c_eeprom_register)
+
+
+// 宏定义收缩定义内容
+// InstanceType  OBJ_NAME   TYPENAME
+#define OBJECT_DECLARE_INSTANCE(InstanceType, OBJ_NAME) \
+    typedef struct InstanceType InstanceType;           \
+    DECLARE_INSTANCE_CHECKER(InstanceType, OBJ_NAME, TYPE_ ## OBJ_NAME)
+
+#define INSTANCE_STRUCT(InstanceType) \
+    struct InstanceType {             \
+        I2CSlave parent_obj;          \
+        I2C_DEVICE_DATA i2cDeviceData;\
+    };
+
+#define EMPTY_I2C_DEVICE_EVENT_FUNC(InstanceType, OBJ_NAME) \
+    static int InstanceType##_event(I2CSlave *s, enum i2c_event event) { \
+        InstanceType *it = OBJ_NAME(s);                 \
+        PTR_I2C_DEVICE_DATA ptrI2cDeviceData = &(it->i2cDeviceData);     \
+        event_##InstanceType(event, ptrI2cDeviceData);  \
+        return 0;                                       \
+    };
+
+#define EMPTY_I2C_DEVICE_RECV_FUNC(InstanceType, OBJ_NAME) \
+    static uint8_t InstanceType##_recv(I2CSlave *s) {  \
+        InstanceType *it = OBJ_NAME(s);                \
+        PTR_I2C_DEVICE_DATA ptrI2cDeviceData = &(it->i2cDeviceData); \
+        return recv_##InstanceType(ptrI2cDeviceData);  \
+    };
+#define EMPTY_I2C_DEVICE_SEND_FUNC(InstanceType, OBJ_NAME) \
+    static int InstanceType##_send(I2CSlave *s, uint8_t data) { \
+        InstanceType *it = OBJ_NAME(s);                \
+        PTR_I2C_DEVICE_DATA ptrI2cDeviceData = &(it->i2cDeviceData); \
+        send_##InstanceType(data, ptrI2cDeviceData);   \
+        return 0;                                      \
+    };
+
+
+#define EMPTY_I2C_DEVICE_RESET_FUNC(InstanceType, OBJ_NAME) \
+    static void InstanceType##_reset(DeviceState *dev) {    \
+        InstanceType *it = OBJ_NAME(dev);                \
+        PTR_I2C_DEVICE_DATA ptrI2cDeviceData = &(it->i2cDeviceData); \
+        init_##InstanceType(ptrI2cDeviceData);              \
+    };
+
+#define EMPTY_I2C_DEVICE_REALIZE_FUNC(InstanceType, OBJ_NAME) \
+    static void InstanceType##_realize(DeviceState *dev, Error **errp){ \
+        InstanceType *it = OBJ_NAME(dev);                \
+        PTR_I2C_DEVICE_DATA ptrI2cDeviceData = &(it->i2cDeviceData); \
+        device_add(getI2cDeviceTypeId(InstanceType##_add), ptrI2cDeviceData->ptrDeviceConfig->name, &(OBJ_NAME(dev)->i2cDeviceData), dev); \
+        InstanceType##_reset(dev);                       \
+    };
+
+
+#define EMPTY_I2C_DEVICE_PROPERTY(InstanceType, OBJ_NAME) \
+    static Property InstanceType##_props[] = {            \
+        DEFINE_PROP_END_OF_LIST()                         \
+    };
+
+
+#define EMPTY_I2C_DEVICE_CLASS_INIT(InstanceType, OBJ_NAME) \
+    static void InstanceType##_class_init(ObjectClass *klass, void *data) { \
+        DeviceClass *dc = DEVICE_CLASS(klass);              \
+        I2CSlaveClass *k = I2C_SLAVE_CLASS(klass);          \
+        dc->realize = &InstanceType##_realize;              \
+        k->event = &InstanceType##_event;                   \
+        k->recv = &InstanceType##_recv;                      \
+        k->send = &InstanceType##_send;                     \
+        device_class_set_props(dc, InstanceType##_props);   \
+        dc->reset = InstanceType##_reset;                   \
+    };
+#define EMPTY_I2C_DEVICE_TYPEINFO(InstanceType, OBJ_NAME) \
+    static const TypeInfo InstanceType##_type = {         \
+        .name = TYPE_##OBJ_NAME,                          \
+        .parent = TYPE_I2C_SLAVE,                         \
+        .instance_size = sizeof(InstanceType),            \
+        .class_size = sizeof(I2CSlaveClass),              \
+        .class_init = InstanceType##_class_init,          \
+    };
+
+#define EMPTY_I2C_DEVICE_REGISTER_INIT(InstanceType, OBJ_NAME) \
+    static void InstanceType##_register(void)             \
+    {                                                   \
+        type_register_static(&InstanceType##_type);       \
+    };                                                  \
+    type_init(InstanceType##_register);
+
+#define EMPTY_I2C_DEVICE_ADD_FUNC(InstanceType, OBJ_NAME) \
+    void InstanceType##_add(void *bus, PTR_DEVICE_CONFIG ptrDeviceConfig) {  \
+        InstanceType *it;                                              \
+        it = OBJ_NAME(i2c_slave_new(TYPE_##OBJ_NAME, ptrDeviceConfig->addr));        \
+        it->i2cDeviceData.ptrDeviceConfig = ptrDeviceConfig;                 \
+        if(ptrDeviceConfig->master.i2CType == I2C) {      \
+            i2c_slave_realize_and_unref(I2C_SLAVE(it), bus, &error_abort); \
+        } else {                                          \
+            i2c_slave_realize_and_unref(I2C_SLAVE(it), (I3C_BUS(bus))->i2c_bus, &error_abort); \
+        }        \
+    };
+
+
+
+#define INIT_I2C_FUNC(InstanceType, OBJ_NAME) \
+    OBJECT_DECLARE_INSTANCE(InstanceType, OBJ_NAME) \
+    INSTANCE_STRUCT(InstanceType)              \
+    EMPTY_I2C_DEVICE_EVENT_FUNC(InstanceType, OBJ_NAME) \
+    EMPTY_I2C_DEVICE_RECV_FUNC(InstanceType, OBJ_NAME)  \
+    EMPTY_I2C_DEVICE_SEND_FUNC(InstanceType, OBJ_NAME)  \
+    EMPTY_I2C_DEVICE_RESET_FUNC(InstanceType, OBJ_NAME) \
+    EMPTY_I2C_DEVICE_REALIZE_FUNC(InstanceType, OBJ_NAME) \
+    EMPTY_I2C_DEVICE_PROPERTY(InstanceType, OBJ_NAME)   \
+    EMPTY_I2C_DEVICE_CLASS_INIT(InstanceType, OBJ_NAME) \
+    EMPTY_I2C_DEVICE_TYPEINFO(InstanceType, OBJ_NAME)   \
+    EMPTY_I2C_DEVICE_REGISTER_INIT(InstanceType, OBJ_NAME)\
+    EMPTY_I2C_DEVICE_ADD_FUNC(InstanceType, OBJ_NAME)
+
+
+#define TYPE_I2C_EMPTY_0 "i2c-empty-0"
+INIT_I2C_FUNC(I2cEmptyDevice0, I2C_EMPTY_0)
+
+#define TYPE_I2C_EMPTY_1 "i2c-empty-1"
+INIT_I2C_FUNC(I2cEmptyDevice1, I2C_EMPTY_1)
+
+#define TYPE_I2C_EMPTY_2 "i2c-empty-2"
+INIT_I2C_FUNC(I2cEmptyDevice2, I2C_EMPTY_2)
+
+#define TYPE_I2C_EMPTY_3 "i2c-empty-3"
+INIT_I2C_FUNC(I2cEmptyDevice3, I2C_EMPTY_3)
+
+#define TYPE_I2C_EMPTY_4 "i2c-empty-4"
+INIT_I2C_FUNC(I2cEmptyDevice4, I2C_EMPTY_4)
+
+
+
+I2cFunctionPtr getI2cDeviceAddFunc(int device_type_id){
+    static I2cFunctionPtr i2CFunctionPtr_static[] = {
+        I2cEmptyDevice0_add,
+        I2cEmptyDevice1_add,
+        I2cEmptyDevice2_add,
+        I2cEmptyDevice3_add,
+        I2cEmptyDevice4_add
+    };
+    if ((device_type_id < I2C_DEVICE_TYPE_ID_OFFSET) || (device_type_id - I2C_DEVICE_TYPE_ID_OFFSET >= I2C_DEVICE_TOTAL_NUM)) {
+        return NULL;
+    } else {
+        return i2CFunctionPtr_static[device_type_id - I2C_DEVICE_TYPE_ID_OFFSET];
+    }
+};
+
+int getI2cDeviceTypeId(I2cFunctionPtr functionPtr){
+    static I2cFunctionPtr i2CFunctionPtr_static[] = {
+            I2cEmptyDevice0_add,
+            I2cEmptyDevice1_add,
+            I2cEmptyDevice2_add,
+            I2cEmptyDevice3_add,
+            I2cEmptyDevice4_add
+    };
+    for (int i = 0; i < I2C_DEVICE_TOTAL_NUM; ++i) {
+        if (i2CFunctionPtr_static[i] == functionPtr) {
+            return I2C_DEVICE_TYPE_ID_OFFSET + i;
+        }
+    }
+    return -1;
+};

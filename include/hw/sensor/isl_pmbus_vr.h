@@ -54,4 +54,6 @@ OBJECT_DECLARE_SIMPLE_TYPE(ISLState, ISL69260)
 #define ISL_READ_IIN_DEFAULT                   40
 #define ISL_READ_PIN_DEFAULT                   4
 
+void pmbus_vr_add(void *bus, uint8_t address, const char *type, PTR_DEVICE_CONFIG ptrDeviceConfig);
+
 #endif

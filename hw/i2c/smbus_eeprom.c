@@ -32,6 +32,8 @@
 #include "migration/vmstate.h"
 #include "hw/i2c/smbus_eeprom.h"
 #include "qom/object.h"
+#include "slib/inc/smbus-device.h"
+#include "hw/i3c/i3c.h"
 
 //#define DEBUG
 
@@ -42,7 +44,9 @@ OBJECT_DECLARE_SIMPLE_TYPE(SMBusEEPROMDevice, SMBUS_EEPROM)
 #define SMBUS_EEPROM_SIZE 256
 
 struct SMBusEEPROMDevice {
+    /* 父类型设备 */
     SMBusDevice smbusdev;
+    /* 设备自定义 */
     uint8_t data[SMBUS_EEPROM_SIZE];
     uint8_t *init_data;
     uint8_t offset;
@@ -86,13 +90,14 @@ static int eeprom_write_data(SMBusDevice *dev, uint8_t *buf, uint8_t len)
     return 0;
 }
 
+/* 确定SMBus EEPROM设备是否需要保存到虚拟机状态中 */
 static bool smbus_eeprom_vmstate_needed(void *opaque)
 {
     MachineClass *mc = MACHINE_GET_CLASS(qdev_get_machine());
     SMBusEEPROMDevice *eeprom = opaque;
 
     return (eeprom->accessed || smbus_vmstate_needed(&eeprom->smbusdev)) &&
-        !mc->smbus_no_migration_support;
+        !mc->smbus_no_migration_support; /* eeprom 设备有被访问 或 设备不处于 IDLE 状态 并且 设备不是不可迁移的 */
 }
 
 static const VMStateDescription vmstate_smbus_eeprom = {
@@ -163,17 +168,18 @@ static void smbus_eeprom_register_types(void)
     type_register_static(&smbus_eeprom_info);
 }
 
+/* 注册该设备类型，并且初始化该设备的对象类型 */
 type_init(smbus_eeprom_register_types)
 
 void smbus_eeprom_init_one(I2CBus *smbus, uint8_t address, uint8_t *eeprom_buf)
 {
     DeviceState *dev;
 
-    dev = qdev_new(TYPE_SMBUS_EEPROM);
-    qdev_prop_set_uint8(dev, "address", address);
+    dev = qdev_new(TYPE_SMBUS_EEPROM);                                  /* 创建一个 smbus-eeprom 类型的对象 */
+    qdev_prop_set_uint8(dev, "address", address);                 /* 设置该对象的 address 属性的值 */
     /* FIXME: use an array of byte or block backend property? */
-    SMBUS_EEPROM(dev)->init_data = eeprom_buf;
-    qdev_realize_and_unref(dev, (BusState *)smbus, &error_fatal);
+    SMBUS_EEPROM(dev)->init_data = eeprom_buf;                                /* 设置该对象的 init_data 属性的值 */
+    qdev_realize_and_unref(dev, (BusState *)smbus, &error_fatal);   /* 将该对象实例化为设备，并释放该对象本身（实例化的设备不受影响） */
 }
 
 void smbus_eeprom_init(I2CBus *smbus, int nb_eeprom,
@@ -298,3 +304,199 @@ uint8_t *spd_data_generate(enum sdram_type type, ram_addr_t ram_size)
     }
     return spd;
 }
+
+/**************************************** 自定义 SMBus 空壳设备 ****************************************/
+#define OBJECT_DECLARE_SIMPLE_EMPTY_TYPE(InstanceType, MODULE_OBJ_NAME) \
+    typedef struct InstanceType{                                        \
+    SMBusDevice smbusdev;                                               \
+    SMBUS_DEVICE_DATA smbus_device_data;                                \
+    } InstanceType; \
+    \
+    G_DEFINE_AUTOPTR_CLEANUP_FUNC(InstanceType, object_unref) \
+    \
+    DECLARE_INSTANCE_CHECKER(InstanceType, MODULE_OBJ_NAME, TYPE_##MODULE_OBJ_NAME)
+
+/**************************************** 接收数据处理函数 ****************************************/
+#define TEMPLATE_EMPTY_RECEIVE_FUNC(DeviceName, NAME) \
+    static uint8_t DeviceName##_receive_byte(SMBusDevice *dev) { \
+        DeviceName *device = NAME(dev);                   \
+        PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData = &(device->smbus_device_data); \
+        return receive_##DeviceName(ptrSmbusDeviceData);  \
+    };
+
+/**************************************** 写入数据处理函数 ****************************************/
+#define TEMPLATE_EMPTY_WRITE_FUNC(DeviceName, NAME) \
+    static int DeviceName##_write_byte(SMBusDevice *dev, uint8_t *buf, uint8_t len) { \
+    DeviceName *device = NAME(dev);           \
+    PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData = &(device->smbus_device_data);          \
+    write_##DeviceName(buf, len, ptrSmbusDeviceData); \
+    return 0;};
+
+#define TEMPLATE_EMPTY_NEEDED_FUNC(DeviceName) \
+    static bool DeviceName##_vmstate_needed(void *opaque){return 1;};
+
+#define TEMPLATE_EMPTY_VMSTATEDESC_STRUCT(NAME, DeviceName) \
+    static const VMStateDescription vmstate_##DeviceName = {    \
+        .name = TYPE_##NAME,        \
+        .version_id=1,             \
+        .minimum_version_id = 1,   \
+        .needed = DeviceName##_vmstate_needed,                      \
+        .fields = (VMStateField[]){\
+            VMSTATE_SMBUS_DEVICE(smbusdev, DeviceName),     \
+            VMSTATE_END_OF_LIST()}                          \
+    };
+
+/**************************************** 重置函数 ****************************************/
+#define TEMPLATE_EMPTY_RESET_FUNC(DeviceName, NAME) \
+    static void DeviceName##_reset(DeviceState *dev){ \
+        DeviceName *device = NAME(dev);           \
+        PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData = &(device->smbus_device_data); \
+        init_##DeviceName(ptrSmbusDeviceData);    \
+    };
+
+/**************************************** 实现函数 ****************************************/
+#define TEMPLATE_EMPTY_REALIZE_FUNC(DeviceName, NAME) \
+    static void DeviceName##_realize(DeviceState *dev, Error **errp) { \
+        DeviceName *device = NAME(dev);           \
+        PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData = &(device->smbus_device_data); \
+        device_add(getSMBusDeviceTypeId(DeviceName##_add), ptrSmbusDeviceData->ptrDeviceConfig->name, &(NAME(dev)->smbus_device_data), dev); \
+        DeviceName##_reset(dev);                       \
+    };
+
+/**************************************** 类初始化函数 ****************************************/
+#define TEMPLATE_EMPTY_CLASS_INIT(NAME, DeviceName) \
+    static void DeviceName##_class_init(ObjectClass *klass, void *data) { \
+    DeviceClass *dc = DEVICE_CLASS(klass); \
+    SMBusDeviceClass *sc = SMBUS_DEVICE_CLASS(klass);\
+    dc->realize = DeviceName##_realize; \
+    dc->reset = DeviceName##_reset; \
+    sc->receive_byte = DeviceName##_receive_byte; \
+    sc->write_data = DeviceName##_write_byte; \
+    dc->vmsd = &vmstate_##DeviceName; \
+    dc->user_creatable = false;}
+
+/**************************************** TypeInfo 结构体 ****************************************/
+#define TEMPLATE_EMPTY_TYPEINFO(NAME, DeviceName) \
+    static const TypeInfo DeviceName##_info = {\
+        .name = TYPE_##NAME,                   \
+        .parent = TYPE_SMBUS_DEVICE,           \
+        .instance_size = sizeof(DeviceName),   \
+        .class_init = DeviceName##_class_init, \
+        };
+
+/**************************************** 类型注册函数 ****************************************/
+#define TEMPLATE_EMPTY_REGISTER_TYPES(DeviceName) \
+    static void DeviceName##_register_types(void) { \
+        type_register_static(&DeviceName##_info);   \
+    }
+
+/**************************************** 类型初始化宏注册此类型 ****************************************/
+#define TEMPLATE_EMPTY_TYPE_INIT(DeviceName) \
+    type_init(DeviceName##_register_types)   \
+    ;
+
+
+/**************************************** 设备添加函数 ****************************************/
+#define TEMPLATE_EMPTY_DEVICE_ADD_FUNC(NAME, DeviceName) \
+    void DeviceName##_add(void *smbus, PTR_DEVICE_CONFIG ptrDeviceConfig) { \
+        DeviceState *dev;                                \
+        dev = qdev_new(TYPE_##NAME);                     \
+        qdev_prop_set_uint8(dev, "address", ptrDeviceConfig->addr);    \
+        NAME(dev)->smbus_device_data.ptrDeviceConfig= ptrDeviceConfig;      \
+        if (ptrDeviceConfig->master.i2CType == I2C) {    \
+            qdev_realize_and_unref(dev, (BusState *)smbus, &error_fatal);   \
+        } else {                                         \
+            qdev_realize_and_unref(dev, (BusState *)((I3C_BUS(smbus))->i2c_bus), &error_fatal);   \
+        }    \
+    }
+
+
+/**************************************** 组合以上宏定义函数 ****************************************/
+
+#define INIT_FUNC(NAME, DeviceName) \
+    OBJECT_DECLARE_SIMPLE_EMPTY_TYPE(DeviceName, NAME)  \
+    TEMPLATE_EMPTY_RECEIVE_FUNC(DeviceName, NAME) \
+    TEMPLATE_EMPTY_WRITE_FUNC(DeviceName, NAME)   \
+    TEMPLATE_EMPTY_NEEDED_FUNC(DeviceName)  \
+    TEMPLATE_EMPTY_VMSTATEDESC_STRUCT(NAME, DeviceName) \
+    TEMPLATE_EMPTY_RESET_FUNC(DeviceName, NAME)   \
+    TEMPLATE_EMPTY_REALIZE_FUNC(DeviceName, NAME) \
+    TEMPLATE_EMPTY_CLASS_INIT(NAME, DeviceName)         \
+    TEMPLATE_EMPTY_TYPEINFO(NAME, DeviceName)           \
+    TEMPLATE_EMPTY_REGISTER_TYPES(DeviceName)           \
+    TEMPLATE_EMPTY_TYPE_INIT(DeviceName)   \
+    TEMPLATE_EMPTY_DEVICE_ADD_FUNC(NAME, DeviceName)
+
+/* 声明简单类型对象 */
+
+#define TYPE_SMBUS_EMPTY_0 "smbus-empty-0"
+INIT_FUNC(SMBUS_EMPTY_0, SMBusEmptyDevice0)
+
+#define TYPE_SMBUS_EMPTY_1 "smbus-empty-1"
+INIT_FUNC(SMBUS_EMPTY_1, SMBusEmptyDevice1)
+
+#define TYPE_SMBUS_EMPTY_2 "smbus-empty-2"
+INIT_FUNC(SMBUS_EMPTY_2, SMBusEmptyDevice2)
+
+#define TYPE_SMBUS_EMPTY_3 "smbus-empty-3"
+INIT_FUNC(SMBUS_EMPTY_3, SMBusEmptyDevice3)
+
+#define TYPE_SMBUS_EMPTY_4 "smbus-empty-4"
+INIT_FUNC(SMBUS_EMPTY_4, SMBusEmptyDevice4)
+
+#define TYPE_SMBUS_EMPTY_5 "smbus-empty-5"
+INIT_FUNC(SMBUS_EMPTY_5, SMBusEmptyDevice5)
+
+#define TYPE_SMBUS_EMPTY_6 "smbus-empty-6"
+INIT_FUNC(SMBUS_EMPTY_6, SMBusEmptyDevice6)
+
+#define TYPE_SMBUS_EMPTY_7 "smbus-empty-7"
+INIT_FUNC(SMBUS_EMPTY_7, SMBusEmptyDevice7)
+
+#define TYPE_SMBUS_EMPTY_8 "smbus-empty-8"
+INIT_FUNC(SMBUS_EMPTY_8, SMBusEmptyDevice8)
+
+#define TYPE_SMBUS_EMPTY_9 "smbus-empty-9"
+INIT_FUNC(SMBUS_EMPTY_9, SMBusEmptyDevice9)
+
+SMBusFunctionPtr getSMBusDeviceAddFunc(int device_type_id) {
+    static SMBusFunctionPtr SMBusFunctions_temp[SMBUS_DEVICE_TOTAL_NUM] = {
+        SMBusEmptyDevice0_add,
+        SMBusEmptyDevice1_add,
+        SMBusEmptyDevice2_add,
+        SMBusEmptyDevice3_add,
+        SMBusEmptyDevice4_add,
+        SMBusEmptyDevice5_add,
+        SMBusEmptyDevice6_add,
+        SMBusEmptyDevice7_add,
+        SMBusEmptyDevice8_add,
+        SMBusEmptyDevice9_add
+    };
+    if ((device_type_id < SMBUS_DEVICE_TYPE_ID_OFFSET) || (device_type_id - SMBUS_DEVICE_TYPE_ID_OFFSET >= SMBUS_DEVICE_TOTAL_NUM)) {
+        return NULL;
+    } else {
+        return SMBusFunctions_temp[device_type_id - SMBUS_DEVICE_TYPE_ID_OFFSET];
+    }
+}
+
+int getSMBusDeviceTypeId(SMBusFunctionPtr functionPtr){
+    static SMBusFunctionPtr FuncList[10] = {
+            SMBusEmptyDevice0_add,
+            SMBusEmptyDevice1_add,
+            SMBusEmptyDevice2_add,
+            SMBusEmptyDevice3_add,
+            SMBusEmptyDevice4_add,
+            SMBusEmptyDevice5_add,
+            SMBusEmptyDevice6_add,
+            SMBusEmptyDevice7_add,
+            SMBusEmptyDevice8_add,
+            SMBusEmptyDevice9_add
+    };
+    for (int i = 0; i < SMBUS_DEVICE_TOTAL_NUM; ++i) {
+        if (FuncList[i] == functionPtr) {
+            return SMBUS_DEVICE_TYPE_ID_OFFSET + i;
+        }
+    }
+    return -1;
+}
+

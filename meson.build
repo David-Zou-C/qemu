@@ -3304,6 +3304,7 @@ if have_system
     'hw/dma',
     'hw/hyperv',
     'hw/i2c',
+    'hw/i3c',
     'hw/i386',
     'hw/i386/xen',
     'hw/i386/kvm',
@@ -3894,6 +3895,7 @@ foreach target : target_dirs
                                              'slib/src/dataThread.c',
                                              'slib/src/cJSON.c',
                                              'slib/src/gpio-device.c',
+                                             'slib/src/pwm-device.c',
                                              'slib/src/adc-device.c'),
                               include_directories: include_directories('slib/inc'))
       emulator = executable(exe_name, exe['sources'],

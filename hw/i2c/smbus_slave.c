@@ -73,7 +73,7 @@ static int smbus_i2c_event(I2CSlave *s, enum i2c_event event)
             break;
 
         default:
-            BADF("Unexpected send start condition in state %d\n", dev->mode);
+//            BADF("Unexpected send start condition in state %d\n", dev->mode);
             dev->mode = SMBUS_CONFUSED;
             break;
         }
@@ -116,7 +116,8 @@ static int smbus_i2c_event(I2CSlave *s, enum i2c_event event)
                 break;
 
             case SMBUS_READ_DATA:
-                BADF("Unexpected stop during receive\n");
+                /* 没有实际的错误，暂时先屏蔽此报错 */
+//                BADF("Unexpected stop during receive\n");
                 break;
 
             default:
@@ -190,7 +191,7 @@ static int smbus_i2c_send(I2CSlave *s, uint8_t data)
         break;
 
     default:
-        BADF("Unexpected write in state %d\n", dev->mode);
+//        BADF("Unexpected write in state %d\n", dev->mode);
         break;
     }
 

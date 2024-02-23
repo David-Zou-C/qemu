@@ -26,6 +26,7 @@ typedef enum DEVICE_TYPE_ {
     GPIO_DEVICE_TYPE,
     ADC_DEVICE_TYPE,
     PCA954X_DEVICE_TYPE,
+    PWM_TACH_DEVICE_TYPE,
 } DEVICE_TYPE, *PTR_DEVICE_TYPE;
 
 typedef enum DEVICE_TYPE_ID_ {
@@ -36,11 +37,10 @@ typedef enum DEVICE_TYPE_ID_ {
     SMBUS_TMP = 2,
     SMBUS_TPA626 = 3,
     SMBUS_DIMM_TEMP = 4,
-    /* PMBUS */
-    PMBUS_PSU = 21,
     /* I2c */
     I2C_EEPROM = 101,
     I2C_BP_CPLD = 102,
+    I2C_DIMM_TEMP = 103,
     /* GPIO */
     GPIO_SWITCH = 201,
     /* ADC */
@@ -48,6 +48,10 @@ typedef enum DEVICE_TYPE_ID_ {
     /* PCA954X */
     PCA9546 = 401,
     PCA9548 = 402,
+    /* PMBUS */
+    PMBUS_PSU = 501,
+    /* PWM_TACH */
+    PWM_TACH = 601
 } DEVICE_TYPE_ID, *PTR_DEVICE_TYPE_ID;
 
 
@@ -113,6 +117,11 @@ typedef struct GPIO_SIGNAL_ {
     struct GPIO_SIGNAL_ *next;
 } GPIO_SIGNAL, *PTR_GPIO_SIGNAL;
 
+typedef enum I2C_TYPE_ {
+    I2C,
+    I3C
+} I2C_TYPE, *PTR_I2C_TYPE;
+
 typedef struct DEVICE_CONFIG_ {
     char *description;
     DEVICE_TYPE deviceType;
@@ -125,11 +134,13 @@ typedef struct DEVICE_CONFIG_ {
     struct {
         int device_index;
         char device_name[DEVICE_NAME_MAX_LEN];
-    } i2c_dev;
+        I2C_TYPE i2CType;
+    } master;
     uint32_t pin_nums;
     PTR_GPIO_SIGNAL ptrGpioSignal;
     PTR_GPIO_OUTPUT_LOGIC_INIT ptrGpioOutputLogicInit;
     PTR_GPIO_RESPONSE_LOGIC ptrGpioResponseLogic;
+    uint8_t pwm_tach_num;
     char *args;
     struct DEVICE_CONFIG_ *pre;
     struct DEVICE_CONFIG_ *next;
@@ -194,6 +205,8 @@ typedef struct PIN_WAVEFORM_GENERATOR_ {
     uint8_t stop_waveform_generator;    /* 是否停止产生波形 */
     uint8_t has_update;                 /* 有更新 */
 }PIN_WAVEFORM_GENERATOR, *PTR_PIN_WAVEFORM_GENERATOR;
+
+int compareIgnoreCase(const char *str1, const char *str2);
 
 void oscilloscope_init(PTR_PIN_OSCILLOSCOPE ptrPinOscilloscope);
 uint8_t oscilloscope_add_status_bit(PTR_PIN_OSCILLOSCOPE ptrPinOscilloscope, uint8_t status_bit);

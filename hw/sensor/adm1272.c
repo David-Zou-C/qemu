@@ -222,10 +222,10 @@ static void adm1272_exit_reset(Object *obj)
     pmdev->pages[0].read_temperature_1 = 0;
     pmdev->pages[0].read_pin = adm1272_watts_to_direct(ADM1272_PWR_DEFAULT);
     pmdev->pages[0].revision = ADM1272_PMBUS_REVISION_DEFAULT;
-    pmdev->pages[0].mfr_id = ADM1272_MFR_ID_DEFAULT;
-    pmdev->pages[0].mfr_model = ADM1272_MODEL_DEFAULT;
-    pmdev->pages[0].mfr_revision = ADM1272_MFR_DEFAULT_REVISION;
-    pmdev->pages[0].mfr_date = ADM1272_DEFAULT_DATE;
+    strcpy(pmdev->pages[0].mfr_id, ADM1272_MFR_ID_DEFAULT);
+    strcpy(pmdev->pages[0].mfr_model, ADM1272_MODEL_DEFAULT);
+    strcpy(pmdev->pages[0].mfr_revision, ADM1272_MFR_DEFAULT_REVISION);
+    strcpy(pmdev->pages[0].mfr_date, ADM1272_DEFAULT_DATE);
 
     s->pin_ext = 0;
     s->ein_ext = 0;

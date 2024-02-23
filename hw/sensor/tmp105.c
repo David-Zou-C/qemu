@@ -26,6 +26,10 @@
 #include "qapi/error.h"
 #include "qapi/visitor.h"
 #include "qemu/module.h"
+#include "include/hw/qdev-properties.h"
+#include "slib/inc/aspeed-init.h"
+#include "qemu/main-loop.h"
+
 
 static void tmp105_interrupt_update(TMP105State *s)
 {
@@ -326,3 +330,394 @@ static void tmp105_register_types(void)
 }
 
 type_init(tmp105_register_types)
+
+
+static void toggle_output(LatchingSwitchState *s, int new_state)
+{
+    static time_t last_time;
+    time_t curr_time;
+    time(&curr_time);
+    printf("\n\n######################### %d #############################\n\n", new_state);
+    if (curr_time - last_time > 5) {
+        s->state = !(s->state);
+        qemu_set_irq(s->output, s->state);
+        last_time = curr_time;
+        printf("\n\n######################### out to gpioZ2 : %d #############################\n\n", s->state);
+    }
+}
+
+static void input_handler(void *opaque, int line, int new_state)
+{
+    LatchingSwitchState *s = LATCHING_SWITCH(opaque);
+
+    assert(line == 0);
+
+//    if (s->trigger_edge == TRIGGER_EDGE_FALLING && new_state == 0) {
+//        toggle_output(s);
+//    } else if (s->trigger_edge == TRIGGER_EDGE_RISING && new_state == 1) {
+//        toggle_output(s);
+//    } else if (s->trigger_edge == TRIGGER_EDGE_BOTH) {
+//        toggle_output(s);
+//    }
+    toggle_output(s, new_state);
+}
+
+static void latching_switch_reset(DeviceState *dev)
+{
+    LatchingSwitchState *s = LATCHING_SWITCH(dev);
+    /* reset to off */
+    s->state = false;
+    /* reset to falling edge trigger */
+    s->trigger_edge = TRIGGER_EDGE_FALLING;
+}
+
+static const VMStateDescription vmstate_latching_switch = {
+        .name = TYPE_LATCHING_SWITCH,
+        .version_id = 1,
+        .minimum_version_id = 1,
+        .fields = (VMStateField[]) {
+                VMSTATE_BOOL(state, LatchingSwitchState),
+                VMSTATE_UINT8(trigger_edge, LatchingSwitchState),
+                VMSTATE_END_OF_LIST()
+        }
+};
+
+static void latching_switch_realize(DeviceState *dev, Error **errp)
+{
+    LatchingSwitchState *s = LATCHING_SWITCH(dev);
+
+    /* init a input io */
+    qdev_init_gpio_in(dev, input_handler, 1);
+
+    /* init a output io */
+    qdev_init_gpio_out(dev, &(s->output), 1);
+}
+
+static void latching_switch_class_init(ObjectClass *klass, void *data)
+{
+    DeviceClass *dc = DEVICE_CLASS(klass);
+
+    dc->desc = "Latching Switch";
+    dc->vmsd = &vmstate_latching_switch;
+    dc->reset = latching_switch_reset;
+    dc->realize = latching_switch_realize;
+    set_bit(DEVICE_CATEGORY_DISPLAY, dc->categories);
+}
+
+static void latching_switch_get_state(Object *obj, Visitor *v, const char *name,
+                                      void *opaque, Error **errp)
+{
+    LatchingSwitchState *s = LATCHING_SWITCH(obj);
+    bool value = s->state;
+
+    visit_type_bool(v, name, &value, errp);
+}
+
+static void latching_switch_set_state(Object *obj, Visitor *v, const char *name,
+                                      void *opaque, Error **errp)
+{
+    LatchingSwitchState *s = LATCHING_SWITCH(obj);
+    bool value;
+    Error *err = NULL;
+
+    visit_type_bool(v, name, &value, &err);
+    if (err) {
+        error_propagate(errp, err);
+        return;
+    }
+
+    if (value != s->state) {
+//        toggle_output(s);
+    }
+}
+static void latching_switch_get_trigger_edge(Object *obj, Visitor *v,
+                                             const char *name, void *opaque,
+                                             Error **errp)
+{
+    LatchingSwitchState *s = LATCHING_SWITCH(obj);
+    int value = s->trigger_edge;
+    char *p = NULL;
+
+    if (value == TRIGGER_EDGE_FALLING) {
+        p = g_strdup("falling");
+        visit_type_str(v, name, &p, errp);
+    } else if (value == TRIGGER_EDGE_RISING) {
+        p = g_strdup("rising");
+        visit_type_str(v, name, &p, errp);
+    } else if (value == TRIGGER_EDGE_BOTH) {
+        p = g_strdup("both");
+        visit_type_str(v, name, &p, errp);
+    } else {
+        error_setg(errp, "Invalid trigger edge value");
+    }
+    g_free(p);
+}
+
+static void latching_switch_set_trigger_edge(Object *obj, Visitor *v,
+                                             const char *name, void *opaque,
+                                             Error **errp)
+{
+    LatchingSwitchState *s = LATCHING_SWITCH(obj);
+    char *value;
+    Error *err = NULL;
+
+    visit_type_str(v, name, &value, &err);
+    if (err) {
+        error_propagate(errp, err);
+        return;
+    }
+
+    if (strcmp(value, "falling") == 0) {
+        s->trigger_edge = TRIGGER_EDGE_FALLING;
+    } else if (strcmp(value, "rising") == 0) {
+        s->trigger_edge = TRIGGER_EDGE_RISING;
+    } else if (strcmp(value, "both") == 0) {
+        s->trigger_edge = TRIGGER_EDGE_BOTH;
+    } else {
+        error_setg(errp, "Invalid trigger edge type: %s", value);
+    }
+}
+
+static void latching_switch_init(Object *obj)
+{
+    LatchingSwitchState *s = LATCHING_SWITCH(obj);
+
+    s->state = false;
+    s->trigger_edge = TRIGGER_EDGE_FALLING;
+
+    object_property_add(obj, "state", "bool",
+                        latching_switch_get_state,
+                        latching_switch_set_state,
+                        NULL, NULL);
+    object_property_add(obj, "trigger-edge", "string",
+                        latching_switch_get_trigger_edge,
+                        latching_switch_set_trigger_edge,
+                        NULL, NULL);
+}
+
+static const TypeInfo latching_switch_info = {
+        .name = TYPE_LATCHING_SWITCH,
+        .parent = TYPE_DEVICE,
+        .instance_size = sizeof(LatchingSwitchState),
+        .class_init = latching_switch_class_init,
+        .instance_init = latching_switch_init,
+};
+
+static void latching_switch_register_types(void)
+{
+    type_register_static(&latching_switch_info);
+}
+
+type_init(latching_switch_register_types);
+
+LatchingSwitchState *latching_switch_create_simple(Object *parentobj,
+                                                   bool state,
+                                                   uint8_t trigger_edge)
+{
+    static const char *name = "latching-switch";
+    DeviceState *dev;
+
+    dev = qdev_new(TYPE_LATCHING_SWITCH);
+
+    qdev_prop_set_bit(dev, "state", state);
+
+    if (trigger_edge == TRIGGER_EDGE_FALLING) {
+        qdev_prop_set_string(dev, "trigger-edge", "falling");
+    } else if (trigger_edge == TRIGGER_EDGE_RISING) {
+        qdev_prop_set_string(dev, "trigger-edge", "rising");
+    } else if (trigger_edge == TRIGGER_EDGE_BOTH) {
+        qdev_prop_set_string(dev, "trigger-edge", "both");
+    } else {
+        perror("Invalid trigger edge value");
+        exit(1);
+    }
+
+    object_property_add_child(parentobj, name, OBJECT(dev));
+    qdev_realize_and_unref(dev, NULL, &error_fatal);
+
+    return LATCHING_SWITCH(dev);
+}
+
+/**************************************** GPIO ****************************************/
+
+
+/**************************************** GPIO 通用函数 ****************************************/
+void connect_gpio_line_for_slib(void *send_dev, int send_line, void *recv_dev, int recv_line) {
+//    printf("connect gpio out send_line: %d -> recv_line: %d \n", send_line, recv_line);
+    qdev_connect_gpio_out(DEVICE(send_dev), send_line, qdev_get_gpio_in(DEVICE(recv_dev), recv_line));
+}
+
+void set_gpio_line_for_slib(void *pin_buf, uint32_t pin, int level) {
+//    printf("set irq: pin - %d ==> level: %d  \n", pin, level);
+    qemu_irq *irqs = (qemu_irq *)pin_buf;
+    if(qemu_mutex_iothread_locked()) {
+        qemu_set_irq(irqs[pin], level);
+    } else {
+        qemu_mutex_lock_iothread();
+        qemu_set_irq(irqs[pin], level);
+        qemu_mutex_unlock_iothread();
+    }
+}
+
+
+/**************************************** 定义设备结构体 ****************************************/
+#define EMPTY_GPIO_DECLARE_TYPE(InstanceType, TYPE_NAME) \
+    struct InstanceType {                          \
+        DeviceState parent_obj;                    \
+        GPIO_DEVICE_DATA gpio_device_data;           \
+    };                                             \
+    typedef struct InstanceType InstanceType;      \
+    DECLARE_INSTANCE_CHECKER(InstanceType, TYPE_NAME, TYPE_##TYPE_NAME)
+
+#define EMPTY_GPIO_CREATE_VMStateDescription(InstanceType, TYPE_NAME) \
+    static const VMStateDescription vmstate_##InstanceType = {        \
+        .name = TYPE_##TYPE_NAME,                                     \
+        .version_id = 1,                                              \
+        .minimum_version_id = 1,                                      \
+        .fields = (VMStateField[]) {                                  \
+            VMSTATE_END_OF_LIST()                                     \
+        }                                                             \
+    };
+
+#define EMPTY_GPIO_CREATE_PIN_HANDLER(InstanceType, TYPE_NAME) \
+    static void InstanceType##_input_handler(void *opaque, int line, int new_state) { \
+        InstanceType *it = TYPE_NAME(opaque);                  \
+        PTR_GPIO_DEVICE_DATA ptrGpioDeviceData = &(it->gpio_device_data); \
+        input_handler_##InstanceType(line, new_state, ptrGpioDeviceData);             \
+    }
+
+#define EMPTY_GPIO_CREATE_RESET_FUNC(InstanceType, TYPE_NAME) \
+    static void InstanceType##_reset(DeviceState *dev) {      \
+        InstanceType *it = TYPE_NAME(dev);                    \
+        PTR_GPIO_DEVICE_DATA ptrGpioDeviceData = &(it->gpio_device_data); \
+        init_##InstanceType(ptrGpioDeviceData);                   \
+    };
+
+#define EMPTY_GPIO_CREATE_REALIZE_FUNC(InstanceType, TYPE_NAME) \
+    static void InstanceType##_realize(DeviceState *dev, Error **errp){ \
+        FUNC_DEBUG("InstanceType##_realize()")                \
+        InstanceType *it = TYPE_NAME(dev);                    \
+        it->gpio_device_data.pin_nums = it->gpio_device_data.ptrDeviceConfig->pin_nums;      \
+        it->gpio_device_data.pin_buf = malloc(sizeof(qemu_irq) * it->gpio_device_data.pin_nums); \
+        it->gpio_device_data.pin_state = (uint8_t *)malloc(sizeof(uint8_t) * it->gpio_device_data.pin_nums); \
+        it->gpio_device_data.pin_type = (uint8_t *)malloc(sizeof(uint8_t) * it->gpio_device_data.pin_nums); \
+        it->gpio_device_data.inputHandler = input_handler_##InstanceType; \
+        it->gpio_device_data.outputHandler = output_handler_##InstanceType; \
+        qdev_init_gpio_in(dev, InstanceType##_input_handler, it->gpio_device_data.pin_nums); \
+        qdev_init_gpio_out(dev, (qemu_irq *)(it->gpio_device_data.pin_buf), it->gpio_device_data.pin_nums); \
+        device_add(getGpioDeviceTypeId(InstanceType##_add), it->gpio_device_data.ptrDeviceConfig->name, &(TYPE_NAME(dev)->gpio_device_data), dev); \
+        InstanceType##_reset(dev);                              \
+    };
+
+#define EMPTY_GPIO_CREATE_CLASS_INIT(InstanceType, TYPE_NAME) \
+    static void InstanceType##_class_init(ObjectClass *klass, void *data) { \
+        DeviceClass *dc = DEVICE_CLASS(klass);                \
+        dc->vmsd = &vmstate_##InstanceType;                   \
+        dc->reset = InstanceType##_reset;                     \
+        dc->realize = InstanceType##_realize;                  \
+    };
+
+#define EMPTY_GPIO_CREATE_TYPEINFO(InstanceType, TYPE_NAME) \
+    static const TypeInfo InstanceType##_info = {                     \
+        .name = TYPE_##TYPE_NAME,                           \
+        .parent = TYPE_DEVICE,                              \
+        .instance_size = sizeof(InstanceType),              \
+        .class_init = InstanceType##_class_init,           \
+    };
+
+#define EMPTY_GPIO_REGISTER_TYPE(InstanceType, TYPE_NAME) \
+    static void InstanceType##_register(void){            \
+        type_register_static(&InstanceType##_info);       \
+    };                                                    \
+    type_init(InstanceType##_register);
+
+#define EMPTY_GPIO_DEVICE_ADD_FUNC(InstanceType, TYPE_NAME) \
+    void *InstanceType##_add(void *parent_obj, PTR_DEVICE_CONFIG ptrDeviceConfig) { \
+        FUNC_DEBUG("InstanceType##_add()")                                                    \
+        static uint32_t device_add_index = 0;               \
+        char child_name[30] = {0};                                \
+        sprintf(child_name, "%s-%d", TYPE_##TYPE_NAME, device_add_index++); \
+        DeviceState *it;                                   \
+        it = qdev_new(TYPE_##TYPE_NAME);                    \
+        TYPE_NAME(it)->gpio_device_data.ptrDeviceConfig = ptrDeviceConfig;                   \
+        object_property_add_child(parent_obj, child_name, OBJECT(it));  \
+        qdev_realize_and_unref(it, NULL, &error_fatal);     \
+        return TYPE_NAME(it);                               \
+    };
+
+
+#define INIT_GPIO_FUNC(InstanceType, TYPE_NAME) \
+    EMPTY_GPIO_DECLARE_TYPE(InstanceType, TYPE_NAME) \
+    EMPTY_GPIO_CREATE_VMStateDescription(InstanceType, TYPE_NAME) \
+    EMPTY_GPIO_CREATE_PIN_HANDLER(InstanceType, TYPE_NAME)        \
+    EMPTY_GPIO_CREATE_RESET_FUNC(InstanceType, TYPE_NAME)         \
+    EMPTY_GPIO_CREATE_REALIZE_FUNC(InstanceType, TYPE_NAME)       \
+    EMPTY_GPIO_CREATE_CLASS_INIT(InstanceType, TYPE_NAME)         \
+    EMPTY_GPIO_CREATE_TYPEINFO(InstanceType, TYPE_NAME)           \
+    EMPTY_GPIO_REGISTER_TYPE(InstanceType, TYPE_NAME)             \
+    EMPTY_GPIO_DEVICE_ADD_FUNC(InstanceType, TYPE_NAME)
+
+#define TYPE_GPIO_EMPTY_0 "gpio-empty-0"
+INIT_GPIO_FUNC(GPIOEmptyDevice0, GPIO_EMPTY_0)
+
+#define TYPE_GPIO_EMPTY_1 "gpio-empty-1"
+INIT_GPIO_FUNC(GPIOEmptyDevice1, GPIO_EMPTY_1)
+
+#define TYPE_GPIO_EMPTY_2 "gpio-empty-2"
+INIT_GPIO_FUNC(GPIOEmptyDevice2, GPIO_EMPTY_2)
+
+#define TYPE_GPIO_EMPTY_3 "gpio-empty-3"
+INIT_GPIO_FUNC(GPIOEmptyDevice3, GPIO_EMPTY_3)
+
+#define TYPE_GPIO_EMPTY_4 "gpio-empty-4"
+INIT_GPIO_FUNC(GPIOEmptyDevice4, GPIO_EMPTY_4)
+
+#define TYPE_GPIO_EMPTY_5 "gpio-empty-5"
+INIT_GPIO_FUNC(GPIOEmptyDevice5, GPIO_EMPTY_5)
+
+#define TYPE_GPIO_EMPTY_6 "gpio-empty-6"
+INIT_GPIO_FUNC(GPIOEmptyDevice6, GPIO_EMPTY_6)
+
+#define TYPE_GPIO_EMPTY_7 "gpio-empty-7"
+INIT_GPIO_FUNC(GPIOEmptyDevice7, GPIO_EMPTY_7)
+
+#define TYPE_GPIO_EMPTY_8 "gpio-empty-8"
+INIT_GPIO_FUNC(GPIOEmptyDevice8, GPIO_EMPTY_8)
+
+#define TYPE_GPIO_EMPTY_9 "gpio-empty-9"
+INIT_GPIO_FUNC(GPIOEmptyDevice9, GPIO_EMPTY_9)
+
+static GpioFunctionPtr GpioFunction_list[] = {
+        GPIOEmptyDevice0_add,
+        GPIOEmptyDevice1_add,
+        GPIOEmptyDevice2_add,
+        GPIOEmptyDevice3_add,
+        GPIOEmptyDevice4_add,
+        GPIOEmptyDevice5_add,
+        GPIOEmptyDevice6_add,
+        GPIOEmptyDevice7_add,
+        GPIOEmptyDevice8_add,
+        GPIOEmptyDevice9_add
+};
+
+
+GpioFunctionPtr getGpioDeviceAddFunc(int device_type_id) {
+    if ((device_type_id < GPIO_DEVICE_TYPE_ID_OFFSET) ||
+        (device_type_id - GPIO_DEVICE_TYPE_ID_OFFSET >= GPIO_DEVICE_TOTAL_NUM)) {
+        /* 超出 ID 范围 */
+        return NULL;
+    } else {
+        return GpioFunction_list[device_type_id - GPIO_DEVICE_TYPE_ID_OFFSET];
+    }
+}
+
+int getGpioDeviceTypeId(GpioFunctionPtr gpioFuntionPtr){
+    for (int i = 0; i < GPIO_DEVICE_TOTAL_NUM; ++i) {
+        if (GpioFunction_list[i] == gpioFuntionPtr) {
+            return GPIO_DEVICE_TYPE_ID_OFFSET + i;
+        }
+    }
+    /* 遍历所有也没找到 */
+    return -1;
+}
+

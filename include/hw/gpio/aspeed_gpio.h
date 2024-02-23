@@ -107,4 +107,7 @@ struct AspeedGPIOState {
     } sets[ASPEED_GPIO_MAX_NR_SETS];
 };
 
+extern AspeedGPIOState *gAspeedGpioState;
+int aspeed_pin_control(const char *gpio_name, uint8_t level);
+
 #endif /* ASPEED_GPIO_H */

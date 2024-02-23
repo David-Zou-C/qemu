@@ -16,6 +16,7 @@
 #include "migration/vmstate.h"
 #include "hw/adc/aspeed_adc.h"
 #include "trace.h"
+#include "slib/inc/aspeed-init.h"
 
 #define ASPEED_ADC_MEMORY_REGION_SIZE           0x1000
 #define ASPEED_ADC_ENGINE_MEMORY_REGION_SIZE    0x100
@@ -60,11 +61,11 @@
 #define INTERRUPT_SOURCE            TO_REG(0xC0)
 #define COMPENSATING_AND_TRIMMING   TO_REG(0xC4)
 
-static inline uint32_t update_channels(uint32_t current)
-{
-    return ((((current >> 16) & ASPEED_ADC_L_MASK) + 7) << 16) |
-        ((current + 5) & ASPEED_ADC_L_MASK);
-}
+//static inline uint32_t update_channels(uint32_t current)
+//{
+//    return ((((current >> 16) & ASPEED_ADC_L_MASK) + 7) << 16) |
+//        ((current + 5) & ASPEED_ADC_L_MASK);
+//}
 
 static bool breaks_threshold(AspeedADCEngineState *s, int reg)
 {
@@ -94,7 +95,7 @@ static uint32_t read_channel_sample(AspeedADCEngineState *s, int reg)
 
     /* Poor man's sampling */
     uint32_t value = s->regs[reg];
-    s->regs[reg] = update_channels(s->regs[reg]);
+//    s->regs[reg] = update_channels(s->regs[reg]);
 
     if (breaks_threshold(s, reg)) {
         s->regs[INTERRUPT_CONTROL] |= BIT(reg - DATA_CHANNEL_1_AND_0);
@@ -161,6 +162,11 @@ static uint64_t aspeed_adc_engine_read(void *opaque, hwaddr addr,
     }
 
     trace_aspeed_adc_engine_read(s->engine_id, addr, value);
+    if (adc_reg10_has_read == FALSE) {
+        if (addr == 0x10) {
+            adc_reg10_has_read = TRUE;
+        }
+    }
     return value;
 }
 
@@ -234,6 +240,41 @@ static void aspeed_adc_engine_write(void *opaque, hwaddr addr, uint64_t value,
     s->regs[reg] = value;
 }
 
+uint16_t aspeed_adc_get_value(void *opaque, uint8_t channel)
+{
+    AspeedADCEngineState *s = ASPEED_ADC_ENGINE(opaque);
+    assert(channel <= 15);
+
+    uint32_t reg_value = s->regs[DATA_CHANNEL_1_AND_0 + channel / 2];
+    uint16_t reg_value_l = reg_value;
+    uint16_t reg_value_h = reg_value >> 16;
+
+    if (channel % 2 == 0) {
+        return reg_value_l;
+    } else {
+        return reg_value_h;
+    }
+}
+
+void aspeed_adc_set_value(void *opaque, uint8_t channel, uint16_t value)
+{
+    AspeedADCEngineState *s = ASPEED_ADC_ENGINE(opaque);
+    if (channel > 15) {
+        return;
+    }
+    uint32_t reg = DATA_CHANNEL_1_AND_0 + channel/2;
+    uint32_t reg_value = s->regs[reg];
+    uint16_t reg_value_l = reg_value;
+    uint16_t reg_value_h = reg_value >> 16;
+
+    if (channel % 2 == 0) {
+        reg_value_l = value;
+    } else if (channel % 2 == 1) {
+        reg_value_h = value;
+    }
+    s->regs[reg] = (reg_value_h << 16) | (reg_value_l);
+}
+
 static const MemoryRegionOps aspeed_adc_engine_ops = {
     .read = aspeed_adc_engine_read,
     .write = aspeed_adc_engine_write,
@@ -257,6 +298,9 @@ static void aspeed_adc_engine_reset(DeviceState *dev)
     AspeedADCEngineState *s = ASPEED_ADC_ENGINE(dev);
 
     memcpy(s->regs, aspeed_adc_resets, sizeof(aspeed_adc_resets));
+
+    /* 设置 ADC010 的值，设定初始偏移补偿 */
+    s->regs[DATA_CHANNEL_1_AND_0] = 0x100 << 16 | 0x100;
 }
 
 static void aspeed_adc_engine_realize(DeviceState *dev, Error **errp)
@@ -274,6 +318,8 @@ static void aspeed_adc_engine_realize(DeviceState *dev, Error **errp)
                           ASPEED_ADC_ENGINE_MEMORY_REGION_SIZE);
 
     sysbus_init_mmio(sbd, &s->mmio);
+
+    s->regs[DATA_CHANNEL_1_AND_0] = 0x100 << 16 | 0x100;
 }
 
 static const VMStateDescription vmstate_aspeed_adc_engine = {
@@ -441,3 +487,62 @@ static void aspeed_adc_register_types(void)
 }
 
 type_init(aspeed_adc_register_types);
+
+void adc_device_add0(void *obj, PTR_DEVICE_CONFIG ptrDeviceConfig) {
+    AspeedADCEngineState *s = ASPEED_ADC_ENGINE(obj);
+
+    PTR_ADC_DEVICE_DATA ptrAdcDeviceData = (PTR_ADC_DEVICE_DATA) malloc(sizeof(ADC_DEVICE_DATA));
+    memset(ptrAdcDeviceData, 0, sizeof(ADC_DEVICE_DATA));
+    ptrAdcDeviceData->ptrDeviceConfig = ptrDeviceConfig;
+
+    assert(ptrAdcDeviceData->ptrDeviceConfig->adc_channel <= 15);
+
+    if (ptrAdcDeviceData->ptrDeviceConfig->adc_channel % 2 == 0) {
+        ptrAdcDeviceData->adcRegType = REG_L;
+    } else {
+        ptrAdcDeviceData->adcRegType = REG_H;
+    }
+
+    uint32_t reg_addr = DATA_CHANNEL_1_AND_0 + ptrAdcDeviceData->ptrDeviceConfig->adc_channel/2;
+
+    ptrAdcDeviceData->ptrAdcReg = (PTR_ADC_REG)&(s->regs[reg_addr]);
+
+    ptrAdcDeviceData->division = (uint32_t )(ptrAdcDeviceData->ptrDeviceConfig->division * 1000);
+
+    init_ADCDevice0(ptrAdcDeviceData);
+    device_add(ADC, ptrDeviceConfig->name, ptrAdcDeviceData, NULL);
+}
+
+void adc_device_add1(void *obj_0, void *obj_1, PTR_DEVICE_CONFIG ptrDeviceConfig) {
+    AspeedADCEngineState *s0 = ASPEED_ADC_ENGINE(obj_0);
+    AspeedADCEngineState *s1 = ASPEED_ADC_ENGINE(obj_1);
+    AspeedADCEngineState *s;
+
+    PTR_ADC_DEVICE_DATA ptrAdcDeviceData = (PTR_ADC_DEVICE_DATA) malloc(sizeof(ADC_DEVICE_DATA));
+    memset(ptrAdcDeviceData, 0, sizeof(ADC_DEVICE_DATA));
+    ptrAdcDeviceData->ptrDeviceConfig = ptrDeviceConfig;
+
+    assert(ptrAdcDeviceData->ptrDeviceConfig->adc_channel <= 15);
+
+    if (ptrAdcDeviceData->ptrDeviceConfig->adc_channel < 8) {
+        s = s0;
+    } else {
+        s = s1;
+    }
+
+    if (ptrAdcDeviceData->ptrDeviceConfig->adc_channel % 2 == 0) {
+        ptrAdcDeviceData->adcRegType = REG_L;
+    } else {
+        ptrAdcDeviceData->adcRegType = REG_H;
+    }
+
+    uint32_t reg_addr = DATA_CHANNEL_1_AND_0 + (ptrAdcDeviceData->ptrDeviceConfig->adc_channel % 8)/2;
+
+    ptrAdcDeviceData->ptrAdcReg = (PTR_ADC_REG)&(s->regs[reg_addr]);
+
+    ptrAdcDeviceData->division = (uint32_t )(ptrAdcDeviceData->ptrDeviceConfig->division * 1000);
+
+    init_ADCDevice0(ptrAdcDeviceData);
+    device_add(ADC, ptrDeviceConfig->name, ptrAdcDeviceData, NULL);
+}
+

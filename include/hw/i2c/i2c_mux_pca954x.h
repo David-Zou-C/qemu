@@ -2,6 +2,7 @@
 #define QEMU_I2C_MUX_PCA954X_H
 
 #include "hw/i2c/i2c.h"
+#include "slib/inc/aspeed-init.h"
 
 #define TYPE_PCA9546 "pca9546"
 #define TYPE_PCA9548 "pca9548"
@@ -15,5 +16,7 @@
  * Returns: a pointer to the associated i2c bus.
  */
 I2CBus *pca954x_i2c_get_bus(I2CSlave *mux, uint8_t channel);
+
+void pca_device_add(I2CBus *bus, PTR_DEVICE_CONFIG ptrDeviceConfig);
 
 #endif

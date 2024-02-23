@@ -25,16 +25,12 @@ void init_I2cEmptyDevice0(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
         ptrI2CEepromSType = (PTR_I2C_EEPROM_sTYPE) ptrI2CDeviceData->data_buf;
         /* 如果是第一次创建，则需要进行互斥锁的初始化操作 */
         pthread_mutex_init(&ptrI2CEepromSType->mutex, NULL);
-//        pthread_mutex_lock(&ptrI2CEepromSType->mutex);
         ptrI2CEepromSType->device_index = get_device_index(ptrI2CDeviceData);
-        /* 释放锁 */
-//        pthread_mutex_unlock(&ptrI2CEepromSType->mutex);
     } else {
         ptrI2CEepromSType = (PTR_I2C_EEPROM_sTYPE) ptrI2CDeviceData->data_buf;
     }
 
     /**************************************** 普通重置区 ****************************************/
-//    pthread_mutex_lock(&ptrI2CEepromSType->mutex);
     /* 1. offset 置 0 */
     ptrI2CEepromSType->offset = 0;
     /* 2. 重新初始化 buf 值 */
@@ -43,7 +39,6 @@ void init_I2cEmptyDevice0(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
         dynamic_change_data(I2C_EEPROM, ptrI2CDeviceData, ptrI2CDeviceData->ptrDeviceConfig->args);
         inited = TRUE;
     }
-//    pthread_mutex_unlock(&ptrI2CEepromSType->mutex);
     /**************************************** 普通重置区 ****************************************/
 
 
@@ -59,9 +54,7 @@ int event_I2cEmptyDevice0(uint8_t i2CEvent, PTR_I2C_DEVICE_DATA ptrI2CDeviceData
         case I2C_FINISH:
             /* 一次 I2C 通信结束，即一次连续地写或读结束了 */
             /* 刚开始写，或一次I2c流程结束了，都应该清掉 have_addr_size */
-//            pthread_mutex_lock(&ptrI2CEepromSType->mutex);
             ptrI2CEepromSType->have_addr_size = 0;
-//            pthread_mutex_unlock(&ptrI2CEepromSType->mutex);
             /* fallthrough */
         case I2C_START_RECV:
             /* ! 此处不能将 have_addr_size 重置，
@@ -84,7 +77,6 @@ uint8_t recv_I2cEmptyDevice0(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
     PTR_I2C_EEPROM_sTYPE ptrI2CEepromSType = (PTR_I2C_EEPROM_sTYPE) ptrI2CDeviceData->data_buf;
     uint8_t ret;
 
-//    pthread_mutex_lock(&ptrI2CEepromSType->mutex);
     ptrI2CEepromSType->receive_times++;
     /* 如果已获得地址字节，但是还没有发送来要求的地址字节数量，就开始要求读操作，则应直接返回无效值 - 0xff 表示 */
     if ((ptrI2CEepromSType->have_addr_size > 0) && (ptrI2CEepromSType->have_addr_size < ptrI2CEepromSType->addr_size)) {
@@ -97,7 +89,6 @@ uint8_t recv_I2cEmptyDevice0(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
     }
     ret = ptrI2CEepromSType->buf[ptrI2CEepromSType->offset];
     ptrI2CEepromSType->offset = (ptrI2CEepromSType->offset + 1u) % ptrI2CEepromSType->total_size;
-//    pthread_mutex_unlock(&ptrI2CEepromSType->mutex);
 
     return ret;
 };
@@ -108,7 +99,6 @@ void send_I2cEmptyDevice0(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
     PTR_I2C_EEPROM_sTYPE ptrI2CEepromSType = (PTR_I2C_EEPROM_sTYPE) ptrI2CDeviceData->data_buf;
 
     /* 逻辑处理前，先获取锁 */
-//    pthread_mutex_lock(&ptrI2CEepromSType->mutex);
     ptrI2CEepromSType->write_times++;
     if (ptrI2CEepromSType->have_addr_size < ptrI2CEepromSType->addr_size) {
         /* 小于地址要求的字节数，此个 data 为地址值 */
@@ -127,7 +117,6 @@ void send_I2cEmptyDevice0(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
         ptrI2CEepromSType->buf[ptrI2CEepromSType->offset] = data;
         ptrI2CEepromSType->offset = (ptrI2CEepromSType->offset + 1) % ptrI2CEepromSType->total_size; /* 地址向下递增 */
     }
-//    pthread_mutex_unlock(&ptrI2CEepromSType->mutex);
 };
 
 
@@ -142,28 +131,22 @@ void init_I2cEmptyDevice1(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
         ptrI2CBpCpldSType = (PTR_I2C_BP_CPLD_sTYPE) ptrI2CDeviceData->data_buf;
         /* 初始化线程锁 */
         pthread_mutex_init(&ptrI2CBpCpldSType->mutex, NULL);
-//        pthread_mutex_lock(&ptrI2CBpCpldSType->mutex);
         ptrI2CBpCpldSType->device_index = get_device_index(ptrI2CDeviceData);
         /* 释放锁 */
-//        pthread_mutex_unlock(&ptrI2CBpCpldSType->mutex);
     } else {
         ptrI2CBpCpldSType = (PTR_I2C_BP_CPLD_sTYPE) ptrI2CDeviceData->data_buf;
     }
-//    pthread_mutex_lock(&ptrI2CBpCpldSType->mutex);
     ptrI2CBpCpldSType->offset = 0;
     dynamic_change_data(I2C_BP_CPLD, ptrI2CDeviceData, ptrI2CDeviceData->ptrDeviceConfig->args);
 
-//    pthread_mutex_unlock(&ptrI2CBpCpldSType->mutex);
 };
 
 int event_I2cEmptyDevice1(uint8_t i2CEvent, PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
-        PTR_I2C_BP_CPLD_sTYPE ptrI2CBpCpldSType = (PTR_I2C_BP_CPLD_sTYPE) ptrI2CDeviceData->data_buf;
+    PTR_I2C_BP_CPLD_sTYPE ptrI2CBpCpldSType = (PTR_I2C_BP_CPLD_sTYPE) ptrI2CDeviceData->data_buf;
     switch (i2CEvent) {
         case I2C_START_SEND:
             /* 开始发送数据 前 */
-//            pthread_mutex_lock(&ptrI2CBpCpldSType->mutex);
             ptrI2CBpCpldSType->has_sent_len = 0;
-//            pthread_mutex_unlock(&ptrI2CBpCpldSType->mutex);
 
             /* fallthrough */
         case I2C_FINISH:
@@ -175,9 +158,7 @@ int event_I2cEmptyDevice1(uint8_t i2CEvent, PTR_I2C_DEVICE_DATA ptrI2CDeviceData
             /* ! 此处不能将 have_addr_size 重置，
              * 因为在 recv 中还需要判断 have_addr_size 的大小，确定是否地址传完了
              * I2C master 开始要求读数据 */
-//            pthread_mutex_lock(&ptrI2CBpCpldSType->mutex);
             ptrI2CBpCpldSType->offset = 0;
-//            pthread_mutex_unlock(&ptrI2CBpCpldSType->mutex);
             break;
         case I2C_NACK:
             break;
@@ -190,11 +171,9 @@ int event_I2cEmptyDevice1(uint8_t i2CEvent, PTR_I2C_DEVICE_DATA ptrI2CDeviceData
 uint8_t recv_I2cEmptyDevice1(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
     PTR_I2C_BP_CPLD_sTYPE ptrI2CBpCpldSType = (PTR_I2C_BP_CPLD_sTYPE) ptrI2CDeviceData->data_buf;
     uint8_t ret = 0xff;
-//    pthread_mutex_lock(&ptrI2CBpCpldSType->mutex);
     ptrI2CBpCpldSType->receive_times++;
 
     if (ptrI2CBpCpldSType->has_sent_len == 0) {
-//        pthread_mutex_unlock(&ptrI2CBpCpldSType->mutex);
         return 0xff;
     }
 
@@ -242,15 +221,15 @@ uint8_t recv_I2cEmptyDevice1(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
                     if (op_code == 0b01) {
                         /* 点亮 Fail，同时关闭 Rebuild */
                         ptrI2CBpCpldSTypeData->hdd_status[hdd_num].Fail = 1;
-                        ptrI2CBpCpldSTypeData->hdd_status[hdd_num].Rebuid = 0;
+                        ptrI2CBpCpldSTypeData->hdd_status[hdd_num].Rebuild = 0;
                     } else if (op_code == 0b11){
                         /* 点亮 Rebuild，同时关闭 Fail */
                         ptrI2CBpCpldSTypeData->hdd_status[hdd_num].Fail = 0;
-                        ptrI2CBpCpldSTypeData->hdd_status[hdd_num].Rebuid = 1;
+                        ptrI2CBpCpldSTypeData->hdd_status[hdd_num].Rebuild = 1;
                     } else if (op_code == 0b00) {
                         /* 都关闭 */
                         ptrI2CBpCpldSTypeData->hdd_status[hdd_num].Fail = 0;
-                        ptrI2CBpCpldSTypeData->hdd_status[hdd_num].Rebuid = 0;
+                        ptrI2CBpCpldSTypeData->hdd_status[hdd_num].Rebuild = 0;
                     }
                 }
             }
@@ -321,38 +300,81 @@ uint8_t recv_I2cEmptyDevice1(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
     }
 
 
-//    pthread_mutex_unlock(&ptrI2CBpCpldSType->mutex);
     return ret;
 };
 
 void send_I2cEmptyDevice1(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
     PTR_I2C_BP_CPLD_sTYPE ptrI2CBpCpldSType = (PTR_I2C_BP_CPLD_sTYPE) ptrI2CDeviceData->data_buf;
 
-//    pthread_mutex_lock(&ptrI2CBpCpldSType->mutex);
     ptrI2CBpCpldSType->write_times++;
     ptrI2CBpCpldSType->op_data[ptrI2CBpCpldSType->has_sent_len] = data;
     ptrI2CBpCpldSType->has_sent_len ++;
-//    pthread_mutex_unlock(&ptrI2CBpCpldSType->mutex);
 };
-
 
 /**************************************** Device 2 ****************************************/
+
 void init_I2cEmptyDevice2(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
+    PTR_I2C_DIMM_TMP_sTYPE ptrI2CDimmTmpSType;
+    if (ptrI2CDeviceData->data_buf == NULL) {
+        ptrI2CDeviceData->data_buf = (uint8_t *) malloc(sizeof(I2C_DIMM_TMP_sTYPE));
+        memset(ptrI2CDeviceData->data_buf, 0, sizeof(I2C_DIMM_TMP_sTYPE));
+        ptrI2CDimmTmpSType = (PTR_I2C_DIMM_TMP_sTYPE) ptrI2CDeviceData->data_buf;
+        /* 初始化互斥锁 */
+        pthread_mutex_init(&ptrI2CDimmTmpSType->mutex, NULL);
+        ptrI2CDimmTmpSType->device_index = get_device_index(ptrI2CDeviceData);
+    } else {
+        ptrI2CDimmTmpSType = (PTR_I2C_DIMM_TMP_sTYPE) ptrI2CDeviceData->data_buf;
+    }
 
-};
-
-int event_I2cEmptyDevice2(uint8_t i2CEvent, PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
-    return 0;
-};
+    dynamic_change_data(I2C_DIMM_TEMP, ptrI2CDeviceData, ptrI2CDeviceData->ptrDeviceConfig->args);
+    ptrI2CDimmTmpSType->offset = 0;
+}
 
 uint8_t recv_I2cEmptyDevice2(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
+    uint8_t ret;
+    PTR_I2C_DIMM_TMP_sTYPE ptrI2CDimmTmpSType = (PTR_I2C_DIMM_TMP_sTYPE) ptrI2CDeviceData->data_buf;
+
+    ptrI2CDimmTmpSType->receive_times++;
+    if (ptrI2CDimmTmpSType->offset == 0) {
+        ptrI2CDimmTmpSType->offset = 1;
+        ret = ptrI2CDimmTmpSType->temperature << 4;
+        return ret;
+    } else if (ptrI2CDimmTmpSType->offset == 1) {
+        ptrI2CDimmTmpSType->offset = 0;
+        ret = ptrI2CDimmTmpSType->temperature >> 4;
+        return ret;
+    } else {
+        ptrI2CDimmTmpSType->offset = 0;
+        ret = ptrI2CDimmTmpSType->temperature << 4;
+        return ret;
+    }
     return 0;
-};
+}
 
 void send_I2cEmptyDevice2(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
+    PTR_I2C_DIMM_TMP_sTYPE ptrI2CDimmTmpSType = (PTR_I2C_DIMM_TMP_sTYPE) ptrI2CDeviceData->data_buf;
 
-};
+    ptrI2CDimmTmpSType->write_times ++;
+    /* 写操作，重置offset */
+    ptrI2CDimmTmpSType->offset = 0;
+}
 
+int event_I2cEmptyDevice2(uint8_t i2CEvent, PTR_I2C_DEVICE_DATA ptrI2cDeviceData) {
+    switch (i2CEvent) {
+        case I2C_START_SEND:
+            /* 开始发送数据 前 */
+        case I2C_FINISH:
+            /* 一次 I2C 通信结束，即一次连续地写或读结束了 */
+            /* fallthrough */
+        case I2C_START_RECV:
+            break;
+        case I2C_NACK:
+            break;
+        default:
+            return -1; /* 其他状态不被支持 */
+    }
+    return 0;
+}
 
 /**************************************** Device 3 ****************************************/
 void init_I2cEmptyDevice3(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
@@ -388,5 +410,3 @@ uint8_t recv_I2cEmptyDevice4(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
 void send_I2cEmptyDevice4(uint8_t data, PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
 
 };
-
-

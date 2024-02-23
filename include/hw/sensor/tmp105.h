@@ -52,4 +52,49 @@ struct TMP105State {
     bool detect_falling;
 };
 
+#define TYPE_LATCHING_SWITCH "latching-switch"
+
+enum TriggerEdge {
+    TRIGGER_EDGE_FALLING,
+    TRIGGER_EDGE_RISING,
+    TRIGGER_EDGE_BOTH,
+};
+
+struct LatchingSwitchState {
+    /* Private */
+    DeviceState parent_obj;
+
+    /* Public */
+    qemu_irq input;
+    qemu_irq output;
+
+    /* Properties */
+    bool state;
+    uint8_t trigger_edge;
+    char *description;
+};
+typedef struct LatchingSwitchState LatchingSwitchState;
+DECLARE_INSTANCE_CHECKER(LatchingSwitchState, LATCHING_SWITCH,
+                         TYPE_LATCHING_SWITCH)
+
+/**
+ * latching_switch_create_simple: Create and realize a  device
+ * @parentobj: the parent object
+ * @state: the initial state of the switch
+ * @trigger_edge: the trigger edge of the switch
+ *                0: falling edge
+ *                1: rising edge
+ *                2: both edge
+ *
+ * Create the device state structure, initialize it, and
+ * drop the reference to it (the device is realized).
+ *
+ */
+LatchingSwitchState *latching_switch_create_simple(Object *parentobj,
+                                                   bool state,
+                                                   uint8_t trigger_edge);
+
+void connect_gpio_line_for_slib(void *send_dev, int send_line, void *recv_dev, int recv_line);
+void set_gpio_line_for_slib(void *pin_buf, uint32_t pin, int level);
+
 #endif

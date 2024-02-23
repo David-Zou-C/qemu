@@ -27,6 +27,7 @@
 #include "qemu/queue.h"
 #include "qom/object.h"
 #include "trace.h"
+#include "slib/inc/aspeed-init.h"
 
 #define PCA9548_CHANNEL_COUNT 8
 #define PCA9546_CHANNEL_COUNT 4
@@ -46,6 +47,7 @@ typedef struct Pca954xState {
     I2CBus *bus[PCA9548_CHANNEL_COUNT];
 
     char *name;
+    PTR_DEVICE_CONFIG ptrDeviceConfig;
 } Pca954xState;
 
 /*
@@ -172,16 +174,48 @@ I2CBus *pca954x_i2c_get_bus(I2CSlave *mux, uint8_t channel)
     return pca954x->bus[channel];
 }
 
+static void pca9546_realize(DeviceState *dev, Error **errp)
+{
+    Pca954xState *pca954x = PCA954X(dev);
+    int index;
+
+    if (pca954x->ptrDeviceConfig == NULL) {
+        return;
+    }
+    index = device_add(PCA9546, pca954x->ptrDeviceConfig->name, pca954x, NULL);
+    if (index > 0) {
+        deviceAddList[index].ptrDeviceConfig = pca954x->ptrDeviceConfig;
+    }
+}
+
 static void pca9546_class_init(ObjectClass *klass, void *data)
 {
+    DeviceClass *dc = DEVICE_CLASS(klass);
+
     Pca954xClass *s = PCA954X_CLASS(klass);
     s->nchans = PCA9546_CHANNEL_COUNT;
+
+    dc->realize = pca9546_realize;
+}
+
+static void pca9548_realize(DeviceState *dev, Error **errp)
+{
+    Pca954xState *pca954x = PCA954X(dev);
+
+    if (pca954x->ptrDeviceConfig == NULL) {
+        return;
+    }
+    device_add(PCA9548, pca954x->ptrDeviceConfig->name, pca954x, NULL);
 }
 
 static void pca9548_class_init(ObjectClass *klass, void *data)
 {
+    DeviceClass *dc = DEVICE_CLASS(klass);
+
     Pca954xClass *s = PCA954X_CLASS(klass);
     s->nchans = PCA9548_CHANNEL_COUNT;
+
+    dc->realize = pca9548_realize;
 }
 
 static void pca954x_realize(DeviceState *dev, Error **errp)
@@ -259,3 +293,27 @@ static const TypeInfo pca954x_info[] = {
 };
 
 DEFINE_TYPES(pca954x_info)
+
+void pca_device_add(I2CBus *bus, PTR_DEVICE_CONFIG ptrDeviceConfig)
+{
+    file_log("pca_device_add", LOG_TIME_END);
+    DeviceState *dev;
+
+    if (ptrDeviceConfig->device_type_id == PCA9546) {
+        dev = qdev_new(TYPE_PCA9546);
+    } else if (ptrDeviceConfig->device_type_id == PCA9548) {
+        dev = qdev_new(TYPE_PCA9548);
+    } else {
+        printf("device add error: not pca device ! \n");
+        exit(1);
+    }
+
+    qdev_prop_set_uint8(dev, "address", ptrDeviceConfig->addr);
+
+    Pca954xState *s;
+    s = PCA954X(dev);
+    s->ptrDeviceConfig = ptrDeviceConfig;
+
+    qdev_realize_and_unref(dev, (BusState *)bus, &error_fatal);
+    printf("pca device added ! \n");
+}
