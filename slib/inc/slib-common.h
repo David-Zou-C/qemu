@@ -137,6 +137,7 @@ typedef struct DEVICE_CONFIG_ {
         I2C_TYPE i2CType;
     } master;
     uint32_t pin_nums;
+    char fru_path[32];
     PTR_GPIO_SIGNAL ptrGpioSignal;
     PTR_GPIO_OUTPUT_LOGIC_INIT ptrGpioOutputLogicInit;
     PTR_GPIO_RESPONSE_LOGIC ptrGpioResponseLogic;
