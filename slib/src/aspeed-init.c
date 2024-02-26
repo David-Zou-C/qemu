@@ -255,6 +255,7 @@ void file_log(const char *message, uint8_t log_type) {
     }
 
     fclose(file);
+    free(filePath);
     pthread_mutex_unlock(&file_log_lock);
 }
 
@@ -320,6 +321,7 @@ cJSON *read_config_file(const char *filename) {
         exit(1);
     }
 
+    free(configFilePath);
     printf("read json file (%s) over! \n", CONFIG_FILE);
     return root;
 }
@@ -668,13 +670,18 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                     FILE *fru_file;
                     uint8_t buffer[2048] = {0};
                     size_t read_size = 0;
-                    fru_file = fopen(((PTR_I2C_DEVICE_DATA) vPtrDeviceData)->ptrDeviceConfig->fru_path, "r");
-                    if (fru_file) {
-                        read_size = fread(buffer, sizeof(uint8_t), sizeof(buffer), fru_file);
-                        if(read_size != 0) {
-                            memcpy(&ptrI2CEepromSType->buf[0x100], buffer, read_size);
+                    char *fru_path = ((PTR_I2C_DEVICE_DATA) vPtrDeviceData)->ptrDeviceConfig->fru_path;
+                    if (fru_path[0] != '\0') {
+                        char *fru_file_path = get_file_right_path(fru_path);
+                        fru_file = fopen(fru_file_path, "r");
+                        if (fru_file) {
+                            read_size = fread(buffer, sizeof(uint8_t), sizeof(buffer), fru_file);
+                            if(read_size != 0) {
+                                memcpy(&ptrI2CEepromSType->buf[0x100], buffer, read_size);
+                            }
+                            fclose(fru_file);
                         }
-                        fclose(fru_file);
+                        free(fru_file_path);
                     }
                 }
 
@@ -1211,7 +1218,7 @@ PTR_CONFIG_DATA parse_configuration(void) {
                 exit(1);
             } else {
                 strcpy(tempConfigJson->fru_path, load_path->valuestring);
-                printf("load_path:%s\n", tempConfigJson->fru_path);
+                printf("fru load_path:%s\n", tempConfigJson->fru_path);
             }
         }
             /**************************************** adc_channel ****************************************/
