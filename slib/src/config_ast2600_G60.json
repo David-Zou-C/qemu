@@ -1,11 +1,1456 @@
 {
   "devices": [
     {
+      "description": "CPU0_APML_Temp",
+      "device_type_id": 2,
+      "bus": 0,
+      "addr": "0x4c",
+      "args": "0x20"
+    },
+    {
+      "description": "CPU1_APML_Temp",
+      "device_type_id": 2,
+      "bus": 3,
+      "addr": "0x4d",
+      "args": "0x21"
+    },
+    {
+      "description": "BP CPLD 0",
+      "device_type_id": 102,
+      "bus": 1,
+      "addr": "0x64",
+      "args": "0x74 0x00 0x90 0x04 0x96 0x23 0x97 0x03 0x98 0xA0 0x9b 0x00 0xa0 0x42 0xa1 0x44 0xa2 0x33 0xa3 0x32 0xa4 0x47 0xa5 0x31 0xa6 0x32 0xa7 0x5f 0xa8 0x38 0xa9 0x36 0xaa 0x33 0xab 0x39 0xac 0x5f 0xad 0x55 0xae 0x32 0xaf 0x5f 0xb0 0x41 S_HDD_STATUS 0x00 0x10 0x01 0x10 0x02 0x10 0x03 0x10 0x04 0x10 0x05 0x10 0x06 0x10 0x07 0x10 0x08 0x10 0x09 0x10 0x0a 0x30 0x0b 0x30 N_HDD_STATUS"
+    },
+    {
       "description": "BP CPLD 1",
       "device_type_id": 102,
       "bus": 1,
       "addr": "0x65",
       "args": "0x74 0x00 0x90 0x04 0x96 0x23 0x97 0x03 0x98 0xA0 0x9b 0x00 0xa0 0x42 0xa1 0x44 0xa2 0x33 0xa3 0x32 0xa4 0x47 0xa5 0x31 0xa6 0x32 0xa7 0x5f 0xa8 0x38 0xa9 0x36 0xaa 0x33 0xab 0x39 0xac 0x5f 0xad 0x55 0xae 0x32 0xaf 0x5f 0xb0 0x41 S_HDD_STATUS 0x00 0x10 0x01 0x10 0x02 0x10 0x03 0x10 0x04 0x10 0x05 0x10 0x06 0x10 0x07 0x10 0x08 0x10 0x09 0x10 0x0a 0x30 0x0b 0x30 N_HDD_STATUS"
+    },
+    {
+      "description": "BP CPLD 2",
+      "device_type_id": 102,
+      "bus": 1,
+      "addr": "0x66",
+      "args": "0x74 0x00 0x90 0x04 0x96 0x23 0x97 0x03 0x98 0xA0 0x9b 0x00 0xa0 0x42 0xa1 0x44 0xa2 0x33 0xa3 0x32 0xa4 0x47 0xa5 0x31 0xa6 0x32 0xa7 0x5f 0xa8 0x38 0xa9 0x36 0xaa 0x33 0xab 0x39 0xac 0x5f 0xad 0x55 0xae 0x32 0xaf 0x5f 0xb0 0x41 S_HDD_STATUS 0x00 0x10 0x01 0x10 0x02 0x10 0x03 0x10 0x04 0x10 0x05 0x10 0x06 0x10 0x07 0x10 0x08 0x10 0x09 0x10 0x0a 0x30 0x0b 0x30 N_HDD_STATUS"
+    },
+    {
+      "description": "HDDFBP_Temp_1",
+      "device_type_id": 2,
+      "bus": 1,
+      "addr": "0x48",
+      "args": "0x12"
+    },
+    {
+      "description": "HDDFBP_Temp_2",
+      "device_type_id": 2,
+      "bus": 1,
+      "addr": "0x4c",
+      "args": "0x12"
+    },
+    {
+      "description": "HDDFBP_Temp_3",
+      "device_type_id": 2,
+      "bus": 1,
+      "addr": "0x49",
+      "args": "0x12"
+    },
+    {
+      "description": "HDDFBP_Temp_4",
+      "device_type_id": 2,
+      "bus": 1,
+      "addr": "0x4d",
+      "args": "0x12"
+    },
+    {
+      "description": "HDDFBP_Temp_5",
+      "device_type_id": 2,
+      "bus": 1,
+      "addr": "0x4a",
+      "args": "0x12"
+    },
+    {
+      "description": "HDDFBP_Temp_6",
+      "device_type_id": 2,
+      "bus": 1,
+      "addr": "0x4e",
+      "args": "0x12"
+    },
+    {
+      "description": "HDDFBP_Temp_7",
+      "device_type_id": 2,
+      "bus": 1,
+      "addr": "0x4b",
+      "args": "0x12"
+    },
+    {
+      "description": "HDDFBP_Temp_8",
+      "device_type_id": 2,
+      "bus": 1,
+      "addr": "0x4f",
+      "args": "0x12"
+    },
+
+    {
+      "description": "DC-SCM-CT75MMR1",
+      "device_type_id": 2,
+      "bus": 2,
+      "addr": "0x48",
+      "args": "0x12"
+    },
+    {
+      "description": "DC-SCM-CT75MMR1",
+      "device_type_id": 2,
+      "bus": 2,
+      "addr": "0x4f",
+      "args": "0x12"
+    },
+    {
+      "description": "OCP_Inlet_Temp",
+      "device_type_id": 2,
+      "bus": 2,
+      "addr": "0x4a",
+      "args": "0x12"
+    },
+    {
+      "description": "OCP1_Temp",
+      "device_type_id": 2,
+      "bus": 2,
+      "addr": "0x4b",
+      "args": "0x12"
+    },
+    {
+      "description": "PSU_Inlet_Temp",
+      "device_type_id": 2,
+      "bus": 2,
+      "addr": "0x4d",
+      "args": "0x12"
+    },
+    {
+      "description": "MB_Inlet2_Temp",
+      "device_type_id": 2,
+      "bus": 2,
+      "addr": "0x4e",
+      "args": "0x12"
+    },
+    {
+      "description": "MB_Inlet1_Temp",
+      "device_type_id": 2,
+      "bus": 2,
+      "addr": "0x49",
+      "args": "0x12"
+    },
+    {
+      "description": "Outlet_Temp",
+      "device_type_id": 2,
+      "bus": 2,
+      "addr": "0x4c",
+      "args": "0x12"
+    },
+
+     {
+      "description": "PSU0",
+      "device_type_id": 21,
+      "bus": 4,
+      "addr": "0x58"
+    },
+    {
+      "description": "PSU2",
+      "device_type_id": 21,
+      "bus": 4,
+      "addr": "0x59"
+    },
+    {
+      "description": "FRU",
+      "device_type_id": 101,
+      "bus": 5,
+      "addr": "0x50",
+      "fru_load_path": "G60_FRU.bin",
+      "args": "0x01 0x0f00 0x08 0x0f01 0x40 0x0f02 0x88 0x0f03 0x7d 0x0f04 0xc1 0x0f05 0x01 0x0f06 0xff 0x0f07 0xff 0x0f08 0x08 0x0f09 0x01 0x0f0a 0x50 0x0f0b 0x88 0x0f0c 0xb1 0x0f0d 0x01 0x0f0e 0xc8 S_SIZE 0x10000 N_SIZE S_MONITOR 0x0f08 0x0f09 0x0f0a 0x0f0b 0x0f0c 0x0f0d N_MONITOR"
+    },
+    {
+      "description": "SCM-CPLD",
+      "device_type_Id": 1,
+      "name": "CPLD",
+      "bus": 5,
+      "addr": "0x56",
+      "args": "0x01 0x70 0x01 0x71 0xA1 0x72 0x01 0x73 0xC1 0x74 0x02 0x75 0xF8 0x76 0xF8 0x77 0xFC"
+    },
+    {
+      "description": "CPLD",
+      "device_type_Id": 1,
+      "name": "CPLD",
+      "bus": 5,
+      "addr": "0x55",
+      "args": "0x01 0x10 0xff 0x11 0xff 0x12 0xff 0x13 0xff 0x14 0xff 0x20 0x00 0x21 0x00 0x22 0x00 0x23 0x00 0x2c 0xff 0x00 0x30 0xff 0x34 0xff 0x38 0xff 0x51 0xfe 0x58 0xfc 0x59 0xfc 0x5a 0xfc 0x5b 0xfc 0x5c 0x00 0x70 0x49 0x71 0x50 0x72 0xf2 0x74 0x01 0x80 0x00"
+    },
+    {
+      "description": "P12V_HDD",
+      "device_type_id": 3,
+      "bus": 5,
+      "addr": "0x48",
+      "args": "0x00 0x4327 0x01 0x01 0x02 0x02 0x03 0x0020 0x04 0x03 0x05 0x0A00 0xfe 0x5549 0xff 0x2260"
+    },
+    {
+      "description": "RiserA_Slot",
+      "device_type_id": 3,
+      "bus": 5,
+      "addr": "0x47",
+      "args": "0x00 0x4327 0x01 0x01 0x02 0x02 0x03 0x0020 0x04 0x03 0x05 0x0A00 0xfe 0x5549 0xff 0x2260"
+    },
+    {
+      "description": "RiserB_Slot",
+      "device_type_id": 3,
+      "bus": 5,
+      "addr": "0x46",
+      "args": "0x00 0x4327 0x01 0x01 0x02 0x02 0x03 0x0020 0x04 0x03 0x05 0x0A00 0xfe 0x5549 0xff 0x2260"
+    },
+    {
+      "description": "GPU_Power_Connector",
+      "device_type_id": 3,
+      "bus": 5,
+      "addr": "0x40",
+      "args": "0x00 0x4327 0x01 0x01 0x02 0x02 0x03 0x0020 0x04 0x03 0x05 0x0A00 0xfe 0x5549 0xff 0x2260"
+    },
+    {
+      "description": "OCP1",
+      "device_type_id": 3,
+      "bus": 5,
+      "addr": "0x49",
+      "args": "0x00 0x4327 0x01 0x01 0x02 0x02 0x03 0x0020 0x04 0x03 0x05 0x0A00 0xfe 0x5549 0xff 0x2260"
+    },
+    {
+      "description": "OCP0",
+      "device_type_id": 3,
+      "bus": 5,
+      "addr": "0x20",
+      "args": "0x00 0x4327 0x01 0x01 0x02 0x02 0x03 0x0020 0x04 0x03 0x05 0x0A00 0xfe 0x5549 0xff 0x2260"
+    },
+    {
+      "description": "P0_MEM0",
+      "device_type_id": 3,
+      "bus": 5,
+      "addr": "0x41",
+      "args": "0x00 0x4327 0x01 0x01 0x02 0x02 0x03 0x0020 0x04 0x03 0x05 0x0A00 0xfe 0x5549 0xff 0x2260"
+    },
+    {
+      "description": "OP0_MEM1",
+      "device_type_id": 3,
+      "bus": 5,
+      "addr": "0x42",
+      "args": "0x00 0x4327 0x01 0x01 0x02 0x02 0x03 0x0020 0x04 0x03 0x05 0x0A00 0xfe 0x5549 0xff 0x2260"
+    },
+    {
+      "description": "P1_MEM0",
+      "device_type_id": 3,
+      "bus": 5,
+      "addr": "0x43",
+      "args": "0x00 0x4327 0x01 0x01 0x02 0x02 0x03 0x0020 0x04 0x03 0x05 0x0A00 0xfe 0x5549 0xff 0x2260"
+    },
+    {
+      "description": "OP1_MEM1",
+      "device_type_id": 3,
+      "bus": 5,
+      "addr": "0x44",
+      "args": "0x00 0x4327 0x01 0x01 0x02 0x02 0x03 0x0020 0x04 0x03 0x05 0x0A00 0xfe 0x5549 0xff 0x2260"
+    },
+    {
+      "description": "VDDCR0_P0_CPU",
+      "device_type_id": 501,
+      "bus": 6,
+      "addr": "0x21"
+    },
+    {
+      "description": "P0_VDDIO_VDDP",
+      "device_type_id": 501,
+      "bus": 6,
+      "addr": "0x22"
+    },
+    {
+      "description": "P0_CLD0_CRCPU1",
+      "device_type_id": 501,
+      "bus": 6,
+      "addr": "0x23"
+    },
+    {
+      "description": "VDDCR_P0_SOC",
+      "device_type_id": 501,
+      "bus": 6,
+      "addr": "0x24"
+    },
+    {
+      "description": "VDDCR_P1_CPU",
+      "device_type_id": 501,
+      "bus": 6,
+      "addr": "0x25"
+    },
+    {
+      "description": "P1_VDDIO_VDDP",
+      "device_type_id": 501,
+      "bus": 6,
+      "addr": "0x26"
+    },
+    {
+      "description": "P1_CLD0_CRCPU1",
+      "device_type_id": 501,
+      "bus": 6,
+      "addr": "0x27"
+    },
+    {
+      "description": "VDDCR_P1_SOC",
+      "device_type_id": 501,
+      "bus": 6,
+      "addr": "0x28"
+    },
+
+    {
+      "description": "RiserA_Power1",
+      "device_type_id": 3,
+      "bus": 0,
+      "addr": "0x47",
+      "args": "0x00 0x4327 0x01 0x01 0x02 0x02 0x03 0x0020 0x04 0x03 0x05 0x0A00 0xfe 0x5549 0xff 0x2260"
+    },
+
+    {
+      "description": "PCA9546",
+      "device_type_id": 401,
+      "name": "PCA9546_9_0x70",
+      "bus": 0,
+      "addr": "0x70"
+    },
+    {
+      "description": "RiserA_Temp1",
+      "device_type_id": 2,
+      "bus": 3,
+      "master": {
+        "device": "PCA9546_9_0x70"
+      },
+      "addr": "0x4c",
+      "args": "0x12"
+    },
+    {
+      "description": "RiserA_Temp2",
+      "device_type_id": 2,
+      "bus": 3,
+      "master": {
+        "device": "PCA9546_9_0x70"
+      },
+      "addr": "0x4d",
+      "args": "0x12"
+    },
+
+    {
+      "description": "RiserB_Power",
+      "device_type_id": 3,
+      "bus": 11,
+      "addr": "0x47",
+      "args": "0x00 0x4327 0x01 0x01 0x02 0x02 0x03 0x0020 0x04 0x03 0x05 0x0A00 0xfe 0x5549 0xff 0x2260"
+    },
+    {
+      "description": "PCA9546",
+      "device_type_id": 401,
+      "name": "PCA9546_11_0x70",
+      "bus": 11,
+      "addr": "0x70"
+    },
+    {
+      "description": "RiserB_Temp1",
+      "device_type_id": 2,
+      "bus": 3,
+      "master": {
+        "device": "PCA9546_11_0x70"
+      },
+      "addr": "0x4c",
+      "args": "0x12"
+    },
+    {
+      "description": "RiserB_Temp2",
+      "device_type_id": 2,
+      "bus": 3,
+      "master": {
+        "device": "PCA9546_11_0x70"
+      },
+      "addr": "0x4d",
+      "args": "0x12"
+    },
+
+    {
+      "description": "PCA9546",
+      "device_type_id": 401,
+      "name": "PCA9546_12_0x70",
+      "bus": 12,
+      "addr": "0x70"
+    },
+    {
+      "description": "PCA9546",
+      "device_type_id": 401,
+      "name": "PCA9546_12_0_0x70",
+      "bus": 3,
+      "master": {
+        "device": "PCA9546_12_0x70"
+      },
+      "addr": "0x77"
+    },
+    {
+      "description": "RiserC_Temp",
+      "device_type_id": 2,
+      "bus": 3,
+      "master": {
+        "device": "PCA9546_12_0_0x70"
+      },
+      "addr": "0x48",
+      "args": "0x13"
+    },
+    {
+      "description": "PCA9546",
+      "device_type_id": 401,
+      "name": "PCA9546_12_1_0x70",
+      "bus": 1,
+      "master": {
+        "device": "PCA9546_12_0x70"
+      },
+      "addr": "0x77"
+    },
+    {
+      "description": "RiserD_Temp",
+      "device_type_id": 2,
+      "bus": 3,
+      "master": {
+        "device": "PCA9546_12_1_0x70"
+      },
+      "addr": "0x48",
+      "args": "0x13"
+    },
+    {
+      "description": "PCA9546",
+      "device_type_id": 401,
+      "name": "PCA9546_12_2_0x70",
+      "bus": 2,
+      "master": {
+        "device": "PCA9546_12_0x70"
+      },
+      "addr": "0x77"
+    },
+    {
+      "description": "RiserE_Temp",
+      "device_type_id": 2,
+      "bus": 3,
+      "master": {
+        "device": "PCA9546_12_2_0x70"
+      },
+      "addr": "0x48",
+      "args": "0x13"
+    },
+    {
+      "description": "PCA9546",
+      "device_type_id": 401,
+      "name": "PCA9546_12_3_0x70",
+      "bus": 3,
+      "master": {
+        "device": "PCA9546_12_0x70"
+      },
+      "addr": "0x77"
+    },
+    {
+      "description": "RiserF_Temp",
+      "device_type_id": 2,
+      "bus": 3,
+      "master": {
+        "device": "PCA9546_12_3_0x70"
+      },
+      "addr": "0x48",
+      "args": "0x13"
+    },
+
+    {
+      "description": "PCA9546",
+      "device_type_id": 401,
+      "name": "PCA9546_12_0x71",
+      "bus": 12,
+      "addr": "0x71"
+    },
+    {
+      "description": "PCA9546",
+      "device_type_id": 401,
+      "name": "PCA9546_12_0_0x71",
+      "bus": 3,
+      "master": {
+        "device": "PCA9546_12_0x71"
+      },
+      "addr": "0x72"
+    },
+    {
+      "description": "RiserG_Temp",
+      "device_type_id": 2,
+      "bus": 3,
+      "master": {
+        "device": "PCA9546_12_0_0x71"
+      },
+      "addr": "0x48",
+      "args": "0x13"
+    },
+    {
+      "description": "PCA9546",
+      "device_type_id": 401,
+      "name": "PCA9546_12_1_0x71",
+      "bus": 1,
+      "master": {
+        "device": "PCA9546_12_0x71"
+      },
+      "addr": "0x72"
+    },
+    {
+      "description": "RiserH_Temp",
+      "device_type_id": 2,
+      "bus": 3,
+      "master": {
+        "device": "PCA9546_12_1_0x71"
+      },
+      "addr": "0x48",
+      "args": "0x13"
+    },
+    {
+      "description": "PCA9546",
+      "device_type_id": 401,
+      "name": "PCA9546_12_2_0x71",
+      "bus": 2,
+      "master": {
+        "device": "PCA9546_12_0x71"
+      },
+      "addr": "0x72"
+    },
+    {
+      "description": "RiserI_Temp",
+      "device_type_id": 2,
+      "bus": 3,
+      "master": {
+        "device": "PCA9546_12_2_0x71"
+      },
+      "addr": "0x48",
+      "args": "0x13"
+    },
+    {
+      "description": "PCA9546",
+      "device_type_id": 401,
+      "name": "PCA9546_12_3_0x71",
+      "bus": 3,
+      "master": {
+        "device": "PCA9546_12_0x71"
+      },
+      "addr": "0x72"
+    },
+    {
+      "description": "RiserJ_Temp",
+      "device_type_id": 2,
+      "bus": 3,
+      "master": {
+        "device": "PCA9546_12_3_0x71"
+      },
+      "addr": "0x48",
+      "args": "0x13"
+    },
+
+    {
+      "description": "rear backplane0",
+      "device_type_id": 102,
+      "bus": 13,
+      "addr": "0x64",
+      "args": "0x74 0x00 0x90 0x04 0x96 0x23 0x97 0x03 0x98 0xA0 0x9b 0x00 0xa0 0x42 0xa1 0x44 0xa2 0x33 0xa3 0x32 0xa4 0x47 0xa5 0x31 0xa6 0x32 0xa7 0x5f 0xa8 0x38 0xa9 0x36 0xaa 0x33 0xab 0x39 0xac 0x5f 0xad 0x55 0xae 0x32 0xaf 0x5f 0xb0 0x41 S_HDD_STATUS 0x00 0x10 0x01 0x10 0x02 0x10 0x03 0x10 0x04 0x10 0x05 0x10 0x06 0x10 0x07 0x10 0x08 0x10 0x09 0x10 0x0a 0x30 0x0b 0x30 N_HDD_STATUS"
+    },
+    {
+      "description": "rear backplane1",
+      "device_type_id": 102,
+      "bus": 13,
+      "addr": "0x65",
+      "args": "0x74 0x00 0x90 0x04 0x96 0x23 0x97 0x03 0x98 0xA0 0x9b 0x00 0xa0 0x42 0xa1 0x44 0xa2 0x33 0xa3 0x32 0xa4 0x47 0xa5 0x31 0xa6 0x32 0xa7 0x5f 0xa8 0x38 0xa9 0x36 0xaa 0x33 0xab 0x39 0xac 0x5f 0xad 0x55 0xae 0x32 0xaf 0x5f 0xb0 0x41 S_HDD_STATUS 0x00 0x10 0x01 0x10 0x02 0x10 0x03 0x10 0x04 0x10 0x05 0x10 0x06 0x10 0x07 0x10 0x08 0x10 0x09 0x10 0x0a 0x30 0x0b 0x30 N_HDD_STATUS"
+    },
+    {
+      "description": "rear backplane2",
+      "device_type_id": 102,
+      "bus": 13,
+      "addr": "0x66",
+      "args": "0x74 0x00 0x90 0x04 0x96 0x23 0x97 0x03 0x98 0xA0 0x9b 0x00 0xa0 0x42 0xa1 0x44 0xa2 0x33 0xa3 0x32 0xa4 0x47 0xa5 0x31 0xa6 0x32 0xa7 0x5f 0xa8 0x38 0xa9 0x36 0xaa 0x33 0xab 0x39 0xac 0x5f 0xad 0x55 0xae 0x32 0xaf 0x5f 0xb0 0x41 S_HDD_STATUS 0x00 0x10 0x01 0x10 0x02 0x10 0x03 0x10 0x04 0x10 0x05 0x10 0x06 0x10 0x07 0x10 0x08 0x10 0x09 0x10 0x0a 0x30 0x0b 0x30 N_HDD_STATUS"
+    },
+
+    {
+      "description": "HDDBPC_Temp_1",
+      "device_type_id": 2,
+      "bus": 13,
+      "addr": "0x48",
+      "args": "0x12"
+    },
+    {
+      "description": "HDDBPC_Temp_2",
+      "device_type_id": 2,
+      "bus": 13,
+      "addr": "0x4c",
+      "args": "0x12"
+    },
+    {
+      "description": "HDDBPA_Temp_1",
+      "device_type_id": 2,
+      "bus": 13,
+      "addr": "0x49",
+      "args": "0x12"
+    },
+    {
+      "description": "HDDBPA_Temp_2",
+      "device_type_id": 2,
+      "bus": 13,
+      "addr": "0x4a",
+      "args": "0x12"
+    },
+    {
+      "description": "HDDBPB_Temp_1",
+      "device_type_id": 2,
+      "bus": 13,
+      "addr": "0x4a",
+      "args": "0x12"
+    },
+    {
+      "description": "HDDBPB_Temp_2",
+      "device_type_id": 2,
+      "bus": 13,
+      "addr": "0x4e",
+      "args": "0x12"
+    },
+    {
+      "description": "PCA9617",
+      "device_type_id": 401,
+      "name": "PCA9617_0x80",
+      "bus": 15,
+      "addr": "0x40"
+    },
+    {
+      "description": "Power Button In: line_0 输出到 GPIO P0",
+      "name": "PowerButtonIn",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 120, 0]
+        ],
+        "output_logic_init": [
+          [0, "1", 0]
+        ]
+      }
+    },
+    {
+      "description": "Power Button out: line_0(GPIO P1) 输入下降沿和上升沿后，翻转 BMC_48",
+      "name": "PowerButtonOut",
+      "device_type_id": 201,
+      "pin_nums": 2,
+      "signal": {
+        "input_lines": [
+          ["BMC", 121, 0]
+        ],
+        "output_lines": [
+          ["BMC", 48, 1]
+        ],
+        "output_logic_init": [
+          [1, "1", 0]
+        ],
+        "response_logic": [
+          [0, "12", 1, "0", 2]
+        ]
+      }
+    },
+    {
+      "description": "CPU0 APML ALERT 中断信号 (GPIO B0)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 8, 0]
+        ],
+        "output_logic_init": [
+          [0, "0", 0]
+        ]
+      }
+    },
+    {
+      "description": "CPU0 在位信号 (GPIO B1)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 9, 0]
+        ],
+        "output_logic_init": [
+          [0, "0", 0]
+        ]
+      }
+    },
+    {
+      "description": "液冷检测线开路检测信号 (GPIO B2)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 10, 0]
+        ],
+        "output_logic_init": [
+          [0, "0", 0]
+        ]
+      }
+    },
+    {
+      "description": "CPU1 APML ALERT中断信号 (GPIO B3)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 11, 0]
+        ],
+        "output_logic_init": [
+          [0, "0", 0]
+        ]
+      }
+    },
+    {
+      "description": "BMC更新 CPLD FW 的切换信号 (GPIO F3)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 43, 0]
+        ]
+      }
+    },
+    {
+      "description": "BMC 清 CMOS (GPIO F4)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 44, 0]
+        ]
+      }
+    },
+    {
+      "description": "MFG mode的远程控制信号 (GPIO G1)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 49, 0]
+        ]
+      }
+    },
+    {
+      "description": "CPLD发给BMC的CPU/DIMM Thermal Trip通知信号 (GPIO G2)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 50, 0]
+        ],
+        "output_logic_init": [
+          [0, "1", 0]
+        ]
+      }
+    },
+    {
+      "description": "System SLP_S5信号 (GPIO G3)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 51, 0]
+        ],
+        "output_logic_init": [
+          [0, "0", 0]
+        ]
+      }
+    },
+    {
+      "description": "BMC更新BIOS Flash时的写保护控制信号 (GPIO G4)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+      "input_lines": [
+          ["BMC", 52, 0]
+        ]
+      }
+    },
+    {
+      "description": "System ID LED控制 (GPIO G5)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+      "input_lines": [
+          ["BMC", 53, 0]
+        ]
+      }
+    },
+    {
+      "description": "BMC刷写BIOS Flash的Reset信号 (GPIO G6)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+      "input_lines": [
+          ["BMC", 54, 0]
+        ]
+      }
+    },
+    {
+      "description": "CPU1 在位信号 (GPIO G7)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 55, 0]
+        ],
+        "output_logic_init": [
+          [0, "0", 0]
+        ]
+      }
+    },
+    {
+      "description": "CPU PWR OK的通知信号，BMC用此信号判断系统是否开机 (GPIO H0)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 56, 0]
+        ],
+        "output_logic_init": [
+          [0, "1", 0]
+        ]
+      }
+    },
+    {
+      "description": "作为确认系统RESET信号 (GPIO H1)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 57, 0]
+        ],
+        "output_logic_init": [
+          [0, "1", 0]
+        ]
+      }
+    },
+    {
+      "description": "液冷检测线短路检测信号 (GPIO H3)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 59, 0]
+        ],
+        "output_logic_init": [
+          [0, "1", 0]
+        ]
+      }
+    },
+    {
+      "description": "PSU1的AC PWR OK信号, (GPIO I5)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 69, 0]
+        ],
+        "output_logic_init": [
+          [0, "1", 0]
+        ]
+      }
+    },
+    {
+      "description": "整机系统风冷模式和液冷模式判断信号 (GPIO I7)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 71, 0]
+        ],
+        "output_logic_init": [
+          [0, "1", 0]
+        ]
+      }
+    },
+    {
+      "description": "PORT80指示LED固定Pin (GPIO  N0-N7)",
+      "device_type_id": 201,
+      "pin_nums": 8,
+      "signal": {
+        "input_lines": [
+          ["BMC", 104, 0],
+          ["BMC", 105, 1],
+          ["BMC", 106, 2],
+          ["BMC", 107, 3],
+          ["BMC", 108, 4],
+          ["BMC", 109, 5],
+          ["BMC", 110, 6],
+          ["BMC", 111, 7]
+        ]
+      }
+    },
+    {
+      "description": "BMC心跳灯 (GPIO  P7)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 127, 0]
+        ]
+      }
+    },
+    {
+      "description": "BMC前置USB接口OC Pin (GPIO S1)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 145, 0]
+        ],
+        "output_logic_init": [
+          [0, "0", 0]
+        ]
+      }
+    },
+    {
+      "description": "System NMI interrupt, Connect to CPU (GPIO S4)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 148, 0]
+        ]
+      }
+    },
+    {
+      "description": "Video Disable (GPIO S5)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 149, 0]
+        ],
+        "output_logic_init": [
+          [0, "0", 0]
+        ]
+      }
+    },
+    {
+      "description": "BIOS Post完成指示信号，BMC通过此信号来判断SPD切换的时机 (GPIO S6)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 150, 0]
+        ],
+        "output_logic_init": [
+          [0, "0", 0]
+        ]
+      }
+    },
+    {
+      "description": "系统ID按键 (GPIO V2)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 170, 0]
+        ],
+        "output_logic_init": [
+          [0, "1", 0]
+        ]
+      }
+    },
+    {
+      "description": "System UART切换信号 (GPIO V3)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 171, 0]
+        ]
+      }
+    },
+    {
+      "description": "BMC复位Dedicate PHY的控制信号 (GPIO V4)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 172, 0]
+        ]
+      }
+    },
+    {
+      "description": "为延长CMOS电池的使用时间，每次对CMOS电池进行电压检测时，需要该信号进行操作 (GPIO X0)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 184, 0]
+        ]
+      }
+    },
+    {
+      "description": "SMI Signal Active Input (GPIO X1)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 185, 0]
+        ],
+        "output_logic_init": [
+          [0, "0", 0]
+        ]
+      }
+    },
+    {
+      "description": "PSU2的AC PWR OK信号 (GPIO X2)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 186, 0]
+        ],
+        "output_logic_init": [
+          [0, "1", 0]
+        ]
+      }
+    },
+    {
+      "description": "驱动健康指示灯Red LED，低电平点亮LED (GPIO X4)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 188, 0]
+        ]
+      }
+    },
+    {
+      "description": "驱动健康指示灯Green LED，低电平点亮LED (GPIO X5)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 189, 0]
+        ]
+      }
+    },
+    {
+      "description": "BIOS Flash的SPI通道切换信号 (GPIO X6)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 190, 0]
+        ]
+      }
+    },
+    {
+      "description": "该信号可用于控制SPD读取链路的切换，相关说明如下： 高：BMC读取DDR5 SPD信息  低：CPU读取DDR5 SPD信息   (GPIO X7)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 191, 0]
+        ]
+      }
+    },
+    {
+      "description": "BMC_READY用于CPLD看门狗功能   (GPIO Y0)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 192, 0]
+        ]
+      }
+    },
+    {
+      "description": "VR SMBUS Alert   (GPIO Y1)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 193, 0]
+        ],
+        "output_logic_init": [
+          [0, "0", 0]
+        ]
+      }
+    },
+    {
+      "description": "该信号用于EEPROM的写保护信号控制   (GPIO Y2)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 194, 0]
+        ]
+      }
+    },
+    {
+      "description": "EMMC IC Reset  (GPIO Y3)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "input_lines": [
+          ["BMC", 195, 0]
+        ]
+      }
+    },
+    {
+      "description": "ADC-0 12V",
+      "device_type_id": 301,
+      "adc_channel": 0,
+      "division": 6.36,
+      "args": "12000"
+    },
+    {
+      "description": "ADC-1 5V",
+      "device_type_id": 301,
+      "adc_channel": 1,
+      "division": 2.66,
+      "args": "5000"
+    },
+    {
+      "description": "ADC-2 3.3V",
+      "device_type_id": 301,
+      "adc_channel": 2,
+      "division": 1.75,
+      "args": "3300"
+    },
+    {
+      "description": "ADC-3 VBAT",
+      "device_type_id": 301,
+      "adc_channel": 3,
+      "division": 3,
+      "args": "3750"
+    },
+    {
+      "description": "ADC-4 P0_VDDCR_CPU0",
+      "device_type_id": 301,
+      "adc_channel": 4,
+      "division": 1,
+      "args": "1300"
+    },
+    {
+      "description": "ADC-5 P0_VDDCR_CPU1",
+      "device_type_id": 301,
+      "adc_channel": 5,
+      "division": 1,
+      "args": "1300"
+    },
+    {
+      "description": "ADC-6 P0_VDDCR_SOC",
+      "device_type_id": 301,
+      "adc_channel": 6,
+      "division": 1,
+      "args": "1300"
+    },
+    {
+      "description": "ADC-7 P0_VDD_CLDO",
+      "device_type_id": 301,
+      "adc_channel": 7,
+      "division": 1,
+      "args": "1300"
+    },
+    {
+      "description": "ADC-8 P0_VDDP_PHY",
+      "device_type_id": 301,
+      "adc_channel": 8,
+      "division": 1,
+      "args": "1300"
+    },
+    {
+      "description": "ADC-9 P0_VDDH_PHY",
+      "device_type_id": 301,
+      "adc_channel": 9,
+      "division": 1,
+      "args": "1300"
+    },
+    {
+      "description": "ADC-10 P1_VDDCR_CPU0",
+      "device_type_id": 301,
+      "adc_channel": 10,
+      "division": 1,
+      "args": "1300"
+    },
+    {
+      "description": "ADC-11 P1_VDDCR_CPU1",
+      "device_type_id": 301,
+      "adc_channel": 11,
+      "division": 1,
+      "args": "1300"
+    },
+    {
+      "description": "ADC-12 P1_VDDCR_SOC",
+      "device_type_id": 301,
+      "adc_channel": 12,
+      "division": 1,
+      "args": "1300"
+    },
+    {
+      "description": "ADC-13 P1_VDD_CLDO",
+      "device_type_id": 301,
+      "adc_channel": 13,
+      "division": 1,
+      "args": "1300"
+    },
+    {
+      "description": "ADC-14 P1_VDDP_PHY",
+      "device_type_id": 301,
+      "adc_channel": 14,
+      "division": 1,
+      "args": "1300"
+    },
+    {
+      "description": "ADC-15 P1_VDDH_PHY",
+      "device_type_id": 301,
+      "adc_channel": 15,
+      "division": 1,
+      "args": "1300"
+    },
+    {
+      "description": "CPU0_DIMM_A0",
+      "device_type_id": 103,
+      "bus": 0,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x50",
+      "args": "0x10"
+    },
+    {
+      "description": "CPU0_DIMM_A1",
+      "device_type_id": 103,
+      "bus": 0,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x51",
+      "args": "0x11"
+    },
+    {
+      "description": "CPU0_DIMM_B0",
+      "device_type_id": 103,
+      "bus": 0,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x52",
+      "args": "0x12"
+    },
+    {
+      "description": "CPU0_DIMM_B1",
+      "device_type_id": 103,
+      "bus": 0,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x53",
+      "args": "0x13"
+    },
+    {
+      "description": "CPU1_DIMM_A0",
+      "device_type_id": 103,
+      "bus": 0,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x50",
+      "args": "0x14"
+    },
+    {
+      "description": "CPU1_DIMM_A1",
+      "device_type_id": 103,
+      "bus": 0,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x51",
+      "args": "0x15"
+    },
+    {
+      "description": "CPU1_DIMM_B0",
+      "device_type_id": 103,
+      "bus": 0,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x52",
+      "args": "0x16"
+    },
+    {
+      "description": "CPU1_DIMM_B1",
+      "device_type_id": 103,
+      "bus": 0,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x53",
+      "args": "0x17"
+    },
+    {
+      "description": "CPU0_DIMM_E1",
+      "device_type_id": 103,
+      "bus": 1,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x54",
+      "args": "0x18"
+    },
+    {
+      "description": "CPU0_DIMM_F1",
+      "device_type_id": 103,
+      "bus": 1,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x55",
+      "args": "0x19"
+    },
+    {
+      "description": "CPU1_DIMM_E1",
+      "device_type_id": 103,
+      "bus": 1,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x54",
+      "args": "0x1a"
+    },
+    {
+      "description": "CPU1_DIMM_F1",
+      "device_type_id": 103,
+      "bus": 1,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x55",
+      "args": "0x1b"
+    },
+    {
+      "description": "CPU0_DIMM_G0",
+      "device_type_id": 103,
+      "bus": 2,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x50",
+      "args": "0x1c"
+    },
+    {
+      "description": "CPU0_DIMM_G1",
+      "device_type_id": 103,
+      "bus": 2,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x51",
+      "args": "0x1d"
+    },
+    {
+      "description": "CPU0_DIMM_H0",
+      "device_type_id": 103,
+      "bus": 2,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x52",
+      "args": "0x1e"
+    },
+    {
+      "description": "CPU0_DIMM_H1",
+      "device_type_id": 103,
+      "bus": 2,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x53",
+      "args": "0x1f"
+    },
+    {
+      "description": "CPU1_DIMM_G0",
+      "device_type_id": 103,
+      "bus": 2,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x50",
+      "args": "0x20"
+    },
+    {
+      "description": "CPU1_DIMM_G1",
+      "device_type_id": 103,
+      "bus": 2,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x51",
+      "args": "0x21"
+    },
+    {
+      "description": "CPU1_DIMM_H0",
+      "device_type_id": 103,
+      "bus": 2,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x52",
+      "args": "0x22"
+    },
+    {
+      "description": "CPU1_DIMM_H1",
+      "device_type_id": 103,
+      "bus": 2,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x53",
+      "args": "0x23"
+    },
+    {
+      "description": "CPU0_DIMM_K1",
+      "device_type_id": 103,
+      "bus": 3,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x54",
+      "args": "0x24"
+    },
+    {
+      "description": "CPU0_DIMM_L1",
+      "device_type_id": 103,
+      "bus": 3,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x55",
+      "args": "0x25"
+    },
+    {
+      "description": "CPU1_DIMM_K1",
+      "device_type_id": 103,
+      "bus": 3,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x54",
+      "args": "0x26"
+    },
+    {
+      "description": "CPU1_DIMM_L1",
+      "device_type_id": 103,
+      "bus": 3,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x55",
+      "args": "0x27"
     }
   ],
   "mac": {

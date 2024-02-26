@@ -255,6 +255,7 @@ void file_log(const char *message, uint8_t log_type) {
     }
 
     fclose(file);
+    free(filePath);
     pthread_mutex_unlock(&file_log_lock);
 }
 
@@ -320,6 +321,7 @@ cJSON *read_config_file(const char *filename) {
         exit(1);
     }
 
+    free(configFilePath);
     printf("read json file (%s) over! \n", CONFIG_FILE);
     return root;
 }
@@ -663,6 +665,26 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                 ptrI2CEepromSType->total_size = ctrl_data[0]; /* total_size */
                 ptrI2CEepromSType->buf = (uint8_t *) malloc(ptrI2CEepromSType->total_size); /* buf */
                 memset(ptrI2CEepromSType->buf, 0xff, ptrI2CEepromSType->total_size);
+
+                if (strstr(((PTR_I2C_DEVICE_DATA) vPtrDeviceData)->ptrDeviceConfig->description, "FRU")) {   
+                    FILE *fru_file;
+                    uint8_t buffer[2048] = {0};
+                    size_t read_size = 0;
+                    char *fru_path = ((PTR_I2C_DEVICE_DATA) vPtrDeviceData)->ptrDeviceConfig->fru_path;
+                    if (fru_path[0] != '\0') {
+                        char *fru_file_path = get_file_right_path(fru_path);
+                        fru_file = fopen(fru_file_path, "r");
+                        if (fru_file) {
+                            read_size = fread(buffer, sizeof(uint8_t), sizeof(buffer), fru_file);
+                            if(read_size != 0) {
+                                memcpy(&ptrI2CEepromSType->buf[0x100], buffer, read_size);
+                            }
+                            fclose(fru_file);
+                        }
+                        free(fru_file_path);
+                    }
+                }
+
                 if (ptrI2CEepromSType->total_size <= 256) {
                     ptrI2CEepromSType->addr_size = 1; /* addr size */
                 } else {
@@ -1067,7 +1089,7 @@ PTR_CONFIG_DATA parse_configuration(void) {
         cJSON *addr = cJSON_GetObjectItem(device, "addr");
         cJSON *master = cJSON_GetObjectItem(device, "master");
         cJSON *args = cJSON_GetObjectItem(device, "args");
-
+        cJSON *fru_load_path = cJSON_GetObjectItem(device, "fru_load_path");
         cJSON *adc_channel = cJSON_GetObjectItem(device, "adc_channel");
         cJSON *division = cJSON_GetObjectItem(device, "division");
 
@@ -1189,6 +1211,15 @@ PTR_CONFIG_DATA parse_configuration(void) {
                 exit(1);
             }
 
+            /* Load FRU Information */
+            if (fru_load_path == NULL) {
+            } else if (fru_load_path->type != cJSON_String) {
+                printf("The devices[%d]: 'fru_load_path' is not a string ! \n", i);
+                exit(1);
+            } else {
+                strcpy(tempConfigJson->fru_path, fru_load_path->valuestring);
+                printf("fru_load_path:%s\n", tempConfigJson->fru_path);
+            }
         }
             /**************************************** adc_channel ****************************************/
         else if (deviceType == ADC_DEVICE_TYPE) {
