@@ -57,9 +57,6 @@ static void create_pipe(void *pVoid) {
             exit(EXIT_FAILURE);
         }
     }
-
-    free(send_pipe_file_Path);
-    free(read_pipe_file_Path);
 }
 
 static void *send_thread(void *pVoid) {
