@@ -15,7 +15,7 @@
 #define TYPE_ASPEED_PWM "aspeed.pwm"
 #define ASPEED_PWM(obj) OBJECT_CHECK(AspeedPWMState, (obj), TYPE_ASPEED_PWM)
 
-#define ASPEED_PWM_NR_REGS (0x7C >> 2)
+#define ASPEED_PWM_NR_REGS (0x110 >> 2)
 
 typedef struct AspeedPWMState {
     /* <private> */
