@@ -1089,7 +1089,7 @@ PTR_CONFIG_DATA parse_configuration(void) {
         cJSON *addr = cJSON_GetObjectItem(device, "addr");
         cJSON *master = cJSON_GetObjectItem(device, "master");
         cJSON *args = cJSON_GetObjectItem(device, "args");
-        cJSON *load_path = cJSON_GetObjectItem(device, "load_path");
+        cJSON *fru_load_path = cJSON_GetObjectItem(device, "fru_load_path");
         cJSON *adc_channel = cJSON_GetObjectItem(device, "adc_channel");
         cJSON *division = cJSON_GetObjectItem(device, "division");
 
@@ -1212,13 +1212,13 @@ PTR_CONFIG_DATA parse_configuration(void) {
             }
 
             /* Load FRU Information */
-            if (load_path == NULL) {
-            } else if (load_path->type != cJSON_String) {
-                printf("The devices[%d]: 'load_path' is not a string ! \n", i);
+            if (fru_load_path == NULL) {
+            } else if (fru_load_path->type != cJSON_String) {
+                printf("The devices[%d]: 'fru_load_path' is not a string ! \n", i);
                 exit(1);
             } else {
-                strcpy(tempConfigJson->fru_path, load_path->valuestring);
-                printf("fru load_path:%s\n", tempConfigJson->fru_path);
+                strcpy(tempConfigJson->fru_path, fru_load_path->valuestring);
+                printf("fru_load_path:%s\n", tempConfigJson->fru_path);
             }
         }
             /**************************************** adc_channel ****************************************/
