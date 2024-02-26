@@ -212,8 +212,8 @@ static void aspeed_pwm_write(void *opaque, hwaddr addr, uint64_t data,
                     /* 赋值 */
                     s->regs[TACH0_STS_REG + ((pwm_channel * 16) >> 2)] = tacho_value & ((1 << 20) - 1);
                     s->regs[TACH0_STS_REG + ((pwm_channel * 16) >> 2)] |= (0b11 << 20);
-                    printf("TACH_STS_REG:%x\n", s->regs[TACH0_STS_REG + ((pwm_channel * 16) >> 2)]);
-                    printf(">>> fan-%d : duty-%f , rpm-%f , tacho_value-%x , clock_division-%f \n", pwm_channel, duty_rate, rpm, tacho_value, fan_tach_clock_division);
+//                    printf("TACH_STS_REG:%x\n", s->regs[TACH0_STS_REG + ((pwm_channel * 16) >> 2)]);
+//                    printf(">>> fan-%d : duty-%f , rpm-%f , tacho_value-%x , clock_division-%f \n", pwm_channel, duty_rate, rpm, tacho_value, fan_tach_clock_division);
                 }
             }
             //printf(">>> old reg trigger: %08x \n", s->regs[TRIGGER]);
