@@ -568,7 +568,7 @@
       "name": "FAN CPLD",
       "bus": 14,
       "addr": "0x14",
-      "args": "0x01 0x10 0xff 0x11 0xff 0x12 0xff 0x13 0xff 0x14 0xff 0x20 0x00 0x21 0x00 0x2f 0xff 0x40 0xfc 0x41 0x03 0x42 0xf3 0x43 0xf0 0x44 0xff 0x48 0xff 0x50 0xfe 0x70 0x49 0x71 0x50 0x72 0xf2 0x74 0x01 0x80 0x00"
+      "args": "0x01 0x10 0xff 0x11 0xff 0x12 0xff 0x13 0xff 0x14 0xff 0x20 0x00 0x21 0x00 0x2f 0xff 0x40 0xfc 0x41 0x03 0x42 0xf3 0x43 0xc0 0x44 0xff 0x48 0xff 0x50 0xfe 0x70 0x49 0x71 0x50 0x72 0xf2 0x74 0x01 0x80 0x00"
     },
     {
       "description": "FB_Inlet_Temp",
@@ -1448,6 +1448,78 @@
       },
       "addr": "0x55",
       "args": "0x27"
+    },
+    {
+      "description": "PWM_TACH_0",
+      "device_type_id": 601,
+      "pwm_tach_num": 0,
+      "args": "S_MIN_RPM 0x708 N_MIN_RPM S_MAX_RPM 0x4268 N_MAX_RPM S_MIN_OFFSET 0x64 N_MIN_OFFSET S_MAX_OFFSET 0x3e8 N_MAX_OFFSET S_RAND_DEVIATION_RATE 0x05 N_RAND_DEVIATION_RATE"
+    },
+    {
+      "description": "PWM_TACH_1",
+      "device_type_id": 601,
+      "pwm_tach_num": 1,
+      "args": "S_MIN_RPM 0x60e N_MIN_RPM S_MAX_RPM 0x38a4 N_MAX_RPM S_MIN_OFFSET 0x64 N_MIN_OFFSET S_MAX_OFFSET 0x3e8 N_MAX_OFFSET S_RAND_DEVIATION_RATE 0x05 N_RAND_DEVIATION_RATE"
+    },
+    {
+      "description": "PWM_TACH_2",
+      "device_type_id": 601,
+      "pwm_tach_num": 2,
+      "args": "S_MIN_RPM 0x708 N_MIN_RPM S_MAX_RPM 0x4268 N_MAX_RPM S_MIN_OFFSET 0x64 N_MIN_OFFSET S_MAX_OFFSET 0x3e8 N_MAX_OFFSET S_RAND_DEVIATION_RATE 0x05 N_RAND_DEVIATION_RATE"
+    },
+    {
+      "description": "PWM_TACH_3",
+      "device_type_id": 601,
+      "pwm_tach_num": 3,
+      "args": "S_MIN_RPM 0x60e N_MIN_RPM S_MAX_RPM 0x38a4 N_MAX_RPM S_MIN_OFFSET 0x64 N_MIN_OFFSET S_MAX_OFFSET 0x3e8 N_MAX_OFFSET S_RAND_DEVIATION_RATE 0x05 N_RAND_DEVIATION_RATE"
+    },
+    {
+      "description": "PWM_TACH_4",
+      "device_type_id": 601,
+      "pwm_tach_num": 4,
+      "args": "S_MIN_RPM 0x708 N_MIN_RPM S_MAX_RPM 0x4268 N_MAX_RPM S_MIN_OFFSET 0x64 N_MIN_OFFSET S_MAX_OFFSET 0x3e8 N_MAX_OFFSET S_RAND_DEVIATION_RATE 0x05 N_RAND_DEVIATION_RATE"
+    },
+    {
+      "description": "PWM_TACH_5",
+      "device_type_id": 601,
+      "pwm_tach_num": 5,
+      "args": "S_MIN_RPM 0x60e N_MIN_RPM S_MAX_RPM 0x38a4 N_MAX_RPM S_MIN_OFFSET 0x64 N_MIN_OFFSET S_MAX_OFFSET 0x3e8 N_MAX_OFFSET S_RAND_DEVIATION_RATE 0x05 N_RAND_DEVIATION_RATE"
+    },
+    {
+      "description": "PWM_TACH_6",
+      "device_type_id": 601,
+      "pwm_tach_num": 6,
+      "args": "S_MIN_RPM 0x708 N_MIN_RPM S_MAX_RPM 0x4268 N_MAX_RPM S_MIN_OFFSET 0x64 N_MIN_OFFSET S_MAX_OFFSET 0x3e8 N_MAX_OFFSET S_RAND_DEVIATION_RATE 0x05 N_RAND_DEVIATION_RATE"
+    },
+    {
+      "description": "PWM_TACH_7",
+      "device_type_id": 601,
+      "pwm_tach_num": 7,
+      "args": "S_MIN_RPM 0x60e N_MIN_RPM S_MAX_RPM 0x38a4 N_MAX_RPM S_MIN_OFFSET 0x64 N_MIN_OFFSET S_MAX_OFFSET 0x3e8 N_MAX_OFFSET S_RAND_DEVIATION_RATE 0x05 N_RAND_DEVIATION_RATE"
+    },
+    {
+      "description": "PWM_TACH_8",
+      "device_type_id": 601,
+      "pwm_tach_num": 8,
+      "args": "S_MIN_RPM 0x60e N_MIN_RPM S_MAX_RPM 0x38a4 N_MAX_RPM S_MIN_OFFSET 0x64 N_MIN_OFFSET S_MAX_OFFSET 0x3e8 N_MAX_OFFSET S_RAND_DEVIATION_RATE 0x05 N_RAND_DEVIATION_RATE"
+    },
+    {
+      "description": "PWM_TACH_9",
+      "device_type_id": 601,
+      "pwm_tach_num": 9,
+      "args": "S_MIN_RPM 0x60e N_MIN_RPM S_MAX_RPM 0x38a4 N_MAX_RPM S_MIN_OFFSET 0x64 N_MIN_OFFSET S_MAX_OFFSET 0x3e8 N_MAX_OFFSET S_RAND_DEVIATION_RATE 0x05 N_RAND_DEVIATION_RATE"
+    },
+    {
+      "description": "PWM_TACH_10",
+      "device_type_id": 601,
+      "pwm_tach_num": 10,
+      "args": "S_MIN_RPM 0x60e N_MIN_RPM S_MAX_RPM 0x38a4 N_MAX_RPM S_MIN_OFFSET 0x64 N_MIN_OFFSET S_MAX_OFFSET 0x3e8 N_MAX_OFFSET S_RAND_DEVIATION_RATE 0x05 N_RAND_DEVIATION_RATE"
+    },
+    {
+      "description": "PWM_TACH_11",
+      "device_type_id": 601,
+      "pwm_tach_num": 11,
+      "args": "S_MIN_RPM 0x60e N_MIN_RPM S_MAX_RPM 0x38a4 N_MAX_RPM S_MIN_OFFSET 0x64 N_MIN_OFFSET S_MAX_OFFSET 0x3e8 N_MAX_OFFSET S_RAND_DEVIATION_RATE 0x05 N_RAND_DEVIATION_RATE"
     }
   ],
   "mac": {

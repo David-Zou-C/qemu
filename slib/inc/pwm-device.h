@@ -21,7 +21,7 @@ typedef struct PWM_TACH_DEVICE_{
     PTR_DEVICE_CONFIG ptrDeviceConfig;
 } PWM_TACH_DEVICE, *PTR_PWM_TACH_DEVICE;
 
-extern RPM_DUTY gRpmDuty[8];
+extern RPM_DUTY gRpmDuty[16];
 
 void pwm_device_add(PTR_DEVICE_CONFIG ptrDeviceConfig);
 

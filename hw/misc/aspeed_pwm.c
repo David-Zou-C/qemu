@@ -121,7 +121,7 @@ static double get_rpm_from_duty(float duty, uint8_t fan_loc)
     PTR_RPM_DUTY ptrRpmDuty;
     double ret = 0;
 
-    if (fan_loc < 8) {
+    if (fan_loc < 16) {
         ptrRpmDuty = &gRpmDuty[fan_loc];
     } else {
         return 0;
