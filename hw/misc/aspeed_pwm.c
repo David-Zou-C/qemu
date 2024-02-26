@@ -146,7 +146,6 @@ static uint64_t aspeed_pwm_read(void *opaque, hwaddr addr,
 {
     AspeedPWMState *s = ASPEED_PWM(opaque);
     uint64_t val = 0;
-    hwaddr temp = addr;
 
     addr >>= 2;
 
