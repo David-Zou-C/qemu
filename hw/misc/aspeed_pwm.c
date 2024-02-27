@@ -20,30 +20,6 @@
 
 #define TO_REG(addr) (addr >> 2)
 
-#define GENERAL_CONTROL                 TO_REG(0x00)
-#define CLOCK_CONTROL                   TO_REG(0x04)
-#define DUTY_CONTROL_0                  TO_REG(0x08)
-#define DUTY_CONTROL_1                  TO_REG(0x0C)
-#define TYPE_M_CONTROL_0                TO_REG(0x10)
-#define TYPE_M_CONTROL_1                TO_REG(0x14)
-#define TYPE_N_CONTROL_0                TO_REG(0x18)
-#define TYPE_N_CONTROL_1                TO_REG(0x1C)
-#define TACH_SOURCE                     TO_REG(0x20)
-#define TRIGGER                         TO_REG(0x28)
-#define RESULT                          TO_REG(0x2C)
-#define INTERRUPT_CONTROL               TO_REG(0x30)
-#define INTERRUPT_STATUS                TO_REG(0x34)
-#define TYPE_M_LIMIT                    TO_REG(0x38)
-#define TYPE_N_LIMIT                    TO_REG(0x3C)
-#define GENERAL_CONTROL_EXTENSION_1     TO_REG(0x40)
-#define CLOCK_CONTROL_EXTENSION_1       TO_REG(0x44)
-#define DUTY_CONTROL_2                  TO_REG(0x48)
-#define DUTY_CONTROL_3                  TO_REG(0x4C)
-#define TYPE_O_CONTROL_0                TO_REG(0x50)
-#define TYPE_O_CONTROL_1                TO_REG(0x54)
-#define TACH_SOURCE_EXTENSION_1         TO_REG(0x60)
-#define TYPE_O_LIMIT                    TO_REG(0x78)
-
 #define PWM0_GENERAL_REG                TO_REG(0x000)
 #define PWM0_DUTY_CYC_REG               TO_REG(0x004)
 #define TACH0_GENERAL_REG               TO_REG(0x008)
@@ -121,7 +97,7 @@ static double get_rpm_from_duty(float duty, uint8_t fan_loc)
     PTR_RPM_DUTY ptrRpmDuty;
     double ret = 0;
 
-    if (fan_loc < 8) {
+    if (fan_loc < 16) {
         ptrRpmDuty = &gRpmDuty[fan_loc];
     } else {
         return 0;
@@ -237,8 +213,7 @@ static void aspeed_pwm_write(void *opaque, hwaddr addr, uint64_t data,
                     s->regs[TACH0_STS_REG + ((pwm_channel * 16) >> 2)] = tacho_value & ((1 << 20) - 1);
                     s->regs[TACH0_STS_REG + ((pwm_channel * 16) >> 2)] |= (0b11 << 20);
 //                    printf("TACH_STS_REG:%x\n", s->regs[TACH0_STS_REG + ((pwm_channel * 16) >> 2)]);
-                    //printf(">>> fan-%d : duty-%f , rpm-%f , tacho_value-%x , clock_division-%f \n", i,
-                    //duty_rate, rpm, tacho_value, fan_tach_clock_division);
+//                    printf(">>> fan-%d : duty-%f , rpm-%f , tacho_value-%x , clock_division-%f \n", pwm_channel, duty_rate, rpm, tacho_value, fan_tach_clock_division);
                 }
             }
             //printf(">>> old reg trigger: %08x \n", s->regs[TRIGGER]);

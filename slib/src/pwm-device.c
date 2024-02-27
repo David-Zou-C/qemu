@@ -6,7 +6,7 @@
 #include "pwm-device.h"
 #include "aspeed-init.h"
 
-RPM_DUTY gRpmDuty[8] = {0};
+RPM_DUTY gRpmDuty[16] = {0};
 
 static void init_pwm_device(PTR_PWM_TACH_DEVICE ptrPwmTachDevice) {
     dynamic_change_data(PWM_TACH, ptrPwmTachDevice, ptrPwmTachDevice->ptrDeviceConfig->args);
@@ -19,7 +19,7 @@ void pwm_device_add(PTR_DEVICE_CONFIG ptrDeviceConfig) {
     ptrPwmTachDevice->ptrDeviceConfig = ptrDeviceConfig;
     ptrPwmTachDevice->pwm_tach_num = ptrDeviceConfig->pwm_tach_num;
     printf("pwm device added - %d\n", ptrPwmTachDevice->pwm_tach_num);
-    if (ptrPwmTachDevice->pwm_tach_num < 8) {
+    if (ptrPwmTachDevice->pwm_tach_num < 16) {
         ptrPwmTachDevice->ptrRpmDuty = &gRpmDuty[ptrPwmTachDevice->pwm_tach_num];
     } else {
         /*  */
