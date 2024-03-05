@@ -381,7 +381,10 @@ void pmbus_vr_add(void *bus, uint8_t address, const char *type, PTR_DEVICE_CONFI
     PMBUS_DEVICE(dev)->ptrDeviceConfig = ptrDeviceConfig;
     if (ptrDeviceConfig->master.i2CType == I2C) {
         qdev_realize_and_unref(dev, (BusState *) bus, &error_fatal);
-    } else {
+    } else if (ptrDeviceConfig->master.i2CType == I3C) {
         qdev_realize_and_unref(dev, (BusState *)((I3C_BUS(bus))->i2c_bus), &error_fatal);
-    }
+    } else {
+        printf("Due to I2C Device type error, device add failed\n");
+        exit(1);
+    }   
 };

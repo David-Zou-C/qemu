@@ -367,9 +367,12 @@ type_init(at24c_eeprom_register)
         it->i2cDeviceData.ptrDeviceConfig = ptrDeviceConfig;                 \
         if(ptrDeviceConfig->master.i2CType == I2C) {      \
             i2c_slave_realize_and_unref(I2C_SLAVE(it), bus, &error_abort); \
-        } else {                                          \
+        } else if (ptrDeviceConfig->master.i2CType == I3C) {                                          \
             i2c_slave_realize_and_unref(I2C_SLAVE(it), (I3C_BUS(bus))->i2c_bus, &error_abort); \
-        }        \
+        } else {     \
+            printf("Due to I2C Device type error, device add failed\n");                    \
+            exit(1);        \
+        }                   \
     };
 
 
