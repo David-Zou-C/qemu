@@ -345,9 +345,9 @@ static void *send_thread(void *pVoid) {
                         cJSON_AddNumberToObject(device, "adc_channel",
                                                 deviceAddList[i].ptrDeviceConfig->adc_channel);
                         if (deviceAddList[i].ptrAdcDeviceData->adcRegType == REG_L) {
-                            sprintf(temp, "%04x", deviceAddList[i].ptrAdcDeviceData->ptrAdcReg->reg_lh.l);
+                            sprintf(temp, "0x%04x", deviceAddList[i].ptrAdcDeviceData->ptrAdcReg->reg_lh.l);
                         } else {
-                            sprintf(temp, "%04x", deviceAddList[i].ptrAdcDeviceData->ptrAdcReg->reg_lh.h);
+                            sprintf(temp, "0x%04x", deviceAddList[i].ptrAdcDeviceData->ptrAdcReg->reg_lh.h);
                         }
                         cJSON_AddStringToObject(device, "adc_register", temp);
                         cJSON_AddNumberToObject(device, "adc_value", deviceAddList[i].ptrAdcDeviceData->set_adc_value);
