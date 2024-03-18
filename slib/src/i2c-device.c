@@ -127,7 +127,7 @@ void init_I2cEmptyDevice1(PTR_I2C_DEVICE_DATA ptrI2CDeviceData) {
     if (ptrI2CDeviceData->data_buf == NULL) {
         /* 分配空间 */
         ptrI2CDeviceData->data_buf = (uint8_t *) malloc(sizeof(I2C_BP_CPLD_sTYPE));
-        memset(ptrI2CDeviceData->data_buf, 0, sizeof(PTR_I2C_BP_CPLD_sTYPE));
+        memset(ptrI2CDeviceData->data_buf, 0, sizeof(I2C_BP_CPLD_sTYPE));
         ptrI2CBpCpldSType = (PTR_I2C_BP_CPLD_sTYPE) ptrI2CDeviceData->data_buf;
         /* 初始化线程锁 */
         pthread_mutex_init(&ptrI2CBpCpldSType->mutex, NULL);
