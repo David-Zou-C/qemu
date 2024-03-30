@@ -135,6 +135,17 @@ void SMBusEmptyDevice7_add(void *smbus, PTR_DEVICE_CONFIG ptrDeviceConfig);
 void SMBusEmptyDevice8_add(void *smbus, PTR_DEVICE_CONFIG ptrDeviceConfig);
 void SMBusEmptyDevice9_add(void *smbus, PTR_DEVICE_CONFIG ptrDeviceConfig);
 
+void SMBusEmptyDevice0_qdev_get_config(void *dev, PTR_DEVICE_CONFIG ptrDeviceConfig);
+void SMBusEmptyDevice1_qdev_get_config(void *dev, PTR_DEVICE_CONFIG ptrDeviceConfig);
+void SMBusEmptyDevice2_qdev_get_config(void *dev, PTR_DEVICE_CONFIG ptrDeviceConfig);
+void SMBusEmptyDevice3_qdev_get_config(void *dev, PTR_DEVICE_CONFIG ptrDeviceConfig);
+void SMBusEmptyDevice4_qdev_get_config(void *dev, PTR_DEVICE_CONFIG ptrDeviceConfig);
+void SMBusEmptyDevice5_qdev_get_config(void *dev, PTR_DEVICE_CONFIG ptrDeviceConfig);
+void SMBusEmptyDevice6_qdev_get_config(void *dev, PTR_DEVICE_CONFIG ptrDeviceConfig);
+void SMBusEmptyDevice7_qdev_get_config(void *dev, PTR_DEVICE_CONFIG ptrDeviceConfig);
+void SMBusEmptyDevice8_qdev_get_config(void *dev, PTR_DEVICE_CONFIG ptrDeviceConfig);
+void SMBusEmptyDevice9_qdev_get_config(void *dev, PTR_DEVICE_CONFIG ptrDeviceConfig);
+
 SMBusFunctionPtr getSMBusDeviceAddFunc(int device_type_id);
 int getSMBusDeviceTypeId(SMBusFunctionPtr functionPtr);
 

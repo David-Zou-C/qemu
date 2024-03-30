@@ -167,5 +167,10 @@ I2cFunctionPtr getI2cDeviceAddFunc(int device_type_id);
 
 int getI2cDeviceTypeId(I2cFunctionPtr functionPtr);
 
+void I2cEmptyDevice0_qdev_get_config(void *dev, void *bus, PTR_DEVICE_CONFIG ptrDeviceConfig);
+void I2cEmptyDevice1_qdev_get_config(void *dev, void *bus, PTR_DEVICE_CONFIG ptrDeviceConfig);
+void I2cEmptyDevice2_qdev_get_config(void *dev, void *bus, PTR_DEVICE_CONFIG ptrDeviceConfig);
+void I2cEmptyDevice3_qdev_get_config(void *dev, void *bus, PTR_DEVICE_CONFIG ptrDeviceConfig);
+void I2cEmptyDevice4_qdev_get_config(void *dev, void *bus, PTR_DEVICE_CONFIG ptrDeviceConfig);
 
 #endif //QEMU_I2C_DEVICE_H

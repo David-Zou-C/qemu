@@ -982,6 +982,12 @@ static void aspeed_i2c_instance_init(Object *obj)
         object_initialize_child(obj, "bus[*]", &s->busses[i],
                                 TYPE_ASPEED_I2C_BUS);
     }
+
+    object_property_add_link(obj, QDEV_HOTPLUG_HANDLER_PROPERTY,
+                             TYPE_HOTPLUG_HANDLER,
+                             (Object **)&s->hotplug_handler,
+                             object_property_allow_set_link,
+                             0);
 }
 
 /*
@@ -1210,6 +1216,17 @@ static void aspeed_i2c_bus_reset(DeviceState *dev)
     i2c_end_transfer(s->bus);
 }
 
+static void aspeed_i2c_bus_set_hotplug_handler(BusState *bus, Object *handler)
+{
+    object_property_set_link(OBJECT(bus), QDEV_HOTPLUG_HANDLER_PROPERTY,
+                             handler, &error_abort);
+}
+
+static void aspeed_i2c_bus_set_bus_hotplug_handler(BusState *bus)
+{
+    aspeed_i2c_bus_set_hotplug_handler(bus, OBJECT(bus));
+}
+
 static void aspeed_i2c_bus_realize(DeviceState *dev, Error **errp)
 {
     AspeedI2CBus *s = ASPEED_I2C_BUS(dev);
@@ -1232,6 +1249,7 @@ static void aspeed_i2c_bus_realize(DeviceState *dev, Error **errp)
     memory_region_init_io(&s->mr, OBJECT(s), &aspeed_i2c_bus_ops,
                           s, name, aic->reg_size);
     sysbus_init_mmio(SYS_BUS_DEVICE(dev), &s->mr);
+    aspeed_i2c_bus_set_bus_hotplug_handler(BUS(s->bus));
 }
 
 static Property aspeed_i2c_bus_properties[] = {

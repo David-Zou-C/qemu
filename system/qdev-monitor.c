@@ -43,6 +43,11 @@
 #include "hw/qdev-properties.h"
 #include "hw/clock.h"
 #include "hw/boards.h"
+#include "slib/inc/slib-common.h"
+#include "slib/inc/aspeed-init.h"
+#include "slib/inc/smbus-device.h"
+#include "hw/sensor/isl_pmbus_vr.h"
+#include "slib/inc/i2c-device.h"
 
 /*
  * Aliases were a bad idea from the start.  Let's keep them
@@ -64,6 +69,19 @@ typedef struct QDevAlias
                               QEMU_ARCH_LOONGARCH)
 #define QEMU_ARCH_VIRTIO_CCW (QEMU_ARCH_S390X)
 #define QEMU_ARCH_VIRTIO_MMIO (QEMU_ARCH_M68K)
+
+typedef enum QDevNumber {
+    QDEV_I2C_DEVICE_NO_0,
+    QDEV_I2C_DEVICE_NO_1,
+    QDEV_I2C_DEVICE_NO_2,
+    QDEV_I2C_DEVICE_NO_3,
+    QDEV_I2C_DEVICE_NO_4,
+    QDEV_I2C_DEVICE_NO_5,
+    QDEV_I2C_DEVICE_NO_6,
+    QDEV_I2C_DEVICE_NO_7,
+    QDEV_I2C_DEVICE_NO_8,
+    QDEV_I2C_DEVICE_NO_9
+} QDevNumber;
 
 /* Please keep this table sorted by typename. */
 static const QDevAlias qdev_alias_table[] = {
@@ -616,111 +634,203 @@ const char *qdev_set_id(DeviceState *dev, char *id, Error **errp)
     return prop->name;
 }
 
+static void qdev_device_get_config(DeviceState *dev, BusState *bus, const uint8_t number, PTR_DEVICE_CONFIG pDeviceConfig)
+{
+    printf("start to get qdev No.%d config data\n", number);
+    if (pDeviceConfig->deviceType == SMBUS_DEVICE_TYPE)
+    {
+        switch (number) {
+            case QDEV_I2C_DEVICE_NO_0:
+                SMBusEmptyDevice0_qdev_get_config((void *)dev, pDeviceConfig);
+                break;
+            case QDEV_I2C_DEVICE_NO_1:
+                SMBusEmptyDevice1_qdev_get_config((void *)dev, pDeviceConfig);
+                break;
+            case QDEV_I2C_DEVICE_NO_2:
+                SMBusEmptyDevice2_qdev_get_config((void *)dev, pDeviceConfig);
+                break;
+            case QDEV_I2C_DEVICE_NO_3:
+                SMBusEmptyDevice3_qdev_get_config((void *)dev, pDeviceConfig);
+                break;
+            case QDEV_I2C_DEVICE_NO_4:
+                SMBusEmptyDevice4_qdev_get_config((void *)dev, pDeviceConfig);
+                break;
+            case QDEV_I2C_DEVICE_NO_5:
+                SMBusEmptyDevice5_qdev_get_config((void *)dev, pDeviceConfig);
+                break;
+            case QDEV_I2C_DEVICE_NO_6:
+                SMBusEmptyDevice6_qdev_get_config((void *)dev, pDeviceConfig);
+                break;
+            case QDEV_I2C_DEVICE_NO_7:
+                SMBusEmptyDevice7_qdev_get_config((void *)dev, pDeviceConfig);
+                break;
+            case QDEV_I2C_DEVICE_NO_8:
+                SMBusEmptyDevice8_qdev_get_config((void *)dev, pDeviceConfig);
+                break;
+            case QDEV_I2C_DEVICE_NO_9:
+                SMBusEmptyDevice9_qdev_get_config((void *)dev, pDeviceConfig);
+                break;
+            default:
+                break;
+        }
+    } else if (pDeviceConfig->deviceType == PMBUS_DEVICE_TYPE)
+    {
+        pmbus_qdev_get_config((void *)dev, pDeviceConfig);
+    } else if (pDeviceConfig->deviceType == I2C_DEVICE_TYPE)
+    {
+        switch (number) {
+            case QDEV_I2C_DEVICE_NO_0:
+                I2cEmptyDevice0_qdev_get_config((void *)dev, (void *)bus, pDeviceConfig);
+                break;
+            case QDEV_I2C_DEVICE_NO_1:
+                I2cEmptyDevice1_qdev_get_config((void *)dev, (void *)bus, pDeviceConfig);
+                break;
+            case QDEV_I2C_DEVICE_NO_2:
+                I2cEmptyDevice2_qdev_get_config((void *)dev, (void *)bus, pDeviceConfig);
+                break;
+            case QDEV_I2C_DEVICE_NO_3:
+                I2cEmptyDevice3_qdev_get_config((void *)dev, (void *)bus, pDeviceConfig);
+                break;
+            case QDEV_I2C_DEVICE_NO_4:
+                I2cEmptyDevice4_qdev_get_config((void *)dev, (void *)bus, pDeviceConfig);
+                break;
+            default:
+                break;
+        }
+    }
+}
+
 DeviceState *qdev_device_add_from_qdict(const QDict *opts,
                                         bool from_json, Error **errp)
 {
     ERRP_GUARD();
     DeviceClass *dc;
-    const char *driver, *path;
+    const char *driver;
+    char devname[32] = {0};
+    char devid[40] = {0};
+    char path[56] = {0};
     char *id;
     DeviceState *dev = NULL;
     BusState *bus = NULL;
+    uint8_t qdevCnt = 0;
+    PTR_CONFIG_DATA ptrConfigData = parse_configuration();
+    PTR_DEVICE_CONFIG pDeviceConfig = ptrConfigData->ptrDeviceConfig;
 
-    driver = qdict_get_try_str(opts, "driver");
-    if (!driver) {
-        error_setg(errp, QERR_MISSING_PARAMETER, "driver");
-        return NULL;
+    while (pDeviceConfig != NULL && pDeviceConfig->pre != NULL) {
+        pDeviceConfig = pDeviceConfig->pre;  /* 确保回到起始节点 */
     }
 
-    /* find driver */
-    dc = qdev_get_device_class(&driver, errp);
-    if (!dc) {
-        return NULL;
-    }
+    while (pDeviceConfig != NULL) {
+        if (pDeviceConfig->deviceType == SMBUS_DEVICE_TYPE)
+        {
+            snprintf(devname, sizeof(devname), "smbus-empty-%d", pDeviceConfig->device_type_id - 1);
+        }
+        else if (pDeviceConfig->deviceType == PMBUS_DEVICE_TYPE)
+        {
+            snprintf(devname, sizeof(devname), "raa228000");
+        }
+        else if (pDeviceConfig->deviceType == I2C_DEVICE_TYPE)
+        {
+            snprintf(devname, sizeof(devname), "i2c-empty-%d", pDeviceConfig->device_type_id - 101);
+        }
 
-    /* find bus */
-    path = qdict_get_try_str(opts, "bus");
-    if (path != NULL) {
-        bus = qbus_find(path, errp);
-        if (!bus) {
-            return NULL;
-        }
-        if (!object_dynamic_cast(OBJECT(bus), dc->bus_type)) {
-            error_setg(errp, "Device '%s' can't go on %s bus",
-                       driver, object_get_typename(OBJECT(bus)));
-            return NULL;
-        }
-    } else if (dc->bus_type != NULL) {
-        bus = qbus_find_recursive(sysbus_get_default(), NULL, dc->bus_type);
-        if (!bus || qbus_is_full(bus)) {
-            error_setg(errp, "No '%s' bus found for device '%s'",
-                       dc->bus_type, driver);
-            return NULL;
-        }
-    }
+        driver = devname;
 
-    if (qdev_should_hide_device(opts, from_json, errp)) {
-        if (bus && !qbus_is_hotpluggable(bus)) {
+        /* find driver */
+        dc = qdev_get_device_class(&driver, errp);
+        if (!dc) {
+            return NULL;
+        }
+
+        if (pDeviceConfig->master.i2CType != I3C)
+        {
+            /* find bus */
+            snprintf(path, sizeof(path), "aspeed.i2c.bus.%d", pDeviceConfig->bus);
+        }
+        else 
+        {
+            /* find bus */
+            snprintf(path, sizeof(path), "aspeed.i3c.device.%d-legacy-i2c", pDeviceConfig->bus);
+        }
+
+        if (path != NULL) {
+            bus = qbus_find(path, errp);
+            if (!bus) {
+                return NULL;
+            }
+            printf("qdev %s will be mount on %s\n", driver, path);
+            if (!object_dynamic_cast(OBJECT(bus), dc->bus_type)) {
+                error_setg(errp, "Device '%s' can't go on %s bus",
+                        driver, object_get_typename(OBJECT(bus)));
+                return NULL;
+            }
+        } else if (dc->bus_type != NULL) {
+            bus = qbus_find_recursive(sysbus_get_default(), NULL, dc->bus_type);
+            if (!bus || qbus_is_full(bus)) {
+                error_setg(errp, "No '%s' bus found for device '%s'",
+                        dc->bus_type, driver);
+                return NULL;
+            }
+        }
+
+        if (phase_check(PHASE_MACHINE_READY) && bus && !qbus_is_hotpluggable(bus)) {
             error_setg(errp, QERR_BUS_NO_HOTPLUG, bus->name);
+            return NULL;
         }
-        return NULL;
-    } else if (*errp) {
-        return NULL;
-    }
 
-    if (phase_check(PHASE_MACHINE_READY) && bus && !qbus_is_hotpluggable(bus)) {
-        error_setg(errp, QERR_BUS_NO_HOTPLUG, bus->name);
-        return NULL;
-    }
+        if (!migration_is_idle()) {
+            error_setg(errp, "device_add not allowed while migrating");
+            return NULL;
+        }
 
-    if (!migration_is_idle()) {
-        error_setg(errp, "device_add not allowed while migrating");
-        return NULL;
-    }
+        /* create device */
+        dev = qdev_new(driver);
 
-    /* create device */
-    dev = qdev_new(driver);
+        /* Check whether the hotplug is allowed by the machine */
+        if (phase_check(PHASE_MACHINE_READY)) {
+            if (!qdev_hotplug_allowed(dev, errp)) {
+                goto err_del_dev;
+            }
 
-    /* Check whether the hotplug is allowed by the machine */
-    if (phase_check(PHASE_MACHINE_READY)) {
-        if (!qdev_hotplug_allowed(dev, errp)) {
+            if (!bus && !qdev_get_machine_hotplug_handler(dev)) {
+                /* No bus, no machine hotplug handler --> device is not hotpluggable */
+                error_setg(errp, "Device '%s' can not be hotplugged on this machine",
+                        driver);
+                goto err_del_dev;
+            }
+        }
+
+        /*
+        * set dev's parent and register its id.
+        * If it fails it means the id is already taken.
+        */
+        snprintf(devid, sizeof(devid), "%s-test%d", devname, qdevCnt);
+        id = g_strdup(devid);
+        printf("id:%s\n", id);
+        if (!qdev_set_id(dev, id, errp)) {
             goto err_del_dev;
         }
 
-        if (!bus && !qdev_get_machine_hotplug_handler(dev)) {
-            /* No bus, no machine hotplug handler --> device is not hotpluggable */
-            error_setg(errp, "Device '%s' can not be hotplugged on this machine",
-                       driver);
+        qdev_prop_set_uint8(dev, "address", pDeviceConfig->addr);
+        if (*errp) {
             goto err_del_dev;
         }
+
+        qdev_device_get_config(dev, bus, pDeviceConfig->device_type_id - 1, pDeviceConfig);
+
+        if (pDeviceConfig->master.i2CType != I3C)
+        {
+            if (!qdev_realize(dev, bus, errp)) {
+                goto err_del_dev;
+            }
+        }
+
+        if (pDeviceConfig->next == NULL) {
+            return dev;
+        }
+        pDeviceConfig = pDeviceConfig->next;
+        qdevCnt++;
     }
-
-    /*
-     * set dev's parent and register its id.
-     * If it fails it means the id is already taken.
-     */
-    id = g_strdup(qdict_get_try_str(opts, "id"));
-    if (!qdev_set_id(dev, id, errp)) {
-        goto err_del_dev;
-    }
-
-    /* set properties */
-    dev->opts = qdict_clone_shallow(opts);
-    qdict_del(dev->opts, "driver");
-    qdict_del(dev->opts, "bus");
-    qdict_del(dev->opts, "id");
-
-    object_set_properties_from_keyval(&dev->parent_obj, dev->opts, from_json,
-                                      errp);
-    if (*errp) {
-        goto err_del_dev;
-    }
-
-    if (!qdev_realize(dev, bus, errp)) {
-        goto err_del_dev;
-    }
-    return dev;
-
 err_del_dev:
     if (dev) {
         object_unparent(OBJECT(dev));
@@ -732,14 +842,14 @@ err_del_dev:
 /* Takes ownership of @opts on success */
 DeviceState *qdev_device_add(QemuOpts *opts, Error **errp)
 {
-    QDict *qdict = qemu_opts_to_qdict(opts, NULL);
+    QDict *qdict = NULL;
     DeviceState *ret;
 
     ret = qdev_device_add_from_qdict(qdict, false, errp);
     if (ret) {
         qemu_opts_del(opts);
     }
-    qobject_unref(qdict);
+
     return ret;
 }
 
@@ -846,17 +956,9 @@ void hmp_info_qdm(Monitor *mon, const QDict *qdict)
 
 void qmp_device_add(QDict *qdict, QObject **ret_data, Error **errp)
 {
-    QemuOpts *opts;
+    QemuOpts *opts =NULL;
     DeviceState *dev;
 
-    opts = qemu_opts_from_qdict(qemu_find_opts("device"), qdict, errp);
-    if (!opts) {
-        return;
-    }
-    if (!monitor_cur_is_qmp() && qdev_device_help(opts)) {
-        qemu_opts_del(opts);
-        return;
-    }
     dev = qdev_device_add(opts, errp);
 
     /*

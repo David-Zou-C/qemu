@@ -262,6 +262,7 @@ struct AspeedI2CState {
     AspeedI2CBus busses[ASPEED_I2C_NR_BUSSES];
     MemoryRegion *dram_mr;
     AddressSpace dram_as;
+    HotplugHandler *hotplug_handler;
 };
 
 #define TYPE_ASPEED_I2C_BUS_SLAVE "aspeed.i2c.slave"
