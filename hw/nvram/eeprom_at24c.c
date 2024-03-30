@@ -372,7 +372,17 @@ type_init(at24c_eeprom_register)
         }        \
     };
 
-
+#define QDEV_I2C_CONFIG_ADD_FUNC(InstanceType, OBJ_NAME) \
+    void InstanceType##_qdev_get_config(void *bus, void *dev, PTR_DEVICE_CONFIG ptrDeviceConfig) { \
+        InstanceType *it;                                              \
+        it = OBJ_NAME(get_i2c_slave_dev(dev));        \
+        it->i2cDeviceData.ptrDeviceConfig = ptrDeviceConfig;                 \
+        if(ptrDeviceConfig->master.i2CType == I2C) {      \
+            i2c_slave_realize_and_unref(I2C_SLAVE(it), bus, &error_abort); \
+        } else {                                          \
+            i2c_slave_realize_and_unref(I2C_SLAVE(it), (I3C_BUS(bus))->i2c_bus, &error_abort); \
+        }        \
+    } 
 
 #define INIT_I2C_FUNC(InstanceType, OBJ_NAME) \
     OBJECT_DECLARE_INSTANCE(InstanceType, OBJ_NAME) \
@@ -386,8 +396,8 @@ type_init(at24c_eeprom_register)
     EMPTY_I2C_DEVICE_CLASS_INIT(InstanceType, OBJ_NAME) \
     EMPTY_I2C_DEVICE_TYPEINFO(InstanceType, OBJ_NAME)   \
     EMPTY_I2C_DEVICE_REGISTER_INIT(InstanceType, OBJ_NAME)\
-    EMPTY_I2C_DEVICE_ADD_FUNC(InstanceType, OBJ_NAME)
-
+    EMPTY_I2C_DEVICE_ADD_FUNC(InstanceType, OBJ_NAME) \
+    QDEV_I2C_CONFIG_ADD_FUNC(InstanceType, OBJ_NAME)
 
 #define TYPE_I2C_EMPTY_0 "i2c-empty-0"
 INIT_I2C_FUNC(I2cEmptyDevice0, I2C_EMPTY_0)
@@ -436,3 +446,8 @@ int getI2cDeviceTypeId(I2cFunctionPtr functionPtr){
     }
     return -1;
 };
+
+I2CSlave *get_i2c_slave_dev(void *dev)
+{
+    return I2C_SLAVE(dev);
+}

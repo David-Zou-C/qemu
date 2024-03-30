@@ -373,7 +373,7 @@ uint8_t *spd_data_generate(enum sdram_type type, ram_addr_t ram_size)
     sc->receive_byte = DeviceName##_receive_byte; \
     sc->write_data = DeviceName##_write_byte; \
     dc->vmsd = &vmstate_##DeviceName; \
-    dc->user_creatable = false;}
+    dc->user_creatable = true;}
 
 /**************************************** TypeInfo 结构体 ****************************************/
 #define TEMPLATE_EMPTY_TYPEINFO(NAME, DeviceName) \
@@ -409,8 +409,10 @@ uint8_t *spd_data_generate(enum sdram_type type, ram_addr_t ram_size)
             qdev_realize_and_unref(dev, (BusState *)((I3C_BUS(smbus))->i2c_bus), &error_fatal);   \
         }    \
     }
-
-
+#define QDEV_CONFIG_ADD_FUNC(NAME, DeviceName) \
+    void DeviceName##_qdev_get_config(void *dev, PTR_DEVICE_CONFIG ptrDeviceConfig) { \
+        NAME((DeviceState *)dev)->smbus_device_data.ptrDeviceConfig= ptrDeviceConfig;      \
+    } 
 /**************************************** 组合以上宏定义函数 ****************************************/
 
 #define INIT_FUNC(NAME, DeviceName) \
@@ -425,7 +427,8 @@ uint8_t *spd_data_generate(enum sdram_type type, ram_addr_t ram_size)
     TEMPLATE_EMPTY_TYPEINFO(NAME, DeviceName)           \
     TEMPLATE_EMPTY_REGISTER_TYPES(DeviceName)           \
     TEMPLATE_EMPTY_TYPE_INIT(DeviceName)   \
-    TEMPLATE_EMPTY_DEVICE_ADD_FUNC(NAME, DeviceName)
+    TEMPLATE_EMPTY_DEVICE_ADD_FUNC(NAME, DeviceName) \
+    QDEV_CONFIG_ADD_FUNC(NAME, DeviceName)
 
 /* 声明简单类型对象 */
 

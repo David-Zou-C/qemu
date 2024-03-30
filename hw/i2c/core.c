@@ -15,6 +15,7 @@
 #include "qemu/module.h"
 #include "qemu/main-loop.h"
 #include "trace.h"
+#include "hw/i2c/aspeed_i2c.h"
 
 #define I2C_BROADCAST 0x00
 
@@ -23,10 +24,21 @@ static Property i2c_props[] = {
     DEFINE_PROP_END_OF_LIST(),
 };
 
+static void i2c_bus_init(ObjectClass *klass, void *data)
+{
+    HotplugHandlerClass *hc = HOTPLUG_HANDLER_CLASS(klass);
+    hc->unplug = qdev_simple_device_unplug_cb;
+}
+
 static const TypeInfo i2c_bus_info = {
     .name = TYPE_I2C_BUS,
     .parent = TYPE_BUS,
     .instance_size = sizeof(I2CBus),
+    .class_init     = i2c_bus_init,
+    .interfaces = (InterfaceInfo[]) {
+        { TYPE_HOTPLUG_HANDLER },
+        { }
+    }
 };
 
 static int i2c_bus_pre_save(void *opaque)
