@@ -388,3 +388,7 @@ void pmbus_vr_add(void *bus, uint8_t address, const char *type, PTR_DEVICE_CONFI
         exit(1);
     }   
 };
+
+void pmbus_qdev_get_config(void *dev, PTR_DEVICE_CONFIG ptrDeviceConfig) {           
+    PMBUS_DEVICE((DeviceState *)dev)->ptrDeviceConfig = ptrDeviceConfig;      
+} 
