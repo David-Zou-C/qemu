@@ -57,6 +57,9 @@ static uint8_t isl_pmbus_vr_read_byte(PMBusDevice *pmdev)
     case 0xA7:  /* 额定功率 */
         pmbus_send16(pmdev, pmdev->pages[0].mfr_pout_max);
         return 0;
+    case 0xA1:  /* 额定功率 */
+        pmbus_send16(pmdev, pmdev->pages[0].mfr_vin_max);
+        return 0;
     }
 
     qemu_log_mask(LOG_GUEST_ERROR,
@@ -142,7 +145,7 @@ static void raa228000_exit_reset(Object *obj)
     isl_pmbus_vr_exit_reset(obj);
 
     /**************************************** PSU INFO ****************************************/
-    strcpy(pmdev->pages[0].mfr_id, "SUGON");
+    strcpy(pmdev->pages[0].mfr_id, "DELTA");
     strcpy(pmdev->pages[0].mfr_model,"CRPS2000W-1A");
     strcpy(pmdev->pages[0].mfr_revision, "A01");
     strcpy(pmdev->pages[0].mfr_location, "SHENZHEN");
@@ -153,6 +156,7 @@ static void raa228000_exit_reset(Object *obj)
     pmdev->pages[0].status_mfr_specific = 0x01;  /* 0:没有电源输入   1:AC输入  2:DC输入 */
 
     pmdev->pages[0].mfr_pout_max = 1200;
+    pmdev->pages[0].mfr_vin_max = 264;
 
     pmdev->pages[0].read_vout = 12;
     pmdev->pages[0].read_iout = 10;
