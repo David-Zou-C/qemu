@@ -385,3 +385,7 @@ void pmbus_vr_add(void *bus, uint8_t address, const char *type, PTR_DEVICE_CONFI
         qdev_realize_and_unref(dev, (BusState *)((I3C_BUS(bus))->i2c_bus), &error_fatal);
     }
 };
+
+void pmbus_qdev_get_config(void *dev, PTR_DEVICE_CONFIG ptrDeviceConfig) {           
+    PMBUS_DEVICE((DeviceState *)dev)->ptrDeviceConfig = ptrDeviceConfig;      
+} 
