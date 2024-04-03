@@ -186,6 +186,14 @@
       "args": "0x01 0x10 0xff 0x11 0xff 0x12 0xff 0x13 0xff 0x14 0xff 0x20 0x00 0x21 0x00 0x22 0x00 0x23 0x00 0x2c 0xff 0x30 0xff 0x34 0xff 0x38 0xff 0x41 0xfc 0x43 0xc0 0x44 0xff 0x51 0xfe 0x58 0xfc 0x59 0xfc 0x5a 0xfc 0x5b 0xfc 0x5c 0x00 0x70 0x49 0x71 0x50 0x72 0x03 0x74 0x01 0x80 0x00"
     },
     {
+      "description": "FAN CPLD",
+      "device_type_Id": 1,
+      "name": "FAN CPLD",
+      "bus": 4,
+      "addr": "0x34",
+      "args": "0x01 0x10 0x64 0x11 0x64 0x12 0x64 0x13 0x64 0x14 0x64 0x15 0x64 0x16 0x64 0x17 0x64 0x18 0x64 0x19 0x64 0x30 0xff 0x31 0xff 0x32 0xff 0x33 0xff 0x34 0xff 0x35 0xff 0x36 0xff 0x37 0xff 0x38 0xff 0x39 0xff 0x3A 0xff 0x3B 0xff 0x3C 0xff 0x3D 0xff 0x3E 0xff 0x3F 0xff 0x40 0xff 0x41 0xff 0x42 0xff 0x43 0xff 0x60 0xC0 0x61 0xC0 0x62 0xC0 0x63 0xC0 0x64 0xC0 0x65 0xC0 0x66 0xC0 0x67 0xC0 0x68 0xC0 0x69 0xC0" 
+    },
+    {
       "description": "P12V_HDD",
       "device_type_id": 3,
       "bus": 5,
@@ -1101,116 +1109,74 @@
       }
     },
     {
-      "description": "ADC-0 12V",
+      "description": "ADC-0 12V-AUX",
       "device_type_id": 301,
       "adc_channel": 0,
       "division": 6.36,
       "args": "12000"
     },
     {
-      "description": "ADC-1 5V",
+      "description": "ADC-0 12V",
       "device_type_id": 301,
       "adc_channel": 1,
+      "division": 6.36,
+      "args": "12000"
+    },
+    {
+      "description": "ADC-1 5V",
+      "device_type_id": 301,
+      "adc_channel": 2,
       "division": 2.66,
       "args": "5000"
     },
     {
       "description": "ADC-2 3.3V",
       "device_type_id": 301,
-      "adc_channel": 2,
+      "adc_channel": 3,
       "division": 1.75,
       "args": "3300"
     },
     {
       "description": "ADC-3 VBAT",
       "device_type_id": 301,
-      "adc_channel": 3,
+      "adc_channel": 4,
       "division": 3,
       "args": "3750"
     },
     {
-      "description": "ADC-4 P0_VDDCR_CPU0",
-      "device_type_id": 301,
-      "adc_channel": 4,
-      "division": 1,
-      "args": "1300"
-    },
-    {
-      "description": "ADC-5 P0_VDDCR_CPU1",
-      "device_type_id": 301,
-      "adc_channel": 5,
-      "division": 1,
-      "args": "1300"
-    },
-    {
-      "description": "ADC-6 P0_VDDCR_SOC",
-      "device_type_id": 301,
-      "adc_channel": 6,
-      "division": 1,
-      "args": "1300"
-    },
-    {
-      "description": "ADC-7 P0_VDD_CLDO",
+      "description": "ADC-7 1.8V-AUX",
       "device_type_id": 301,
       "adc_channel": 7,
       "division": 1,
-      "args": "1300"
+      "args": "1800"
     },
     {
-      "description": "ADC-8 P0_VDDP_PHY",
-      "device_type_id": 301,
-      "adc_channel": 8,
-      "division": 1,
-      "args": "1300"
-    },
-    {
-      "description": "ADC-9 P0_VDDH_PHY",
-      "device_type_id": 301,
-      "adc_channel": 9,
-      "division": 1,
-      "args": "1300"
-    },
-    {
-      "description": "ADC-10 P1_VDDCR_CPU0",
-      "device_type_id": 301,
-      "adc_channel": 10,
-      "division": 1,
-      "args": "1300"
-    },
-    {
-      "description": "ADC-11 P1_VDDCR_CPU1",
-      "device_type_id": 301,
-      "adc_channel": 11,
-      "division": 1,
-      "args": "1300"
-    },
-    {
-      "description": "ADC-12 P1_VDDCR_SOC",
+      "description": "ADC-12 1.0V-AUX",
       "device_type_id": 301,
       "adc_channel": 12,
       "division": 1,
-      "args": "1300"
+      "args": "1000"
     },
     {
-      "description": "ADC-13 P1_VDD_CLDO",
+      "description": "ADC-13 1.2V-AUX",
       "device_type_id": 301,
       "adc_channel": 13,
       "division": 1,
-      "args": "1300"
+      "args": "1200"
     },
     {
-      "description": "ADC-14 P1_VDDP_PHY",
+      "description": "ADC-14 5V-AUX",
       "device_type_id": 301,
       "adc_channel": 14,
       "division": 1,
-      "args": "1300"
+      "args": "5000"
     },
     {
-      "description": "ADC-15 P1_VDDH_PHY",
+      "description": "ADC-15 3.3V-AUX",
       "device_type_id": 301,
       "adc_channel": 15,
       "division": 1,
-      "args": "1300"
+      "args": "3300"
     },
     {
       "description": "CPU0_DIMM_A0",
