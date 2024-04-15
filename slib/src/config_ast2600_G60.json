@@ -1112,6 +1112,7 @@
       "description": "ADC-0 12V-AUX",
       "device_type_id": 301,
       "adc_channel": 0,
+      "adc_type": "internal",
       "division": 6.36,
       "args": "12000"
     },
@@ -1119,6 +1120,7 @@
       "description": "ADC-0 12V",
       "device_type_id": 301,
       "adc_channel": 1,
+      "adc_type": "internal",
       "division": 6.36,
       "args": "12000"
     },
@@ -1126,6 +1128,7 @@
       "description": "ADC-1 5V",
       "device_type_id": 301,
       "adc_channel": 2,
+      "adc_type": "internal",
       "division": 2.66,
       "args": "5000"
     },
@@ -1133,6 +1136,7 @@
       "description": "ADC-2 3.3V",
       "device_type_id": 301,
       "adc_channel": 3,
+      "adc_type": "internal",
       "division": 1.75,
       "args": "3300"
     },
@@ -1140,6 +1144,7 @@
       "description": "ADC-3 VBAT",
       "device_type_id": 301,
       "adc_channel": 4,
+      "adc_type": "internal",
       "division": 3,
       "args": "3750"
     },
@@ -1147,6 +1152,7 @@
       "description": "ADC-7 1.8V-AUX",
       "device_type_id": 301,
       "adc_channel": 7,
+      "adc_type": "internal",
       "division": 1,
       "args": "1800"
     },
@@ -1154,6 +1160,7 @@
       "description": "ADC-12 1.0V-AUX",
       "device_type_id": 301,
       "adc_channel": 12,
+      "adc_type": "internal",
       "division": 1,
       "args": "1000"
     },
@@ -1161,6 +1168,7 @@
       "description": "ADC-13 1.2V-AUX",
       "device_type_id": 301,
       "adc_channel": 13,
+      "adc_type": "internal",
       "division": 1,
       "args": "1200"
     },
@@ -1168,6 +1176,7 @@
       "description": "ADC-14 5V-AUX",
       "device_type_id": 301,
       "adc_channel": 14,
+      "adc_type": "internal",
       "division": 1,
       "args": "5000"
     },
@@ -1175,8 +1184,57 @@
       "description": "ADC-15 3.3V-AUX",
       "device_type_id": 301,
       "adc_channel": 15,
+      "adc_type": "internal",
       "division": 1,
       "args": "3300"
+    },
+    {
+      "description": "ADC-EXT-0 P0_VDDP_PHY",
+      "device_type_id": 301,
+      "adc_channel": 0,
+      "adc_type": "external",
+      "division": 1,
+      "args": "1300"
+    },
+    {
+      "description": "ADC-EXT-1 P1_VDDP_PHY",
+      "device_type_id": 301,
+      "adc_channel": 1,
+      "adc_type": "external",
+      "division": 1,
+      "args": "1300"
+    },
+    {
+      "description": "ADC-EXT-2 P0_P1V8_VDD",
+      "device_type_id": 301,
+      "adc_channel": 2,
+      "adc_type": "external",
+      "division": 1,
+      "args": "1800"
+    },
+    {
+      "description": "ADC-EXT-3 P1_P1V8_VDD",
+      "device_type_id": 301,
+      "adc_channel": 3,
+      "adc_type": "external",
+      "division": 1,
+      "args": "1800"
+    },
+    {
+      "description": "ADC-EXT-4 P0_VDDCR_SOC_S5",
+      "device_type_id": 301,
+      "adc_channel": 4,
+      "adc_type": "external",
+      "division": 1,
+      "args": "1300"
+    },
+    {
+      "description": "ADC-EXT-5 P1_VDDCR_SOC_S5",
+      "device_type_id": 301,
+      "adc_channel": 5,
+      "adc_type": "external",
+      "division": 1,
+      "args": "1300"
     },
     {
       "description": "CPU0_DIMM_A0",
