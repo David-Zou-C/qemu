@@ -33,6 +33,7 @@
 #include "sysemu/sysemu.h"
 #include "slib/inc/aspeed-init.h"
 #include "hw/i2c/smbus_slave.h"
+#include "hw/i2c/i2c_mux_cad251x.h"
 
 static struct arm_boot_info aspeed_board_binfo = {
     .board_id = -1, /* device-tree-only board */
@@ -689,7 +690,12 @@ static void ast2600_evb_i2c_init(AspeedMachineState *bmc)
             GpioFunctionPtr gpioFunctionPtr = getGpioDeviceAddFunc(pDeviceConfig->device_type_id);
             gpioFunctionPtr(OBJECT(bmc), pDeviceConfig);
         } else if (pDeviceConfig->deviceType == ADC_DEVICE_TYPE) {
-            adc_device_add1(&(soc->adc.engines[0]), &(soc->adc.engines[1]), pDeviceConfig);  /* ! ast2600 adc 与 ast2500 不同 */
+            if (pDeviceConfig->adc_type == INTERNAL) {
+                adc_device_add1(&(soc->adc.engines[0]), &(soc->adc.engines[1]), pDeviceConfig);  /* ! ast2600 adc 与 ast2500 不同 */
+            } else {
+                adc_device_add2(&(soc->cad2512), pDeviceConfig);
+            }
+            
         } else if (pDeviceConfig->deviceType == PCA954X_DEVICE_TYPE) {
             pca_device_add(master_bus, pDeviceConfig);
         } else if (pDeviceConfig->deviceType == PWM_TACH_DEVICE_TYPE) {

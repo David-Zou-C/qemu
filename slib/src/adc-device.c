@@ -9,7 +9,7 @@
 #include <unistd.h>
 
 uint8_t adc_reg10_has_read = FALSE;
-
+uint8_t adc_channel_disable_flag[8] = {0};
 static void *adc_control_thread(void *pVoidAdcDeviceData) {
     PTR_ADC_DEVICE_DATA ptrAdcDeviceData = (PTR_ADC_DEVICE_DATA) pVoidAdcDeviceData;
     uint32_t real_vol = 0;
@@ -37,9 +37,14 @@ static void *adc_control_thread(void *pVoidAdcDeviceData) {
             if (ptrAdcDeviceData->ptrAdcReg->reg_lh.l != real_reg) {
                 ptrAdcDeviceData->ptrAdcReg->reg_lh.l = real_reg;
             }
-        } else {
+        } else if (ptrAdcDeviceData->adcRegType == REG_H){
             if (ptrAdcDeviceData->ptrAdcReg->reg_lh.h != real_reg) {
                 ptrAdcDeviceData->ptrAdcReg->reg_lh.h = real_reg;
+            }
+        } else {
+            if (ptrAdcDeviceData->ptrAdcExtReg->data != real_reg && 
+            adc_channel_disable_flag[ptrAdcDeviceData->ptrDeviceConfig->adc_channel] == 0) {
+                ptrAdcDeviceData->ptrAdcExtReg->data = real_reg;
             }
         }
 

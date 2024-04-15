@@ -505,6 +505,7 @@ config NPCM7XX
     select SSI
     select UNIMP
     select PCA954X
+    select CAD251X
 
 config FSL_IMX25
     bool

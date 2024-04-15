@@ -122,6 +122,11 @@ typedef enum I2C_TYPE_ {
     I3C
 } I2C_TYPE, *PTR_I2C_TYPE;
 
+typedef enum ADC_TYPE_ {
+    INTERNAL,
+    EXTERNAL
+} ADC_TYPE, *PTR_ADC_TYPE;
+
 typedef struct DEVICE_CONFIG_ {
     char *description;
     DEVICE_TYPE deviceType;
@@ -129,6 +134,7 @@ typedef struct DEVICE_CONFIG_ {
     char name[DEVICE_NAME_MAX_LEN];
     uint8_t bus;
     uint8_t adc_channel;
+    uint8_t adc_type;
     double division;
     uint8_t addr;
     struct {

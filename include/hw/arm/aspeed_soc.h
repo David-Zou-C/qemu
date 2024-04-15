@@ -38,6 +38,7 @@
 #include "hw/misc/aspeed_peci.h"
 #include "hw/misc/aspeed_pwm.h"
 #include "hw/char/serial.h"
+#include "hw/i2c/i2c_mux_cad251x.h"
 
 #define ASPEED_SPIS_NUM  2
 #define ASPEED_EHCIS_NUM 2
@@ -91,6 +92,7 @@ struct AspeedSoCState {
     UnimplementedDeviceState udc;
     UnimplementedDeviceState sgpiom;
     UnimplementedDeviceState jtag[ASPEED_JTAG_NUM];
+    CAD251xState cad2512;
 };
 
 #define TYPE_ASPEED_SOC "aspeed-soc"

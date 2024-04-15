@@ -17,6 +17,7 @@
 #include "hw/adc/aspeed_adc.h"
 #include "trace.h"
 #include "slib/inc/aspeed-init.h"
+#include "hw/i2c/i2c_mux_cad251x.h"
 
 #define ASPEED_ADC_MEMORY_REGION_SIZE           0x1000
 #define ASPEED_ADC_ENGINE_MEMORY_REGION_SIZE    0x100

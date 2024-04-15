@@ -403,8 +403,10 @@ static void *send_thread(void *pVoid) {
                                                 deviceAddList[i].ptrDeviceConfig->adc_channel);
                         if (deviceAddList[i].ptrAdcDeviceData->adcRegType == REG_L) {
                             sprintf(temp, "0x%04x", deviceAddList[i].ptrAdcDeviceData->ptrAdcReg->reg_lh.l);
-                        } else {
+                        } else if (deviceAddList[i].ptrAdcDeviceData->adcRegType == REG_H){
                             sprintf(temp, "0x%04x", deviceAddList[i].ptrAdcDeviceData->ptrAdcReg->reg_lh.h);
+                        } else {
+                            sprintf(temp, "0x%04x", deviceAddList[i].ptrAdcDeviceData->ptrAdcExtReg->data);
                         }
                         cJSON_AddStringToObject(device, "adc_register", temp);
                         cJSON_AddNumberToObject(device, "adc_value", deviceAddList[i].ptrAdcDeviceData->set_adc_value);

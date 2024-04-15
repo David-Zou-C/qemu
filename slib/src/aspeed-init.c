@@ -985,8 +985,10 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
             } else {
                 if (ptrAdcDeviceData->adcRegType == REG_L) {
                     ptrAdcDeviceData->ptrAdcReg->reg_lh.l = ctrl_data[0];
-                } else {
+                } else if (ptrAdcDeviceData->adcRegType == REG_H){
                     ptrAdcDeviceData->ptrAdcReg->reg_lh.h = ctrl_data[0];
+                } else {
+                    ptrAdcDeviceData->ptrAdcExtReg->data = ctrl_data[0];
                 }
             }
             free(ctrl_data);
@@ -1092,7 +1094,7 @@ PTR_CONFIG_DATA parse_configuration(void) {
         cJSON *fru_load_path = cJSON_GetObjectItem(device, "fru_load_path");
         cJSON *adc_channel = cJSON_GetObjectItem(device, "adc_channel");
         cJSON *division = cJSON_GetObjectItem(device, "division");
-
+        cJSON *adc_type = cJSON_GetObjectItem(device, "adc_type");
         cJSON *pwm_tach_num = cJSON_GetObjectItem(device, "pwm_tach_num");
         /* 校验 */
         if (description == NULL) {
@@ -1242,6 +1244,21 @@ PTR_CONFIG_DATA parse_configuration(void) {
                 exit(1);
             }
             tempConfigJson->division = division->valuedouble;
+
+            /* type */
+            if (adc_type == NULL) {
+                printf("The devices[%d]: 'adc_type' is internal ADC controller was be used! \n", i);
+                tempConfigJson->adc_type = INTERNAL;
+            } else if (adc_type->type == cJSON_String) {
+                if (compareIgnoreCase("external", adc_type->valuestring)) {
+                    tempConfigJson->adc_type = EXTERNAL;
+                } else {
+                    tempConfigJson->adc_type = INTERNAL;
+                }
+            } else {
+                printf("The devices[%d]: 'adc_type' is not string ! \n", i);
+                exit(1);
+            }
         }
         /**************************************** pwm_tach ****************************************/
         else if (deviceType == PWM_TACH_DEVICE_TYPE) {

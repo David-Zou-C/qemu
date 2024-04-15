@@ -1063,6 +1063,7 @@ add_executable(qemu
         hw/i2c/core.c
         hw/i2c/exynos4210_i2c.c
         hw/i2c/i2c_mux_pca954x.c
+        hw/i2c/i2c_mux_cad251x.c
         hw/i2c/imx_i2c.c
         hw/i2c/microbit_i2c.c
         hw/i2c/mpc_i2c.c
