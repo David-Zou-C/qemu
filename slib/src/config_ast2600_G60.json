@@ -665,12 +665,25 @@
       }
     },
     {
-      "description": "CPU0 APML ALERT 中断信号 (GPIO B0)",
+      "description": "CPU0 APML ALERT 中断信号 (GPIO O3)",
       "device_type_id": 201,
       "pin_nums": 1,
       "signal": {
         "output_lines": [
-          ["BMC", 8, 0]
+          ["BMC", 115, 0]
+        ],
+        "output_logic_init": [
+          [0, "0", 0]
+        ]
+      }
+    },
+    {
+      "description": "CPU1 APML ALERT 中断信号 (GPIO O4)",
+      "device_type_id": 201,
+      "pin_nums": 1,
+      "signal": {
+        "output_lines": [
+          ["BMC", 116, 0]
         ],
         "output_logic_init": [
           [0, "0", 0]
@@ -704,19 +717,6 @@
       }
     },
     {
-      "description": "CPU1 APML ALERT中断信号 (GPIO B3)",
-      "device_type_id": 201,
-      "pin_nums": 1,
-      "signal": {
-        "output_lines": [
-          ["BMC", 11, 0]
-        ],
-        "output_logic_init": [
-          [0, "0", 0]
-        ]
-      }
-    },
-    {
       "description": "BMC更新 CPLD FW 的切换信号 (GPIO F3)",
       "device_type_id": 201,
       "pin_nums": 1,
@@ -727,7 +727,7 @@
       }
     },
     {
-      "description": "BMC 清 CMOS (GPIO F4)",
+      "description": "BMC 清 CMOS (GPIO F4) --待确认",
       "device_type_id": 201,
       "pin_nums": 1,
       "signal": {
@@ -747,7 +747,7 @@
       }
     },
     {
-      "description": "CPLD发给BMC的CPU/DIMM Thermal Trip通知信号 (GPIO G2)",
+      "description": "CPLD发给BMC的CPU/DIMM Thermal Trip通知信号 (GPIO G2) -- 待确认",
       "device_type_id": 201,
       "pin_nums": 1,
       "signal": {
@@ -760,7 +760,7 @@
       }
     },
     {
-      "description": "System SLP_S5信号 (GPIO G3)",
+      "description": "System SLP_S4信号 (GPIO G3)",
       "device_type_id": 201,
       "pin_nums": 1,
       "signal": {
@@ -773,7 +773,7 @@
       }
     },
     {
-      "description": "BMC更新BIOS Flash时的写保护控制信号 (GPIO G4)",
+      "description": "BMC更新BIOS Flash时的写保护控制信号 (GPIO G4) -- 待确认",
       "device_type_id": 201,
       "pin_nums": 1,
       "signal": {
@@ -793,7 +793,7 @@
       }
     },
     {
-      "description": "BMC刷写BIOS Flash的Reset信号 (GPIO G6)",
+      "description": "BMC刷写BIOS Flash的Reset信号 (GPIO G6) -- 待确认",
       "device_type_id": 201,
       "pin_nums": 1,
       "signal": {
@@ -803,7 +803,7 @@
       }
     },
     {
-      "description": "CPU1 在位信号 (GPIO G7)",
+      "description": "CPU1 在位信号 (GPIO G7) -- 待确认",
       "device_type_id": 201,
       "pin_nums": 1,
       "signal": {
@@ -816,7 +816,7 @@
       }
     },
     {
-      "description": "CPU PWR OK的通知信号，BMC用此信号判断系统是否开机 (GPIO H0)",
+      "description": "CPU PWR OK的通知信号，BMC用此信号判断系统是否开机 (GPIO H0) --待确认",
       "device_type_id": 201,
       "pin_nums": 1,
       "signal": {
@@ -829,7 +829,7 @@
       }
     },
     {
-      "description": "作为确认系统RESET信号 (GPIO H1)",
+      "description": "作为确认系统RESET信号 (GPIO H1) --待确认",
       "device_type_id": 201,
       "pin_nums": 1,
       "signal": {
@@ -842,7 +842,7 @@
       }
     },
     {
-      "description": "液冷检测线短路检测信号 (GPIO H3)",
+      "description": "液冷检测线短路检测信号 (GPIO H3) --待确认",
       "device_type_id": 201,
       "pin_nums": 1,
       "signal": {
@@ -855,12 +855,12 @@
       }
     },
     {
-      "description": "PSU1的AC PWR OK信号, (GPIO I5)",
+      "description": "PSU1的AC PWR OK信号, (GPIO V6)",
       "device_type_id": 201,
       "pin_nums": 1,
       "signal": {
         "output_lines": [
-          ["BMC", 69, 0]
+          ["BMC", 174, 0]
         ],
         "output_logic_init": [
           [0, "1", 0]
@@ -921,17 +921,17 @@
       }
     },
     {
-      "description": "System NMI interrupt, Connect to CPU (GPIO S4)",
+      "description": "System NMI interrupt, Connect to CPU (GPIO R5)",
       "device_type_id": 201,
       "pin_nums": 1,
       "signal": {
         "input_lines": [
-          ["BMC", 148, 0]
+          ["BMC", 141, 0]
         ]
       }
     },
     {
-      "description": "Video Disable (GPIO S5)",
+      "description": "Video Disable (GPIO S5) -- 待确认",
       "device_type_id": 201,
       "pin_nums": 1,
       "signal": {
@@ -944,7 +944,7 @@
       }
     },
     {
-      "description": "BIOS Post完成指示信号，BMC通过此信号来判断SPD切换的时机 (GPIO S6)",
+      "description": "BIOS Post完成指示信号，BMC通过此信号来判断SPD切换的时机 (GPIO S6) -- 待确认",
       "device_type_id": 201,
       "pin_nums": 1,
       "signal": {
@@ -970,12 +970,12 @@
       }
     },
     {
-      "description": "System UART切换信号 (GPIO V3)",
+      "description": "System UART切换信号 (GPIO R6)",
       "device_type_id": 201,
       "pin_nums": 1,
       "signal": {
         "input_lines": [
-          ["BMC", 171, 0]
+          ["BMC", 142, 0]
         ]
       }
     },
@@ -1000,12 +1000,12 @@
       }
     },
     {
-      "description": "SMI Signal Active Input (GPIO X1)",
+      "description": "SMI Signal Active Input (GPIO O6)",
       "device_type_id": 201,
       "pin_nums": 1,
       "signal": {
         "output_lines": [
-          ["BMC", 185, 0]
+          ["BMC", 118, 0]
         ],
         "output_logic_init": [
           [0, "0", 0]
@@ -1076,12 +1076,12 @@
       }
     },
     {
-      "description": "VR SMBUS Alert   (GPIO Y1)",
+      "description": "VR SMBUS Alert   (GPIO O5)",
       "device_type_id": 201,
       "pin_nums": 1,
       "signal": {
         "output_lines": [
-          ["BMC", 193, 0]
+          ["BMC", 117, 0]
         ],
         "output_logic_init": [
           [0, "0", 0]
