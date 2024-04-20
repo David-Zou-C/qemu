@@ -847,7 +847,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                         }
                         pmBusPage->status_mfr_specific = (int8_t) initial_data[data_i++];
                         break;
-                    case 8 ... 18:
+                    case 8 ... 19:
                         /* mfr_pout_max 
                          * read_vout
                          * read_iout
@@ -882,6 +882,10 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                             pmBusPage->read_temperature_2 = (uint16_t) initial_data[data_i++];
                         } else if (reg_type == 17) {
                             pmBusPage->read_fan_speed_1 = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 18) {
+                            pmBusPage->mfr_vin_max = (uint16_t) initial_data[data_i++];
+                        } else if (reg_type == 19) {
+                            pmBusPage->vout_mode = (uint8_t) initial_data[data_i++];
                         }
                         break;
                     default:

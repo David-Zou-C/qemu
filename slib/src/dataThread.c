@@ -257,6 +257,8 @@ static void *send_thread(void *pVoid) {
                         cJSON_AddNumberToObject(device, "Hs_Temp", pmBusPage->read_temperature_1);
                         cJSON_AddNumberToObject(device, "Amb_Temp", pmBusPage->read_temperature_2);
                         cJSON_AddNumberToObject(device, "FanSpeed", pmBusPage->read_fan_speed_1);
+                        cJSON_AddNumberToObject(device, "Vin_max", pmBusPage->mfr_vin_max);
+                        cJSON_AddNumberToObject(device, "Vout_mode", pmBusPage->vout_mode);
                         cJSON_AddNumberToObject(device, receive_times_str, (double) pmBusPage->receive_times);
                         cJSON_AddNumberToObject(device, write_times_str, (double) pmBusPage->write_times);
                         break;

@@ -30,7 +30,7 @@ OBJECT_DECLARE_SIMPLE_TYPE(ISLState, ISL69260)
 #define ISL_CAPABILITY_DEFAULT                 0x40
 #define ISL_OPERATION_DEFAULT                  0x80
 #define ISL_ON_OFF_CONFIG_DEFAULT              0x16
-#define ISL_VOUT_MODE_DEFAULT                  0x40
+#define ISL_VOUT_MODE_DEFAULT                  0x0B      //Linear mode
 #define ISL_VOUT_COMMAND_DEFAULT               0x0384
 #define ISL_VOUT_MAX_DEFAULT                   0x08FC
 #define ISL_VOUT_MARGIN_HIGH_DEFAULT           0x0640

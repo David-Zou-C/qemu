@@ -60,6 +60,9 @@ static uint8_t isl_pmbus_vr_read_byte(PMBusDevice *pmdev)
     case 0xA1:  /* 额定功率 */
         pmbus_send16(pmdev, pmdev->pages[0].mfr_vin_max);
         return 0;
+    case 0x20:  /* VOUT MODE */
+        pmbus_send8(pmdev, pmdev->pages[0].vout_mode);
+        return 0;
     }
 
     qemu_log_mask(LOG_GUEST_ERROR,
@@ -170,6 +173,7 @@ static void raa228000_exit_reset(Object *obj)
     pmdev->pages[0].read_temperature_2 = 30;
 
     pmdev->pages[0].read_fan_speed_1 = 900;
+    pmdev->pages[0].vout_mode = 11;
 }
 
 static void psu_realize(DeviceState *dev, Error **errp) {
