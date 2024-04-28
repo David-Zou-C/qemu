@@ -340,6 +340,7 @@ typedef struct DEVICE_ADD_INFO_ {
     PTR_ADC_DEVICE_DATA ptrAdcDeviceData;
     PMBusPage *pmBusPage;
     void *pca954x;
+    void *cad251x;
     PTR_PWM_TACH_DEVICE ptrPwmTachDevice;
     PTR_DEVICE_CONFIG ptrDeviceConfig;
 } DEVICE_ADD_INFO, *PTR_DEVICE_ADD_INFO;
@@ -353,6 +354,7 @@ extern MAC_DEVICE_INFO macDeviceInfo[MAC_DEVICE_INFO_MAX_NUM];
 
 int device_add(DEVICE_TYPE_ID device_type_id, const char *device_name, void *vPtrDeviceData, void *vPtrDevGpio);
 int get_device_index(void *vPtrDeviceData);
+int get_cad2512_device_index(void);
 DEVICE_TYPE get_device_type(DEVICE_TYPE_ID device_type_id);
 void *get_dev_gpio(int32_t device_index, const char *device_name);
 void get_dev_index_for_name(const char *name, int *index);

@@ -11,6 +11,7 @@
 
 #define ADC_DEVICE_TYPE_ID_OFFSET 301
 #define ADC_DEVICE_TOTAL_NUM 5
+#define EXT_ADC_CAD251X_NR_REGS 64
 
 typedef enum ADC_REG_TYPE_ {
     REG_L = 0,
@@ -26,15 +27,10 @@ typedef union ADC_REG_ {
     } reg_lh;
 } ADC_REG, *PTR_ADC_REG;
 
-typedef union ADC_EXTERNAL_REG_ {
-    uint32_t reg;
-    uint16_t data;
-} ADC_EXTERNAL_REG, *PTR_ADC_EXTERNAL_REG;
-
 typedef struct ADC_DEVICE_DATA_ {
     ADC_REG_TYPE adcRegType;
     PTR_ADC_REG ptrAdcReg;
-    PTR_ADC_EXTERNAL_REG ptrAdcExtReg;
+    uint8_t *ptrExtAdcReg;
     uint32_t set_adc_value;
     uint32_t division;
     pthread_mutex_t value_mutex;

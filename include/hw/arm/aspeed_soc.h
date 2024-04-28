@@ -92,7 +92,6 @@ struct AspeedSoCState {
     UnimplementedDeviceState udc;
     UnimplementedDeviceState sgpiom;
     UnimplementedDeviceState jtag[ASPEED_JTAG_NUM];
-    CAD251xState cad2512;
 };
 
 #define TYPE_ASPEED_SOC "aspeed-soc"

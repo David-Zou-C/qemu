@@ -693,13 +693,15 @@ static void ast2600_evb_i2c_init(AspeedMachineState *bmc)
             if (pDeviceConfig->adc_type == INTERNAL) {
                 adc_device_add1(&(soc->adc.engines[0]), &(soc->adc.engines[1]), pDeviceConfig);  /* ! ast2600 adc 与 ast2500 不同 */
             } else {
-                adc_device_add2(&(soc->cad2512), pDeviceConfig);
+                adc_device_add2(pDeviceConfig);
             }
             
         } else if (pDeviceConfig->deviceType == PCA954X_DEVICE_TYPE) {
             pca_device_add(master_bus, pDeviceConfig);
         } else if (pDeviceConfig->deviceType == PWM_TACH_DEVICE_TYPE) {
             pwm_device_add(pDeviceConfig);
+        } else if (pDeviceConfig->deviceType == CAD251X_DEVICE_TYPE) {
+            cad_device_add(master_bus, pDeviceConfig);
         }
 
         if (pDeviceConfig->next == NULL) {

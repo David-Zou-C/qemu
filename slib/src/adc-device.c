@@ -42,9 +42,9 @@ static void *adc_control_thread(void *pVoidAdcDeviceData) {
                 ptrAdcDeviceData->ptrAdcReg->reg_lh.h = real_reg;
             }
         } else {
-            if (ptrAdcDeviceData->ptrAdcExtReg->data != real_reg && 
+            if (*(ptrAdcDeviceData->ptrExtAdcReg) != real_reg && 
             adc_channel_disable_flag[ptrAdcDeviceData->ptrDeviceConfig->adc_channel] == 0) {
-                ptrAdcDeviceData->ptrAdcExtReg->data = real_reg;
+                *ptrAdcDeviceData->ptrExtAdcReg = real_reg;
             }
         }
 

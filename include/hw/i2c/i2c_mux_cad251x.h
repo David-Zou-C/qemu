@@ -58,6 +58,7 @@ struct CAD251xState {
 
     uint8_t regs[CAD251X_NR_REGS];
     char *description; /* For debugging purpose only */
+    PTR_DEVICE_CONFIG ptrDeviceConfig;
 };
 
 struct CAD251xClass {
@@ -77,5 +78,6 @@ typedef struct CAD251xClass CAD251xClass;
 DECLARE_CLASS_CHECKERS(CAD251xClass, CAD251X,
                        TYPE_CAD251X)
 
-void adc_device_add2(void *obj_0, PTR_DEVICE_CONFIG ptrDeviceConfig);
+void adc_device_add2(PTR_DEVICE_CONFIG ptrDeviceConfig);
+void cad_device_add(I2CBus *bus, PTR_DEVICE_CONFIG ptrDeviceConfig);
 #endif

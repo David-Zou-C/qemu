@@ -104,6 +104,9 @@ int device_add(DEVICE_TYPE_ID device_type_id, const char *device_name, void *vPt
                 deviceAddList[i].ptrPwmTachDevice = vPtrDeviceData;
                 deviceAddList[i].device_type = PWM_TACH_DEVICE_TYPE;
                 deviceAddList[i].ptrDeviceConfig = deviceAddList[i].ptrPwmTachDevice->ptrDeviceConfig;
+            } else if (device_type_id == CAD2512) {
+                deviceAddList[i].cad251x = vPtrDeviceData;
+                deviceAddList[i].device_type = CAD251X_DEVICE_TYPE;
             }
                 
             return i;
@@ -131,6 +134,25 @@ int get_device_index(void *vPtrDeviceData) {
                 if (deviceAddList[i].ptrGpioDeviceData == vPtrDeviceData) {
                     return i;
                 }
+            } else if (deviceAddList[i].device_type == CAD251X_DEVICE_TYPE) {
+                if (deviceAddList[i].ptrGpioDeviceData == vPtrDeviceData) {
+                    return i;
+                }
+            }
+        } else { /* 设备不能存在 */
+            /* 没有必要继续，后续设备都不存在 */
+            return -1;
+        }
+    }
+    return -1;
+}
+
+int get_cad2512_device_index(void) {
+    FUNC_DEBUG("function: get_cad2512_device_index()")
+    for (int i = 0; i < DEVICE_MAX_NUM; ++i) {
+        if (deviceAddList[i].exist == 1) { /* 设备存在 */
+            if (deviceAddList[i].device_type == CAD251X_DEVICE_TYPE) {
+                return i;
             }
         } else { /* 设备不能存在 */
             /* 没有必要继续，后续设备都不存在 */
@@ -162,6 +184,8 @@ DEVICE_TYPE get_device_type(DEVICE_TYPE_ID device_type_id) {
         return PCA954X_DEVICE_TYPE;
     } else if (device_type_id == PWM_TACH) {
         return PWM_TACH_DEVICE_TYPE;
+    } else if (device_type_id == CAD2512) {
+        return CAD251X_DEVICE_TYPE;
     } else {
         return UNDEFINED;
     }
@@ -992,7 +1016,7 @@ void dynamic_change_data(DEVICE_TYPE_ID device_type_id, void *vPtrDeviceData, ch
                 } else if (ptrAdcDeviceData->adcRegType == REG_H){
                     ptrAdcDeviceData->ptrAdcReg->reg_lh.h = ctrl_data[0];
                 } else {
-                    ptrAdcDeviceData->ptrAdcExtReg->data = ctrl_data[0];
+                    *(ptrAdcDeviceData->ptrExtAdcReg) = ctrl_data[0];
                 }
             }
             free(ctrl_data);
@@ -1143,7 +1167,8 @@ PTR_CONFIG_DATA parse_configuration(void) {
         if (deviceType == SMBUS_DEVICE_TYPE ||
             deviceType == I2C_DEVICE_TYPE ||
             deviceType == PMBUS_DEVICE_TYPE ||
-            deviceType == PCA954X_DEVICE_TYPE) {
+            deviceType == PCA954X_DEVICE_TYPE ||
+            deviceType == CAD251X_DEVICE_TYPE) {
             /* bus */
             if (bus == NULL) {
                 printf("The devices[%d]: 'bus' not found, but it is necessary! \n", i);

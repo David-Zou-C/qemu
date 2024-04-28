@@ -327,6 +327,14 @@
       "bus": 0,
       "addr": "0x70"
     },
+
+    {
+      "description": "CAD2512",
+      "device_type_id": 701,
+      "name": "CAD2512_6_0x1d",
+      "bus": 5,
+      "addr": "0x1d"
+    },
     {
       "description": "RiserA_Temp1",
       "device_type_id": 2,

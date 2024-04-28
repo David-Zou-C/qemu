@@ -201,12 +201,22 @@ static void cad251x_initfn(Object *obj)
     //CAD251xClass *k = CAD251X_GET_CLASS(obj);
 }
 
-static void cad251_realize(DeviceState *dev, Error **errp)
+static void cad251x_realize(DeviceState *dev, Error **errp)
 {
+    uint8_t index;
     CAD251xState *s = CAD251X(dev);
-
     if (!s->description) {
         s->description = g_strdup("cad-unspecified");
+    }
+
+    if (s->ptrDeviceConfig == NULL) {
+        return;
+    }
+
+    index = device_add(CAD2512, s->ptrDeviceConfig->name, s, NULL);
+
+    if (index > 0) {
+        deviceAddList[index].ptrDeviceConfig = s->ptrDeviceConfig;
     }
 }
 
@@ -223,7 +233,7 @@ static void cad251x_class_init(ObjectClass *klass, void *data)
     k->event = cad251x_event;
     k->recv = cad251x_recv;
     k->send = cad251x_send;
-    dc->realize = cad251_realize;
+    dc->realize = cad251x_realize;
     device_class_set_props(dc, cad251x_properties);
 }
 
@@ -259,23 +269,43 @@ static void cad251x_register_types(void)
 
 type_init(cad251x_register_types)
 
-void adc_device_add2(void *obj_0, PTR_DEVICE_CONFIG ptrDeviceConfig) {
-    CAD251xState *s = CAD251X(obj_0);
-
+void adc_device_add2(PTR_DEVICE_CONFIG ptrDeviceConfig) {
     PTR_ADC_DEVICE_DATA ptrAdcDeviceData = (PTR_ADC_DEVICE_DATA) malloc(sizeof(ADC_DEVICE_DATA));
     memset(ptrAdcDeviceData, 0, sizeof(ADC_DEVICE_DATA));
-    ptrAdcDeviceData->ptrDeviceConfig = ptrDeviceConfig;
 
+    ptrAdcDeviceData->ptrDeviceConfig = ptrDeviceConfig;
     assert(ptrAdcDeviceData->ptrDeviceConfig->adc_channel <= 7);
 
     ptrAdcDeviceData->adcRegType = REG_EXTERNAL;
-
     uint32_t reg_addr = CAD2512_CHN_READING_IN0_REG + ptrAdcDeviceData->ptrDeviceConfig->adc_channel;
 
-    ptrAdcDeviceData->ptrAdcExtReg = (PTR_ADC_EXTERNAL_REG)&(s->regs[reg_addr]);
-
+    int index = get_cad2512_device_index();
+    CAD251xState *s = (CAD251xState *)(deviceAddList[index].cad251x);
+    ptrAdcDeviceData->ptrExtAdcReg = (uint8_t *)&(s->regs[reg_addr]);
     ptrAdcDeviceData->division = (uint32_t )(ptrAdcDeviceData->ptrDeviceConfig->division * 1000);
 
     init_ADCDevice0(ptrAdcDeviceData);
     device_add(ADC, ptrDeviceConfig->name, ptrAdcDeviceData, NULL);
+}
+
+void cad_device_add(I2CBus *bus, PTR_DEVICE_CONFIG ptrDeviceConfig)
+{
+    file_log("cad_device_add", LOG_TIME_END);
+    DeviceState *dev;
+
+    if (ptrDeviceConfig->device_type_id == CAD2512) {
+        dev = qdev_new(TYPE_CAD2512);
+    } else {
+        printf("device add error: not pca device ! \n");
+        exit(1);
+    }
+
+    qdev_prop_set_uint8(dev, "address", ptrDeviceConfig->addr);
+
+    CAD251xState *s;
+    s = CAD251X(dev);
+    s->ptrDeviceConfig = ptrDeviceConfig;
+
+    qdev_realize_and_unref(dev, (BusState *)bus, &error_fatal);
+    printf("external adc device added ! \n");
 }
