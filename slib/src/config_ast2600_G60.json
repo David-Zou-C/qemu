@@ -1285,67 +1285,67 @@
       "args": "0x13"
     },
     {
-      "description": "CPU1_DIMM_A0",
-      "device_type_id": 103,
-      "bus": 0,
-      "master": {
-        "i2c_type": "i3c"
-      },
-      "addr": "0x50",
-      "args": "0x14"
-    },
-    {
-      "description": "CPU1_DIMM_A1",
-      "device_type_id": 103,
-      "bus": 0,
-      "master": {
-        "i2c_type": "i3c"
-      },
-      "addr": "0x51",
-      "args": "0x15"
-    },
-    {
-      "description": "CPU1_DIMM_B0",
-      "device_type_id": 103,
-      "bus": 0,
-      "master": {
-        "i2c_type": "i3c"
-      },
-      "addr": "0x52",
-      "args": "0x16"
-    },
-    {
-      "description": "CPU1_DIMM_B1",
-      "device_type_id": 103,
-      "bus": 0,
-      "master": {
-        "i2c_type": "i3c"
-      },
-      "addr": "0x53",
-      "args": "0x17"
-    },
-    {
       "description": "CPU0_DIMM_E1",
       "device_type_id": 103,
-      "bus": 1,
+      "bus": 0,
       "master": {
         "i2c_type": "i3c"
       },
       "addr": "0x54",
-      "args": "0x18"
+      "args": "0x14"
     },
     {
       "description": "CPU0_DIMM_F1",
+      "device_type_id": 103,
+      "bus": 0,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x55",
+      "args": "0x15"
+    },
+    {
+      "description": "CPU0_DIMM_G0",
       "device_type_id": 103,
       "bus": 1,
       "master": {
         "i2c_type": "i3c"
       },
-      "addr": "0x55",
+      "addr": "0x50",
+      "args": "0x16"
+    },
+    {
+      "description": "CPU0_DIMM_G1",
+      "device_type_id": 103,
+      "bus": 1,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x51",
+      "args": "0x17"
+    },
+    {
+      "description": "CPU0_DIMM_H0",
+      "device_type_id": 103,
+      "bus": 1,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x52",
+      "args": "0x18"
+    },
+    {
+      "description": "CPU0_DIMM_H1",
+      "device_type_id": 103,
+      "bus": 1,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x53",
       "args": "0x19"
     },
     {
-      "description": "CPU1_DIMM_E1",
+      "description": "CPU0_DIMM_K1",
       "device_type_id": 103,
       "bus": 1,
       "master": {
@@ -1355,7 +1355,7 @@
       "args": "0x1a"
     },
     {
-      "description": "CPU1_DIMM_F1",
+      "description": "CPU0_DIMM_L1",
       "device_type_id": 103,
       "bus": 1,
       "master": {
@@ -1365,7 +1365,7 @@
       "args": "0x1b"
     },
     {
-      "description": "CPU0_DIMM_G0",
+      "description": "CPU1_DIMM_A0",
       "device_type_id": 103,
       "bus": 2,
       "master": {
@@ -1375,7 +1375,7 @@
       "args": "0x1c"
     },
     {
-      "description": "CPU0_DIMM_G1",
+      "description": "CPU1_DIMM_A1",
       "device_type_id": 103,
       "bus": 2,
       "master": {
@@ -1385,7 +1385,7 @@
       "args": "0x1d"
     },
     {
-      "description": "CPU0_DIMM_H0",
+      "description": "CPU1_DIMM_B0",
       "device_type_id": 103,
       "bus": 2,
       "master": {
@@ -1395,7 +1395,7 @@
       "args": "0x1e"
     },
     {
-      "description": "CPU0_DIMM_H1",
+      "description": "CPU1_DIMM_B1",
       "device_type_id": 103,
       "bus": 2,
       "master": {
@@ -1405,63 +1405,63 @@
       "args": "0x1f"
     },
     {
-      "description": "CPU1_DIMM_G0",
+      "description": "CPU1_DIMM_E1",
       "device_type_id": 103,
       "bus": 2,
-      "master": {
-        "i2c_type": "i3c"
-      },
-      "addr": "0x50",
-      "args": "0x20"
-    },
-    {
-      "description": "CPU1_DIMM_G1",
-      "device_type_id": 103,
-      "bus": 2,
-      "master": {
-        "i2c_type": "i3c"
-      },
-      "addr": "0x51",
-      "args": "0x21"
-    },
-    {
-      "description": "CPU1_DIMM_H0",
-      "device_type_id": 103,
-      "bus": 2,
-      "master": {
-        "i2c_type": "i3c"
-      },
-      "addr": "0x52",
-      "args": "0x22"
-    },
-    {
-      "description": "CPU1_DIMM_H1",
-      "device_type_id": 103,
-      "bus": 2,
-      "master": {
-        "i2c_type": "i3c"
-      },
-      "addr": "0x53",
-      "args": "0x23"
-    },
-    {
-      "description": "CPU0_DIMM_K1",
-      "device_type_id": 103,
-      "bus": 3,
       "master": {
         "i2c_type": "i3c"
       },
       "addr": "0x54",
-      "args": "0x24"
+      "args": "0x20"
     },
     {
-      "description": "CPU0_DIMM_L1",
+      "description": "CPU1_DIMM_F1",
+      "device_type_id": 103,
+      "bus": 2,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x55",
+      "args": "0x21"
+    },
+    {
+      "description": "CPU1_DIMM_G0",
       "device_type_id": 103,
       "bus": 3,
       "master": {
         "i2c_type": "i3c"
       },
-      "addr": "0x55",
+      "addr": "0x50",
+      "args": "0x22"
+    },
+    {
+      "description": "CPU1_DIMM_G1",
+      "device_type_id": 103,
+      "bus": 3,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x51",
+      "args": "0x23"
+    },
+    {
+      "description": "CPU1_DIMM_H0",
+      "device_type_id": 103,
+      "bus": 3,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x52",
+      "args": "0x24"
+    },
+    {
+      "description": "CPU1_DIMM_H1",
+      "device_type_id": 103,
+      "bus": 3,
+      "master": {
+        "i2c_type": "i3c"
+      },
+      "addr": "0x53",
       "args": "0x25"
     },
     {
