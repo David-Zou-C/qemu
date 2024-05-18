@@ -266,54 +266,90 @@ int write_SMBusEmptyDevice2(unsigned char *buf, unsigned char len, PTR_SMBUS_DEV
     return 0;
 }
 
-/**************************************** SMBusEmptyDevice3 ****************************************/
-void init_SMBusEmptyDevice3(PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
-    PTR_SMBUS_DIMM_TMP_sTYPE ptrSmbusDimmTmpSType;
-    if (ptrSmbusDeviceData->data_buf == NULL) {
-        ptrSmbusDeviceData->data_buf = (uint8_t *) malloc(sizeof(SMBUS_DIMM_TMP_sTYPE));
-        memset(ptrSmbusDeviceData->data_buf, 0, sizeof(SMBUS_DIMM_TMP_sTYPE));
-        ptrSmbusDimmTmpSType = (PTR_SMBUS_DIMM_TMP_sTYPE) ptrSmbusDeviceData->data_buf;
-        /* 第一次创建，需要初始化互斥锁 */
-        pthread_mutex_init(&ptrSmbusDimmTmpSType->mutex, NULL);
-        ptrSmbusDimmTmpSType->device_index = get_device_index(ptrSmbusDeviceData);
+static double SMBusDevice_get_rpm_from_duty(float duty)
+{
+    double max_rpm = 0x4268;
+    double min_rpm = 0x708;
+    double min_offset = (0x64 % 1001) / 1000.0;
+    double max_offset = (0x3e8 % 1001) / 1000.0;
+    int rand_deviation_rate = 0x05;
+    double ret = 0;
+
+    if (duty <= min_offset) {
+        ret = min_rpm;
     } else {
-        /* 初始值 */
-        ptrSmbusDimmTmpSType = (PTR_SMBUS_DIMM_TMP_sTYPE) ptrSmbusDeviceData->data_buf;
+        ret = min_rpm +
+              (duty - min_offset) / (max_offset - min_offset) *
+              (max_rpm - min_rpm);
+    }
+    if (rand_deviation_rate > 0 && rand_deviation_rate < 100) {
+        double a = rand() % (rand_deviation_rate * 2 * 100) / 100.0;
+        ret = ret * (1 - rand_deviation_rate/100.0 + a/100.0);
+    }
+    return ret;
+}
+
+/**************************************** SMBusEmptyDevice3 ****************************************/
+/* 风扇板CPLD专用 */
+void init_SMBusEmptyDevice3(PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
+    PTR_SMBUS_EEPROM_sTYPE ptrSmbusEepromSType;
+    /* 先判断 data_buf 似乎为 NULL */
+    if (ptrSmbusDeviceData->data_buf == NULL) {
+        /* 为 NULL，表示未曾初始化过 */
+        ptrSmbusDeviceData->data_buf = (uint8_t *) malloc(sizeof(SMBUS_EEPROM_sTYPE));
+        memset(ptrSmbusDeviceData->data_buf, 0, sizeof(SMBUS_EEPROM_sTYPE));
+        ptrSmbusEepromSType = (PTR_SMBUS_EEPROM_sTYPE) ptrSmbusDeviceData->data_buf;
+        /* 如果是第一次创建，则需要进行互斥锁的初始化操作 */
+        pthread_mutex_init(&ptrSmbusEepromSType->mutex, NULL);
+        /* 获取 device_index */
+        ptrSmbusEepromSType->device_index = get_device_index(ptrSmbusDeviceData);
+    } else {
+        ptrSmbusEepromSType = (PTR_SMBUS_EEPROM_sTYPE) ptrSmbusDeviceData->data_buf;
     }
 
-    /* 根据参数修改数据 */
-    dynamic_change_data(SMBUS_DIMM_TEMP, ptrSmbusDeviceData, ptrSmbusDeviceData->ptrDeviceConfig->args);
-    ptrSmbusDimmTmpSType->offset = 0;
+    /* 1. buf 全部置为 0xff，offset置0 */
+    for (int i = 0; i < SMBUS_EEPROM_BUF_SIZE; ++i) {
+        ptrSmbusEepromSType->buf[i] = 0xff;
+    }
+    ptrSmbusEepromSType->offset = 0;
+
+
+    /* 2. 解析 args 的第一个十六进制数 - 赋值方式 （SMBUS上的EEPROM不需指定大小） */
+
+    dynamic_change_data(SMBUS_EEPROM_S, ptrSmbusDeviceData, ptrSmbusDeviceData->ptrDeviceConfig->args);
 
 }
 
 uint8_t receive_SMBusEmptyDevice3(PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
-    uint8_t ret;
-    PTR_SMBUS_DIMM_TMP_sTYPE ptrSmbusDimmTmpSType = (PTR_SMBUS_DIMM_TMP_sTYPE) ptrSmbusDeviceData->data_buf;
+    PTR_SMBUS_EEPROM_sTYPE ptrSmbusEepromSType = (PTR_SMBUS_EEPROM_sTYPE) ptrSmbusDeviceData->data_buf;
+    /* 逻辑处理前，先获取锁 */
+    ptrSmbusEepromSType->receive_times++;
+    uint8_t res = ptrSmbusEepromSType->buf[ptrSmbusEepromSType->offset++];
 
-    ptrSmbusDimmTmpSType->receive_times ++;
-    if (ptrSmbusDimmTmpSType->offset == 0) {
-        ptrSmbusDimmTmpSType->offset = 1;
-        ret = ptrSmbusDimmTmpSType->temperature >> 4;
-        return ret;
-    } else if (ptrSmbusDimmTmpSType->offset == 1) {
-        ptrSmbusDimmTmpSType->offset = 0;
-        ret = ptrSmbusDimmTmpSType->temperature << 4;
-        return ret;
-    } else {
-        ptrSmbusDimmTmpSType->offset = 0;
-        ret = ptrSmbusDimmTmpSType->temperature >> 4;
-        return ret;
-    }
-    return 0;
+    return res;
 }
 
 int write_SMBusEmptyDevice3(unsigned char *buf, unsigned char len, PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
-    PTR_SMBUS_DIMM_TMP_sTYPE ptrSmbusDimmTmpSType = (PTR_SMBUS_DIMM_TMP_sTYPE) ptrSmbusDeviceData->data_buf;
+    PTR_SMBUS_EEPROM_sTYPE ptrSmbusEepromSType = (PTR_SMBUS_EEPROM_sTYPE) ptrSmbusDeviceData->data_buf;
+    uint8_t fanNo;
+    uint16_t rpm;
+    /* 逻辑处理前，先获取锁 */
 
-    ptrSmbusDimmTmpSType->write_times ++;
-    /* 有写操作，直接重置 offset */
-    ptrSmbusDimmTmpSType->offset = 0;
+    ptrSmbusEepromSType->write_times++;
+    ptrSmbusEepromSType->offset = buf[0];
+    uint8_t addr = ptrSmbusEepromSType->offset;
+    buf++; /* 第一个是地址，先排除 */
+    len--; /* 第一个是地址，先排除 */
+    for (; len > 0; len--) {
+        ptrSmbusEepromSType->buf[ptrSmbusEepromSType->offset++] = *buf++;
+    }
+
+    if ((addr >= 0x10) && (addr <= 0x19)){
+        fanNo = addr & 0x0F;
+        rpm = (uint16_t)SMBusDevice_get_rpm_from_duty(ptrSmbusEepromSType->buf[addr]);
+        ptrSmbusEepromSType->buf[0x30 + fanNo * 2] = (uint8_t)rpm;
+        ptrSmbusEepromSType->buf[0x31 + fanNo * 2] = (uint8_t)(rpm >> 8);
+    }
 
     return 0;
 }
