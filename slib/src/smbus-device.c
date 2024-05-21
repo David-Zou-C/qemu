@@ -77,22 +77,18 @@ int write_SMBusEmptyDevice0(unsigned char *buf, unsigned char len, PTR_SMBUS_DEV
     ptrSmbusEepromSType->write_times++;
     ptrSmbusEepromSType->offset = buf[0];
     uint8_t addr = ptrSmbusEepromSType->offset;
-    printf("-------write_SMBusEmptyDevice0 offset:0x%x\n", addr);
     buf++; /* 第一个是地址，先排除 */
-    printf("-------write_SMBusEmptyDevice0 data:0x%x\n", *buf);
     len--; /* 第一个是地址，先排除 */
     for (; len > 0; len--) {
         ptrSmbusEepromSType->buf[ptrSmbusEepromSType->offset++] = *buf++;
     }
     
-    printf("-------write_SMBusEmptyDevice0 device name:%s\n", ptrSmbusDeviceData->ptrDeviceConfig->name);
     if (strncmp(ptrSmbusDeviceData->ptrDeviceConfig->name, "FAN CPLD", 8) == 0){
         if ((addr >= 0x10) && (addr <= 0x19)){
             fanNo = addr & 0x0F;
             rpm = (uint16_t)SMBusDevice_get_rpm_from_duty(ptrSmbusEepromSType->buf[addr]);
             ptrSmbusEepromSType->buf[0x30 + fanNo * 2] = (uint8_t)rpm;
             ptrSmbusEepromSType->buf[0x31 + fanNo * 2] = (uint8_t)(rpm >> 8);
-            printf("-------write_SMBusEmptyDevice0 fan rpm:0x%x\n", rpm);
         }
     }
 
