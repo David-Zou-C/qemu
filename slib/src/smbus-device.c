@@ -301,59 +301,14 @@ static double SMBusDevice_get_rpm_from_duty(float duty)
 }
 
 /**************************************** SMBusEmptyDevice3 ****************************************/
-/* 风扇板CPLD专用 */
 void init_SMBusEmptyDevice3(PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
-    PTR_SMBUS_EEPROM_sTYPE ptrSmbusEepromSType;
-    /* 先判断 data_buf 似乎为 NULL */
-    if (ptrSmbusDeviceData->data_buf == NULL) {
-        /* 为 NULL，表示未曾初始化过 */
-        ptrSmbusDeviceData->data_buf = (uint8_t *) malloc(sizeof(SMBUS_EEPROM_sTYPE));
-        memset(ptrSmbusDeviceData->data_buf, 0, sizeof(SMBUS_EEPROM_sTYPE));
-        ptrSmbusEepromSType = (PTR_SMBUS_EEPROM_sTYPE) ptrSmbusDeviceData->data_buf;
-        /* 如果是第一次创建，则需要进行互斥锁的初始化操作 */
-        pthread_mutex_init(&ptrSmbusEepromSType->mutex, NULL);
-        /* 获取 device_index */
-        ptrSmbusEepromSType->device_index = get_device_index(ptrSmbusDeviceData);
-    } else {
-        ptrSmbusEepromSType = (PTR_SMBUS_EEPROM_sTYPE) ptrSmbusDeviceData->data_buf;
-    }
-
-    /* 1. buf 全部置为 0xff，offset置0 */
-    for (int i = 0; i < SMBUS_EEPROM_BUF_SIZE; ++i) {
-        ptrSmbusEepromSType->buf[i] = 0xff;
-    }
-    ptrSmbusEepromSType->offset = 0;
-
-
-    /* 2. 解析 args 的第一个十六进制数 - 赋值方式 （SMBUS上的EEPROM不需指定大小） */
-
-    dynamic_change_data(SMBUS_EEPROM_S, ptrSmbusDeviceData, ptrSmbusDeviceData->ptrDeviceConfig->args);
-
 }
 
 uint8_t receive_SMBusEmptyDevice3(PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
-    PTR_SMBUS_EEPROM_sTYPE ptrSmbusEepromSType = (PTR_SMBUS_EEPROM_sTYPE) ptrSmbusDeviceData->data_buf;
-    /* 逻辑处理前，先获取锁 */
-    ptrSmbusEepromSType->receive_times++;
-    uint8_t res = ptrSmbusEepromSType->buf[ptrSmbusEepromSType->offset++];
-
-    return res;
+    return 0;
 }
 
 int write_SMBusEmptyDevice3(unsigned char *buf, unsigned char len, PTR_SMBUS_DEVICE_DATA ptrSmbusDeviceData) {
-    PTR_SMBUS_EEPROM_sTYPE ptrSmbusEepromSType = (PTR_SMBUS_EEPROM_sTYPE) ptrSmbusDeviceData->data_buf;
-
-    /* 逻辑处理前，先获取锁 */
-
-    ptrSmbusEepromSType->write_times++;
-    ptrSmbusEepromSType->offset = buf[0];
-    uint8_t addr = ptrSmbusEepromSType->offset;
-    buf++; /* 第一个是地址，先排除 */
-    len--; /* 第一个是地址，先排除 */
-    for (; len > 0; len--) {
-        ptrSmbusEepromSType->buf[ptrSmbusEepromSType->offset++] = *buf++;
-    }
-
     return 0;
 }
 
