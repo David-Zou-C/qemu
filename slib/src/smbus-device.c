@@ -8,6 +8,28 @@
 #include <pthread.h>
 #include "smbus-device.h"
 
+static double SMBusDevice_get_rpm_from_duty(float duty)
+{
+    double max_rpm = 0x4268;
+    double min_rpm = 0x708;
+    double min_offset = (0x64 % 1001) / 1000.0;
+    double max_offset = (0x3e8 % 1001) / 1000.0;
+    int rand_deviation_rate = 0x05;
+    double ret = 0;
+
+    if (duty <= min_offset) {
+        ret = min_rpm;
+    } else {
+        ret = min_rpm +
+              (duty - min_offset) / (max_offset - min_offset) *
+              (max_rpm - min_rpm);
+    }
+    if (rand_deviation_rate > 0 && rand_deviation_rate < 100) {
+        double a = rand() % (rand_deviation_rate * 2 * 100) / 100.0;
+        ret = ret * (1 - rand_deviation_rate/100.0 + a/100.0);
+    }
+    return ret;
+}
 
 /**************************************** SMBusEmptyDevice0 ****************************************/
 
@@ -275,29 +297,6 @@ int write_SMBusEmptyDevice2(unsigned char *buf, unsigned char len, PTR_SMBUS_DEV
     }
     
     return 0;
-}
-
-static double SMBusDevice_get_rpm_from_duty(float duty)
-{
-    double max_rpm = 0x4268;
-    double min_rpm = 0x708;
-    double min_offset = (0x64 % 1001) / 1000.0;
-    double max_offset = (0x3e8 % 1001) / 1000.0;
-    int rand_deviation_rate = 0x05;
-    double ret = 0;
-
-    if (duty <= min_offset) {
-        ret = min_rpm;
-    } else {
-        ret = min_rpm +
-              (duty - min_offset) / (max_offset - min_offset) *
-              (max_rpm - min_rpm);
-    }
-    if (rand_deviation_rate > 0 && rand_deviation_rate < 100) {
-        double a = rand() % (rand_deviation_rate * 2 * 100) / 100.0;
-        ret = ret * (1 - rand_deviation_rate/100.0 + a/100.0);
-    }
-    return ret;
 }
 
 /**************************************** SMBusEmptyDevice3 ****************************************/
