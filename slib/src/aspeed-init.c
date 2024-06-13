@@ -23,13 +23,13 @@ MAC_DEVICE_INFO macDeviceInfo[MAC_DEVICE_INFO_MAX_NUM] = {
             .macApplyMethod = 1,
             .deviceTypeId = I2C_EEPROM,
             .i2c_bus = 5,
-            .i2c_addr = 0x50,
-            .mac_value_for_offset[0] = 0x0f00,
-            .mac_value_for_offset[1] = 0x0f01,
-            .mac_value_for_offset[2] = 0x0f02,
-            .mac_value_for_offset[3] = 0x0f03,
-            .mac_value_for_offset[4] = 0x0f04,
-            .mac_value_for_offset[5] = 0x0f05
+            .i2c_addr = 0x57,
+            .mac_value_for_offset[0] = 0x00,
+            .mac_value_for_offset[1] = 0x01,
+            .mac_value_for_offset[2] = 0x02,
+            .mac_value_for_offset[3] = 0x03,
+            .mac_value_for_offset[4] = 0x04,
+            .mac_value_for_offset[5] = 0x05
         },
         { /* end of list */ }
 };
